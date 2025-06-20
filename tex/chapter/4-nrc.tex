@@ -12,6 +12,10 @@
 
 \section{Collecting Training Data}
 
+To store the training data we use a fixed-size ring buffer with an atomic counter to ensure thread safety.
+This is not ideal, as it may lead to serialization of the GPU threads and thus potentially introduces a performance bottleneck, but it allows us to write dynamic amounts of data per thread.
+Further research could be done to find a more efficient way to store the training data, for example using warp aggregation and compaction, but this is not straightforward as OptiX does not expose shared memory to allow for Shader Execution Reordering.
+
 \section{Reflectance Factorization}
 
 \section{Self-Learning}
