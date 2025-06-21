@@ -1,2 +1,10 @@
 OptiX
 Sobol
+Cranley-Patterson
+Pathtracer
+integrand
+cuRAND
+conformant
+glTF
+decorrelated
+pathtracing

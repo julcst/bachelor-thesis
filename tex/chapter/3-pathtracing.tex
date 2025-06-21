@@ -8,7 +8,7 @@ As always in rendering, we are interested in solving the rendering equation, whi
 The rendering equation is given by:
 
 \begin{equation}
-    L_o(\vec{x}, \vec{\omega}_o) = L_e(\vec{x}, \vec{\omega}_o) + \int_{\Omega} f(\vec{\omega}_i, \vec{x}, \vec{\omega}_o) L_i(\vec{x}, \vec{\omega}_i) \cos(\theta_i) d\vec{\omega}_i
+    L_o(\vec{x}, \vec{\omega}_o) = L_e(\vec{x}, \vec{\omega}_o) + \int_{\Omega} f(\vec{\omega}_i, \vec{x}, \vec{\omega}_o) L_i(\vec{x}, \vec{\omega}_i) \cos(\theta_i) \diff\vec{\omega}_i
 \end{equation}
 
 where $L_o$ is the outgoing radiance, $L_e$ is the emitted radiance, $f$ is the bidirectional reflectance distribution function (BRDF), and $L_i$ is the incoming radiance from direction $\omega_i$.
@@ -24,38 +24,55 @@ The idea is, to sample the integral using random samples drawn from a probabilit
 Applying this to the rendering equation, we can formulate an estimator for the outgoing radiance $L_o$:
 
 \begin{equation}
-    \estimator{L_o(\vec{x}, \vec{\omega}_o)} = L_e(\vec{x}, \vec{\omega}_o) + \sum_{i=1}^{N} \frac{f(\vec{\hat{\omega}}_i, \vec{x}, \vec{\omega}_o) \cos(\hat{\theta}_i)}{p(\vec{\hat{\omega}}_i)} L_i(\vec{x}, \vec{\hat{\omega}}_i), \quad \vec{\hat{\omega}}_i \sim p
+    \estimator{L_o(\vec{x}, \vec{\omega}_o)} = L_e(\vec{x}, \vec{\omega}_o) + \frac{1}{N} \sum_{i=1}^{N} \frac{f(\vec{\hat{\omega}}_i, \vec{x}, \vec{\omega}_o) \cos(\hat{\theta}_i)}{p(\vec{\hat{\omega}}_i)} L_i(\vec{x}, \vec{\hat{\omega}}_i), \quad \vec{\hat{\omega}}_i \sim p
 \end{equation}
 
 This is an unbiased estimator for the rendering equation, as can be easily shown:
 
 \begin{equation}
-    \expectation{\estimator{L_o(\vec{x}, \vec{\omega}_o)}} = L_e(\vec{x}, \vec{\omega}_o) + \sum_{i=1}^{N} \frac{f(\vec{\hat{\omega}}_i, \vec{x}, \vec{\omega}_o) \cos(\hat{\theta}_i) p(\vec{\hat{\omega}}_i)}{p(\vec{\hat{\omega}}_i)} L_i(\vec{x}, \vec{\hat{\omega}}_i) = L_o(\vec{x}, \vec{\omega}_o)
+\begin{aligned}
+    \expectation{\estimator{L_o(\vec{x}, \vec{\omega}_o)}}
+    &= L_e(\vec{x}, \vec{\omega}_o) + \cancel{\frac{1}{N}} \cancel{\sum_{i=1}^{N}} \expectationvar{\vec{\hat{\omega}}_i \sim p}{\frac{f(\vec{\hat{\omega}}_i, \vec{x}, \vec{\omega}_o) \cos(\hat{\theta}_i)}{p(\vec{\hat{\omega}}_i)} L_i(\vec{x}, \vec{\hat{\omega}}_i)} \\
+    &= L_e(\vec{x}, \vec{\omega}_o) + \int_{\Omega} \frac{f(\vec{\hat{\omega}}_i, \vec{x}, \vec{\omega}_o) \cos(\hat{\theta}_i) \cancel{p(\vec{\hat{\omega}}_i)}}{\cancel{p(\vec{\hat{\omega}}_i)}} L_i(\vec{x}, \vec{\hat{\omega}}_i) \diff\vec{\omega}_i \\
+    &= L_o(\vec{x}, \vec{\omega}_o)
+\end{aligned}
 \end{equation}
 
-To handle the infinite recursion without introducing bias, I use Russian roulette termination \bcite{veach1997}, which probabilistically terminates the recursion based on the contribution of the current path segment:
+Hence, by the law of large numbers this estimator converges to the correct solution of the rendering equation for $N \to \infty$.
+
+To handle the infinite recursion without introducing bias, I use Russian roulette termination as motivated by \textcite{veach1997}, which probabilistically terminates the recursion based on the contribution of the current path segment:
 
 \begin{equation}
-    X =
+    \estimator{I} =
     \begin{cases}
-        \frac{L_o(\vec{x}, \vec{\omega}_o)}{p_\mathrm{continue}} & \text{with probability } p_\mathrm{continue} \\
+        \frac{\estimator{L_o(\vec{x}, \vec{\omega}_o)}}{p_\mathrm{continue}} & \text{with probability } p_\mathrm{continue} \\
         0 & \text{with probability } 1 - p_\mathrm{continue}
     \end{cases}
 \end{equation}
 
-I choose $p_\mathrm{continue}$ proportional to the relative luminance $Y$ of the contribution of the current path segment, which measures the perceived linear brightness.
+The probability terms cancel out, hence this modification to the estimator does not introduce bias.
+I choose $p_\mathrm{continue}$ proportional to the relative luminance $Y$ of the contribution of the current path segment, which measures the perceived linear brightness of that sample \bcite{kirkpatrick2025}.
 
-% Thus, the radiance of a complete path is calculated as:
+% With this and by introducing a visibility term $V$, we can express the collected radiance along a path in an unbiased manner:
 
 % \begin{equation}
-%     L_o(\vec{x}, \vec{\omega}_o) = \frac{1}{N} \sum_{i=1}^{N} X_i
+%     L_o(\vec{x_0}, \vec{\omega}_o^0) = \frac{1}{N} \sum_{i=1}^{N} X_i
 % \end{equation}
 
 \section{Randomized Quasi-Monte Carlo Integration}
 
+To improve the convergence of the Monte Carlo integration, low-discrepancy sequences can be used instead of purely random samples.
+Low-discrepancy sequence are designed to fill the integration domain more uniformly than random samples, which can lead to a lower variance in the estimator.
+This approach is called Quasi-Monte Carlo integration and was first introduced to rendering by \textcite{heinrich1994a}.
+\textcite{keller1996a} later showed faster convergence of Quasi-Monte Carlo integration compared to random Monte Carlo integration in exemplary pathtracing scenarios.
+
+Carefully introducing randomness to the low-discrepancy sequence can help to improve convergence further and mitigate visible artifacts caused by the deterministic nature of such sequences.
+This is known as Randomized Quasi-Monte Carlo integration and was first introduced by \textcite{owen1995}.
+For a practical application to pathtracing see for example \textcite{burley2020}.
+
 I use the scrambled Sobol' sequence from cuRAND \bcite{nvidiacorporation2024} which is based on the work of \textcite{owen2008}.
 Furthermore, I employ the same technique as the \textcite{blenderfoundation} and only precompute a single Sobol' sequence for the entire scene, which is then decorrelated between pixels using constant random per-pixel shifts modulo 1, also known as Cranley-Patterson rotations \bcite{cranley1976}.
-The Sobol' sequence is regularly recomputed in batches on the GPU to allow for unlimited progressive rendering, the per pixel  shifts are only recomputed on frame buffer resize, which makes the technique relatively lightweight.
+The Sobol' sequence is regularly recomputed in batches on the GPU to allow for unlimited progressive rendering, the per pixel shifts are only recomputed on frame buffer resize, which makes the technique relatively lightweight.
 
 \section{Principled BRDF}
 
