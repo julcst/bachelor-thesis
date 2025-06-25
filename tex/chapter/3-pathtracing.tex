@@ -8,7 +8,7 @@ As always in rendering, we are interested in solving the rendering equation, whi
 The rendering equation is given by:
 
 \begin{equation}
-    L_o(\vec{x}, \vec{\omega}_o) = L_e(\vec{x}, \vec{\omega}_o) + \int_{\Omega} f(\vec{\omega}_i, \vec{x}, \vec{\omega}_o) L_i(\vec{x}, \vec{\omega}_i) \cos(\theta_i) \diff\vec{\omega}_i
+    L_o(\vec{x}, \wo) = L_e(\vec{x}, \wo) + \int_{\Omega} f(\wi, \vec{x}, \wo) L_i(\vec{x}, \wi) \cos(\theta_i) \diff\wi
 \end{equation}
 
 where $L_o$ is the outgoing radiance, $L_e$ is the emitted radiance, $f$ is the bidirectional reflectance distribution function (BRDF), and $L_i$ is the incoming radiance from direction $\omega_i$.
@@ -24,28 +24,28 @@ The idea is, to sample the integral using random samples drawn from a probabilit
 Applying this to the rendering equation, we can formulate an estimator for the outgoing radiance $L_o$:
 
 \begin{equation}
-    \estimator{L_o(\vec{x}, \vec{\omega}_o)} = L_e(\vec{x}, \vec{\omega}_o) + \frac{1}{N} \sum_{i=1}^{N} \frac{f(\vec{\hat{\omega}}_i, \vec{x}, \vec{\omega}_o) \cos(\hat{\theta}_i)}{p(\vec{\hat{\omega}}_i)} L_i(\vec{x}, \vec{\hat{\omega}}_i), \quad \vec{\hat{\omega}}_i \sim p
+    \estimator{L_o(\vec{x}, \wo)} = L_e(\vec{x}, \wo) + \frac{1}{N} \sum_{i=1}^{N} \frac{f(\vec{\hat{\omega}}_i, \vec{x}, \wo) \cos(\hat{\theta}_i)}{p(\vec{\hat{\omega}}_i)} L_i(\vec{x}, \vec{\hat{\omega}}_i), \quad \vec{\hat{\omega}}_i \sim p
 \end{equation}
 
 This is an unbiased estimator for the rendering equation, as can be easily shown:
 
 \begin{equation}
 \begin{aligned}
-    \expectation{\estimator{L_o(\vec{x}, \vec{\omega}_o)}}
-    &= L_e(\vec{x}, \vec{\omega}_o) + \cancel{\frac{1}{N}} \cancel{\sum_{i=1}^{N}} \expectationvar{\vec{\hat{\omega}}_i \sim p}{\frac{f(\vec{\hat{\omega}}_i, \vec{x}, \vec{\omega}_o) \cos(\hat{\theta}_i)}{p(\vec{\hat{\omega}}_i)} L_i(\vec{x}, \vec{\hat{\omega}}_i)} \\
-    &= L_e(\vec{x}, \vec{\omega}_o) + \int_{\Omega} \frac{f(\vec{\hat{\omega}}_i, \vec{x}, \vec{\omega}_o) \cos(\hat{\theta}_i) \cancel{p(\vec{\hat{\omega}}_i)}}{\cancel{p(\vec{\hat{\omega}}_i)}} L_i(\vec{x}, \vec{\hat{\omega}}_i) \diff\vec{\omega}_i \\
-    &= L_o(\vec{x}, \vec{\omega}_o)
+    \expectation{\estimator{L_o(\vec{x}, \wo)}}
+    &= L_e(\vec{x}, \wo) + \cancel{\frac{1}{N}} \cancel{\sum_{i=1}^{N}} \expectationvar{\vec{\hat{\omega}}_i \sim p}{\frac{f(\vec{\hat{\omega}}_i, \vec{x}, \wo) \cos(\hat{\theta}_i)}{p(\vec{\hat{\omega}}_i)} L_i(\vec{x}, \vec{\hat{\omega}}_i)} \\
+    &= L_e(\vec{x}, \wo) + \int_{\Omega} \frac{f(\vec{\hat{\omega}}_i, \vec{x}, \wo) \cos(\hat{\theta}_i) \cancel{p(\vec{\hat{\omega}}_i)}}{\cancel{p(\vec{\hat{\omega}}_i)}} L_i(\vec{x}, \vec{\hat{\omega}}_i) \diff\wi \\
+    &= L_o(\vec{x}, \wo)
 \end{aligned}
 \end{equation}
 
-Hence, by the law of large numbers this estimator converges to the correct solution of the rendering equation for $N \to \infty$.
+Hence, by the law of large numbers this estimator converges to the true solution to the rendering equation for $N \to \infty$.
 
 To handle the infinite recursion without introducing bias, I use Russian roulette termination as motivated by \textcite{veach1997}, which probabilistically terminates the recursion based on the contribution of the current path segment:
 
 \begin{equation}
     \estimator{I} =
     \begin{cases}
-        \frac{\estimator{L_o(\vec{x}, \vec{\omega}_o)}}{p_\mathrm{continue}} & \text{with probability } p_\mathrm{continue} \\
+        \frac{\estimator{L_o(\vec{x}, \wo)}}{p_\mathrm{continue}} & \text{with probability } p_\mathrm{continue} \\
         0 & \text{with probability } 1 - p_\mathrm{continue}
     \end{cases}
 \end{equation}
@@ -53,10 +53,10 @@ To handle the infinite recursion without introducing bias, I use Russian roulett
 The probability terms cancel out, hence this modification to the estimator does not introduce bias.
 I choose $p_\mathrm{continue}$ proportional to the relative luminance $Y$ \bcite{kirkpatrick2025} of the contribution of the current path segment, which measures the perceived linear brightness of that sample.
 
-% With this and by introducing a visibility term $V$, we can express the collected radiance along a path in an unbiased manner:
+% With this and by introducing a visibility term $V$, we can express the collected radiance along a complete path in an unbiased manner:
 
 % \begin{equation}
-%     L_o(\vec{x_0}, \vec{\omega}_o^0) = \frac{1}{N} \sum_{i=1}^{N} X_i
+%     L_o(\vec{x_0}, \wo^0) = \frac{1}{N} \sum_{i=1}^{N} X_i
 % \end{equation}
 
 \section{Randomized Quasi-Monte Carlo Integration}
@@ -78,6 +78,89 @@ The Sobol' sequence is regularly recomputed in batches on the GPU to allow for u
 
 As a material model I use a simplified physically based model, which is inspired by the Disney principled BRDF \bcite{burley2012} and conformant with the glTF PBR specification \bcite{thekhronosr3dformatsworkinggroup2021}.
 I restrict myself to the diffuse, specular and transmission components, as they can already cover a wide range of interesting materials and suffice to showcase the strengths and weaknesses of the subsequent techniques.
+
+The BRDF is split into two parts: If the light direction $\wi$ and the view direction $\wo$ lie in the same hemisphere, the BRDF is composed of a diffuse and a specular component, otherwise it consists only of a transmission component:
+
+\begin{equation}
+    f(\wi, \vec{x}, \wo) =
+    \begin{cases}
+        f_s(\wi, \vec{x}, \wo) + f_d(\wi, \vec{x}, \wo) & \text{if } \NdotL \cdot \NdotV > 0 \\
+        f_t(\wi, \vec{x}, \wo) & \text{otherwise}
+    \end{cases}
+\end{equation}
+
+For the specular component, I use the Torrance-Sparrow/Cook-Torrance microfacet model \bcite{torrance1967, cook1982}:
+
+\begin{equation}
+    f_s(\wi, \vec{x}, \wo) = \frac{D(\NdotH) G(\n, \wi, \wo) F(\LdotH)}{4 \NdotL \NdotV}
+\end{equation}
+
+where $D$ is the isotropic Trowbridge-Reitz normal distribution function (NDF) originally defined by \textcite{trowbridge1975} and later rediscovered by \textcite{walter2007}:
+
+\begin{equation}
+    D(\NdotH) = \frac{\alpha^2}{\pi (\alpha^2 \cos^2 \theta_m + \sin^2 \theta_m)^2}
+\end{equation}
+
+Here, $\alpha$ is the width of the microfacet distribution, which is related to the roughness of the surface.
+$\wm$ is the normal of an ideally reflecting microfacet:
+
+\begin{equation}
+    \wm = \frac{\wi + \wo}{\|\wi + \wo\|}
+\end{equation}
+
+$G$ is the corresponding geometric attenuation term, for which I use the Smith shadowing-masking function \bcite{smith1967}, derived for the Trowbridge-Reitz NDF by \textcite{walter2007}:
+
+\begin{equation}
+    \begin{aligned}
+    G(\n, \wi, \wo) &= \frac{1}{1 + \Lambda(\NdotL) + \Lambda(\NdotV)}\\
+    \quad \text{with } \quad
+    \Lambda(\NdotX) &= \frac{1}{2} \left( \sqrt{1 + \alpha^2 \mathrm{tan}^2 \theta} - 1 \right)
+    \end{aligned}
+\end{equation}
+
+For the Fresnel term $F$, I use the Schlick approximation \bcite{schlick1994}:
+
+\begin{equation}
+    F(\LdotH) = F_0 + (1 - F_0) (1 - \LdotH)^5
+\end{equation}
+
+In the case of transmission, the normal of the ideally refracting microfacet is given by:
+
+\begin{equation}
+    \wm = \frac{\eta \wi + \wo}{\|\eta \wi + \wo\|}
+\end{equation}
+
+where $\eta = \frac{\eta_i}{\eta_o}$ is the relative index of refraction (IOR).
+The transmission component is then given by:
+
+\begin{equation}
+    f_t(\wi, \vec{x}, \wo) = \rho_t \frac{D(\NdotH) G(\n, \wi, \wo) (1 - F(\LdotH))}{(\LdotH + \VdotH / \eta)^2} \left|\frac{\LdotH \VdotH}{\NdotL \NdotL}\right|
+\end{equation}
+
+For the diffuse component, I simply use the Lambertian reflectance model:
+
+\begin{equation}
+    f_d(\wi, \vec{x}, \wo) = \frac{\rho_d}{\pi}
+\end{equation}
+
+Several other, more physically accurate, models have been proposed for the diffuse component, such as the microfacet-based Oren-Nayar reflectance model \bcite{oren1994} or the heuristic model from \textcite{burley2012}.
+The Oren-Nayar model is rather computational expensive and not fully energy conserving, although these deficiencies can be mostly overcome by the improvements made by \textcite{fujii}.
+Burley's model suffers also from energy conservation issues, but renormalized versions exist \bcite{lagarde2014}.
+However, the Lambertian model has the nice property of being constant over the hemisphere, which can be advantageous for caching.
+
+To parameterize the BRDF, I use a base color $\vec{c} \in [0, 1]^3$, a metallic factor $m \in [0, 1]$, a roughness factor $r \in [0, 1]$ and a transmission factor $t \in [0, 1]$, as follows:
+
+\begin{equation}
+    \begin{aligned}
+        \alpha &= r^2 \\
+        \rho_d &= (1 - m) \cdot (1 - t) \cdot \vec{c} \\
+        \rho_t &= (1 - m) \cdot t \cdot \vec{c} \\
+        F_0 &= 0.04 \cdot (1 - m) + \vec{c} \cdot m \\
+    \end{aligned}
+\end{equation}
+
+Here, I assume the IOR of the surface to be $1.5$, which results in a specular reflectance at normal incidence of $F_0 = 0.04$.
+For metals, the base color $\vec{c}$ is used directly as the $F_0$ to simulate wavelength dependent complex-valued IOR.
 
 \section{Importance Sampling}
 

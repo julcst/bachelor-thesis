@@ -8,3 +8,10 @@ conformant
 glTF
 decorrelated
 pathtracing
+microfacet
+Trowbridge-Reitz
+Stamm
+microfacet-based
+Lambertian
+Oren-Nayar
+Schlick
