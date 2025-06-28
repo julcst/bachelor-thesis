@@ -1,0 +1,1 @@
+{"rule":"COMMA_COMPOUND_SENTENCE","sentence":"^\\QAdditionally, they omit biases because they did not observe a benefit and it simplifies the implementation.\\E$"}

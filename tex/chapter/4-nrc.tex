@@ -2,7 +2,23 @@
 \chapter{Neural Radiance Caching}
 \label{chap:nrc}
 
+A weak point of the reference Monte Carlo pathtracer motivated in \ref{chap:pathtracing} is, that we have to start from zero, every time the scene or camera changes.
+It would make sense to keep samples around that can be reused when similar paths occur in the evaluation of the global illumination integral.
+\textcite{muller2021} introduced Neural Radiance Caching (NRC) to address this problem.
+The idea is to train a neural network on collected radiance samples and use it to accumulate and interpolate these samples online.
+
 \section{Network Architecture}
+
+Because the network has to be trained and evaluated in real-time, \textcite{muller2021} propose to use a rather small hardware-accelerated network architecture.
+They use a fully connected network with 5 hidden layers, with 64 neurons and ReLU activation each.
+The output layer has 3 neurons, one for each color channel.
+Additionally, they omit biases as they did not observe a measurable benefit and it simplifies the implementation.
+
+To maximize the inference and training performance, \textcite{muller2021} introduce a fully fused implementation of the network, which fully utilizes shared memory and per-thread registers.
+For this, the whole network is implemented as a single CUDA kernel, with each block handling a batch of 128 64-dimensional input vectors and keeping the $64\times128$ activations in shared memory.
+Each block then consists of 4 warps, computing 16 neuron activations of the network each by applying a $16\times64$ matrix multiplication and the element-wise activation function.
+For this, the hardware accelerated $16\times16$ FP16 matrix multiplication instruction is used when available.
+With this hardware-optimized implementation, \textcite{muller2021} achieve a speedup of $5\times$ to $10\times$ compared to the widely used TensorFlow framework \bcite{tensorflow} on large batch sizes corresponding to HD resolution.
 
 \section{Input Encodings}
 
@@ -12,8 +28,8 @@
 
 \section{Collecting Training Data}
 
-To store the training data we use a fixed-size ring buffer with an atomic counter to ensure thread safety.
-This is not ideal, as it may lead to serialization of the GPU threads and thus potentially introduces a performance bottleneck, but it allows us to write dynamic amounts of data per thread.
+To store the training data I use a fixed-size ring buffer with an atomic counter to ensure thread safety.
+This is not ideal, as it may lead to serialization of the GPU threads and thus potentially introduces a performance bottleneck, but it allows me to write dynamic amounts of data per thread.
 Further research could be done to find a more efficient way to store the training data, for example using warp aggregation and compaction, but this is not straightforward as OptiX does not expose shared memory to allow for Shader Execution Reordering.
 
 \section{Reflectance Factorization}
@@ -22,4 +38,4 @@ Further research could be done to find a more efficient way to store the trainin
 
 \section{Inference Strategies}
 
-\section{Emission Separation}
+\section{Emission Factorization}

@@ -37,6 +37,14 @@
   file = {/Users/julianstamm/Zotero/storage/BYYX7CC2/Backward.pdf}
 }
 
+@article{barre-brisebois2017,
+  title = {A {{Certain Slant}} of {{Light}}: {{Past}}, {{Present}} and {{Future Challenges}} of {{Global Illumination}} in {{Games}}},
+  shorttitle = {A {{Certain Slant}} of {{Light}}},
+  author = {Barré-Brisebois, Colin},
+  date = {2017},
+  journaltitle = {Lecturer on SIGGRAPH}
+}
+
 @inproceedings{barron2021,
   title = {Mip-{{NeRF}}: {{A Multiscale Representation}} for {{Anti-Aliasing Neural Radiance Fields}}},
   shorttitle = {Mip-{{NeRF}}},
@@ -84,6 +92,40 @@
   organization = {A journey into rendering},
   keywords = {Important},
   file = {/Users/julianstamm/Zotero/storage/GL7VG6SL/vndf-importance-sampling-an-isotropic-distribution.html}
+}
+
+@inproceedings{binder2018,
+  title = {Fast Path Space Filtering by Jittered Spatial Hashing},
+  booktitle = {{{ACM SIGGRAPH}} 2018 {{Talks}}},
+  author = {Binder, Nikolaus and Fricke, Sascha and Keller, Alexander},
+  date = {2018-08-12},
+  series = {{{SIGGRAPH}} '18},
+  pages = {1--2},
+  publisher = {Association for Computing Machinery},
+  location = {New York, NY, USA},
+  doi = {10.1145/3214745.3214806},
+  url = {https://dl.acm.org/doi/10.1145/3214745.3214806},
+  urldate = {2025-06-27},
+  abstract = {Restricting path tracing to a small number of paths per pixel for performance reasons rarely achieves a satisfactory image quality for scenes of interest. However, path space filtering may dramatically improve the visual quality by sharing information across vertices of paths classified as "nearby". While thus contributions can be filtered in path space and beyond the first intersection, searching "nearby" paths is more expensive than filtering in screen space. We greatly improve over this performance penalty by storing and looking up the required information in a hash map using hash keys constructed from jittered and quantized information, such that only a single query may replace costly neighborhood searches.},
+  isbn = {978-1-4503-5820-0},
+  file = {/Users/julianstamm/Zotero/storage/B4U7KQ2G/Binder et al. - 2018 - Fast path space filtering by jittered spatial hashing.pdf}
+}
+
+@article{bitterli2020,
+  title = {Spatiotemporal Reservoir Resampling for Real-Time Ray Tracing with Dynamic Direct Lighting},
+  author = {Bitterli, Benedikt and Wyman, Chris and Pharr, Matt and Shirley, Peter and Lefohn, Aaron and Jarosz, Wojciech},
+  date = {2020-08-31},
+  journaltitle = {ACM Transactions on Graphics},
+  shortjournal = {ACM Trans. Graph.},
+  volume = {39},
+  number = {4},
+  issn = {0730-0301, 1557-7368},
+  doi = {10.1145/3386569.3392481},
+  url = {https://dl.acm.org/doi/10.1145/3386569.3392481},
+  urldate = {2025-06-25},
+  abstract = {Efficiently rendering direct lighting from millions of dynamic light sources using Monte Carlo integration remains a challenging problem, even for off-line rendering systems. We introduce a new algorithm---ReSTIR---that renders such lighting interactively, at high quality, and without needing to maintain complex data structures. We repeatedly resample a set of candidate light samples and apply further spatial and temporal resampling to leverage information from relevant nearby samples. We derive an unbiased Monte Carlo estimator for this approach, and show that it achieves equal-error 6×-60× faster than state-of-the-art methods. A biased estimator reduces noise further and is 35×-65× faster, at the cost of some energy loss. We implemented our approach on the GPU, rendering complex scenes containing up to 3.4 million dynamic, emissive triangles in under 50 ms per frame while tracing at most 8 rays per pixel.},
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/MF9HIG9S/Bitterli et al. - 2020 - Spatiotemporal reservoir resampling for real-time ray tracing with dynamic direct lighting.pdf;/Users/julianstamm/Zotero/storage/M8NBIH3M/restir.html}
 }
 
 @online{blenderfoundation,
@@ -383,20 +425,28 @@
   file = {/Users/julianstamm/Zotero/storage/MZXA4C7C/Georgiev et al. - 2012 - Light transport simulation with vertex connection and merging.pdf;/Users/julianstamm/Zotero/storage/35FI9KHH/VertexMerging.html}
 }
 
+@article{green,
+  title = {Spherical {{Harmonic Lighting}}: {{The Gritty Details}}},
+  author = {Green, Robin and Programmer, D},
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/U83XVBU4/Green and Programmer - Spherical Harmonic Lighting The Gritty Details.pdf}
+}
+
 @article{greger1998,
   title = {The Irradiance Volume},
-  author = {Greger, G. and Shirley, P. and Hubbard, P.M. and Greenberg, D.P.},
+  author = {Greger, Gene and Shirley, Peter and Hubbard, Philip M. and Greenberg, Donald P.},
   year = {March-April/1998},
   journaltitle = {IEEE Computer Graphics and Applications},
   shortjournal = {IEEE Comput. Grap. Appl.},
   volume = {18},
   number = {2},
   pages = {32--43},
+  publisher = {IEEE},
   issn = {02721716},
   doi = {10.1109/38.656788},
-  url = {http://ieeexplore.ieee.org/document/656788/},
-  urldate = {2025-04-22},
-  file = {/Users/julianstamm/Zotero/storage/JJEZB4CW/The irradiance volume.pdf;/Users/julianstamm/Zotero/storage/RFQNFDU2/mcg1998020032.pdf}
+  url = {https://ieeexplore.ieee.org/abstract/document/656788/},
+  urldate = {2025-06-27},
+  file = {/Users/julianstamm/Zotero/storage/JJEZB4CW/The irradiance volume.pdf;/Users/julianstamm/Zotero/storage/PWR638VQ/Greger et al. - 1998 - The irradiance volume.pdf;/Users/julianstamm/Zotero/storage/RFQNFDU2/mcg1998020032.pdf}
 }
 
 @article{gunther,
@@ -575,6 +625,22 @@
   abstract = {Learn about Shader Execution Reordering (SER), a performance optimization that unlocks the potential for better ray and memory coherency in ray tracing shaders.},
   langid = {american},
   organization = {NVIDIA Technical Blog}
+}
+
+@incollection{jensen1995,
+  title = {Importance {{Driven Path Tracing}} Using the {{Photon Map}}},
+  booktitle = {Rendering {{Techniques}} ’95},
+  author = {Jensen, Henrik Wann},
+  editor = {Hanrahan, Patrick M. and Purgathofer, Werner},
+  date = {1995},
+  pages = {326--335},
+  publisher = {Springer Vienna},
+  location = {Vienna},
+  doi = {10.1007/978-3-7091-9430-0_31},
+  url = {http://link.springer.com/10.1007/978-3-7091-9430-0_31},
+  urldate = {2025-06-25},
+  isbn = {978-3-211-82733-8 978-3-7091-9430-0},
+  langid = {english}
 }
 
 @incollection{jensen1996,
@@ -772,6 +838,23 @@
   keywords = {Computers / Artificial Intelligence / Computer Vision & Pattern Recognition,Computers / Image Processing,Computers / Optical Data Processing,Mathematics / General}
 }
 
+@incollection{lafortune1995,
+  title = {A {{5D Tree}} to {{Reduce}} the {{Variance}} of {{Monte Carlo Ray Tracing}}},
+  booktitle = {Rendering {{Techniques}} ’95},
+  author = {Lafortune, Eric P. and Willems, Yves D.},
+  editor = {Hanrahan, Patrick M. and Purgathofer, Werner},
+  date = {1995},
+  pages = {11--20},
+  publisher = {Springer Vienna},
+  location = {Vienna},
+  doi = {10.1007/978-3-7091-9430-0_2},
+  url = {http://link.springer.com/10.1007/978-3-7091-9430-0_2},
+  urldate = {2025-06-25},
+  isbn = {978-3-211-82733-8 978-3-7091-9430-0},
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/V5FSIPBZ/Lafortune and Willems - 1995 - A 5D Tree to Reduce the Variance of Monte Carlo Ray Tracing.pdf}
+}
+
 @article{lagarde2014,
   title = {Moving {{Frostbite}} to {{Physically Based Rendering}} 3.0},
   author = {Lagarde, Sébastien and family=Rousiers, given=Charles, prefix=de, useprefix=true},
@@ -838,6 +921,16 @@
   abstract = {We describe the design space for real-time photon density estimation, the key step of rendering global illumination (GI) via photon mapping. We then detail and analyze efficient GPU implementations of four best-of-breed algorithms. All produce reasonable results on NVIDIA GeForce 670 at 1920 × 1080 for complex scenes with multiple-bounce diffuse effects, caustics, and glossy reflection in real-time. Across the designs we conclude that tiled, deferred photon gathering in a compute shader gives the best combination of performance and quality.},
   isbn = {978-1-4503-1956-0},
   file = {/Users/julianstamm/Zotero/storage/SYH49PPN/Mara et al. - 2013 - Toward practical real-time photon mapping efficient GPU density estimation.pdf}
+}
+
+@article{martin2015,
+  title = {{{TensorFlow}}: {{Large-scale}} Machine Learning on Heterogeneous Systems},
+  shorttitle = {{{TensorFlow}}},
+  author = {Martín, Abadi and Ashish, Agarwal and Paul, Barham and Eugene, Brevdo and Zhifeng, Chen and Craig, Citro and Greg, S. Corrado and Andy, Davis and Jeffrey, Dean and Matthieu, Devin},
+  date = {2015},
+  journaltitle = {Software available from tensorflow. org},
+  volume = {7},
+  url = {tensorflow.org}
 }
 
 @online{mihut,
@@ -1016,6 +1109,33 @@
   file = {/Users/julianstamm/Zotero/storage/RKHBFXPF/Owen - 2008 - Local antithetic sampling with scrambled nets.pdf;/Users/julianstamm/Zotero/storage/CQ4H5JJ3/0811.html}
 }
 
+@article{pantaleoni2020,
+  title = {Online {{Path Sampling Control}} with {{Progressive Spatio-temporal Filtering}}},
+  author = {Pantaleoni, Jacopo},
+  date = {2020-09},
+  journaltitle = {SN Computer Science},
+  shortjournal = {SN COMPUT. SCI.},
+  volume = {1},
+  number = {5},
+  pages = {279},
+  issn = {2662-995X, 2661-8907},
+  doi = {10.1007/s42979-020-00291-z},
+  url = {https://link.springer.com/10.1007/s42979-020-00291-z},
+  urldate = {2025-06-27},
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/EZKEZXPF/Pantaleoni - 2020 - Online Path Sampling Control with Progressive Spatio-temporal Filtering.pdf}
+}
+
+@book{pharr2023,
+  title = {Physically Based Rendering: {{From}} Theory to Implementation},
+  shorttitle = {Physically Based Rendering},
+  author = {Pharr, Matt and Jakob, Wenzel and Humphreys, Greg},
+  date = {2023},
+  publisher = {MIT Press},
+  url = {https://books.google.com/books?hl=en&lr=&id=i9d2EAAAQBAJ&oi=fnd&pg=PR17&dq=physically+based+rendering+from+theory&ots=eF2MZlw6xm&sig=pmi3D6QVEXMfSRJJiySq-Fd99Fw},
+  urldate = {2025-06-26}
+}
+
 @article{qin2015,
   title = {Unbiased Photon Gathering for Light Transport Simulation},
   author = {Qin, Hao and Sun, Xin and Hou, Qiming and Guo, Baining and Zhou, Kun},
@@ -1154,6 +1274,47 @@
   file = {/Users/julianstamm/Zotero/storage/5PV4YKD5/Takikawa et al. - 2023 - Compact Neural Graphics Primitives with Learned Hash Probing.pdf;/Users/julianstamm/Zotero/storage/FQX3VKFC/Takikawa et al. - 2023 - Compact Neural Graphics Primitives with Learned Hash Probing.pdf}
 }
 
+@article{tatzgern2024,
+  title = {Radiance {{Caching}} with {{On-Surface Caches}} for {{Real-Time Global Illumination}}},
+  author = {Tatzgern, Wolfgang and Weinrauch, Alexander and Stadlbauer, Pascal and Mueller, Joerg H. and Winter, Martin and Steinberger, Markus},
+  date = {2024-08-09},
+  journaltitle = {Proceedings of the ACM on Computer Graphics and Interactive Techniques},
+  shortjournal = {Proc. ACM Comput. Graph. Interact. Tech.},
+  volume = {7},
+  number = {3},
+  pages = {1--17},
+  issn = {2577-6193},
+  doi = {10.1145/3675382},
+  url = {https://dl.acm.org/doi/10.1145/3675382},
+  urldate = {2025-06-28},
+  abstract = {Achieving global illumination is crucial for delivering realistic lighting in real-time rendering applications. Despite recent advancements in hardware ray tracing, the computational demands of full path tracing remain largely impractical for real-world production scenarios. We introduce a novel two-level radiance caching system that exclusively utilizes on-surface caches, diverging from conventional approaches that combine screen-space and world-space caches. Unlike previous texture space techniques, which mostly prioritize closely matching the resolution to screen space to minimize artifacts, our focus is on achieving optimal visual quality with minimal texture space resolutions. By caching directional radiance information on both primary and secondary hits, our approach delivers high-quality renderings of global illumination while being computationally efficient. Overall, this leads to an up to 5\% to 10\% improvement in both speed and quality compared to other state-of-the-art approaches. Our proposed method is versatile, handling not only diffuse global illumination but also addressing (glossy) reflections. Furthermore, our approach is well-suited for multi-viewer rendering, as the utilization of on-surface caches enables information sharing among different viewers, making it applicable to cloud-native rendering environments.},
+  langid = {english}
+}
+
+@article{tatzgernwolfgang2024,
+  title = {Radiance {{Caching}} with {{On-Surface Caches}} for {{Real-Time Global Illumination}}},
+  author = {TatzgernWolfgang and WeinrauchAlexander and StadlbauerPascal and H, MuellerJoerg and WinterMartin and SteinbergerMarkus},
+  date = {2024-08-09},
+  journaltitle = {Proceedings of the ACM on Computer Graphics and Interactive Techniques},
+  publisher = {ACMPUB27New York, NY, USA},
+  doi = {10.1145/3675382},
+  url = {https://dl.acm.org/doi/10.1145/3675382},
+  urldate = {2025-06-28},
+  abstract = {Achieving global illumination is crucial for delivering realistic lighting in real-time rendering applications. Despite recent advancements in hardware ray tracing, the computational demands of full path tracing remain largely impractical for real-world ...},
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/4P8J5QL8/3675382.html}
+}
+
+@software{tensorflow,
+  title = {{{TensorFlow}}},
+  author = {Developers, TensorFlow},
+  date = {2021-05},
+  doi = {10.5281/zenodo.4758419},
+  url = {https://doi.org/10.5281/zenodo.4758419},
+  organization = {Zenodo},
+  version = {v2.5.0}
+}
+
 @report{thekhronosr3dformatsworkinggroup2021,
   title = {{{glTF}}™  2.0 {{Specification}}},
   author = {{The Khronos® 3D Formats Working Group}},
@@ -1240,15 +1401,15 @@
 }
 
 @article{walter2007,
-  title = {Microfacet {{Models}} for {{Refraction}} through {{Rough Surfaces}}},
-  author = {Walter, Bruce and Marschner, Stephen R and Li, Hongsong and Torrance, Kenneth E},
+  title = {Microfacet {{Models}} for {{Refraction}} through {{Rough Surfaces}}.},
+  author = {Walter, Bruce and Marschner, Stephen R. and Li, Hongsong and Torrance, Kenneth E.},
   date = {2007},
-  journaltitle = {Proceedings of the 18th Eurographics conference on Rendering Techniques},
-  pages = {195--206},
-  url = {https://diglib.eg.org/xmlui/bitstream/handle/10.2312/EGWR.EGSR07.195-206/195-206.pdf?sequence=1},
-  abstract = {Microfacet models have proven very successful for modeling light reflection from rough surfaces. In this paper we review microfacet theory and demonstrate how it can be extended to simulate transmission through rough surfaces such as etched glass. We compare the resulting transmission model to measured data from several real surfaces and discuss appropriate choices for the microfacet distribution and shadowing-masking functions. Since rendering transmission through media requires tracking light that crosses at least two interfaces, good importance sampling is a practical necessity. Therefore, we also describe efficient schemes for sampling the microfacet models and the corresponding probability density functions.},
-  langid = {english},
-  file = {/Users/julianstamm/Zotero/storage/AJEVMZ48/Walter et al. - Microfacet Models for Refraction through Rough Surfaces.pdf}
+  journaltitle = {Rendering techniques},
+  volume = {2007},
+  pages = {18th},
+  url = {https://www.graphics.cornell.edu/~bjw/microfacetbsdf.pdf},
+  urldate = {2025-06-25},
+  file = {/Users/julianstamm/Zotero/storage/AJEVMZ48/Walter et al. - Microfacet Models for Refraction through Rough Surfaces.pdf;/Users/julianstamm/Zotero/storage/BCWPRGM3/Walter et al. - 2007 - Microfacet Models for Refraction through Rough Surfaces..pdf}
 }
 
 @article{ward1988,

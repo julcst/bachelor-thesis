@@ -8,6 +8,7 @@ As always in rendering, we are interested in solving the rendering equation, whi
 The rendering equation is given by:
 
 \begin{equation}
+\label{eq:rendering_equation}
     L_o(\vec{x}, \wo) = L_e(\vec{x}, \wo) + \int_{\Omega} f(\wi, \vec{x}, \wo) L_i(\vec{x}, \wi) \cos(\theta_i) \diff\wi
 \end{equation}
 
@@ -56,7 +57,7 @@ I choose $p_\mathrm{continue}$ proportional to the relative luminance $Y$ \bcite
 % With this and by introducing a visibility term $V$, we can express the collected radiance along a complete path in an unbiased manner:
 
 % \begin{equation}
-%     L_o(\vec{x_0}, \wo^0) = \frac{1}{N} \sum_{i=1}^{N} X_i
+%     L_o(\vec{x^0}, \wo^0) = \frac{1}{N} \sum_{i=1}^{N} L_e(\vec{x^1}, \wo^1) + \frac{f(\wi^1, \wo^1) \cos(\theta_i^1)}{p_\mathrm{continue} p(\wi^1)} \cdot \left( L_e(\vec{x^2}, \wo^2) + \frac{f(\wi^2, \wo^2) \cos(\theta_i^2)}{p_\mathrm{continue} p(\wi^2)} \cdot \left(\cdots\right) \right)
 % \end{equation}
 
 \section{Randomized Quasi-Monte Carlo Integration}
@@ -124,17 +125,17 @@ For the Fresnel term $F$, I use the Schlick approximation \bcite{schlick1994}:
     F(\LdotH) = F_0 + (1 - F_0) (1 - \LdotH)^5
 \end{equation}
 
-In the case of transmission, the normal of the ideally refracting microfacet is given by:
+In the case of transmission, the normal of an ideally refracting microfacet is given by:
 
 \begin{equation}
-    \wm = \frac{\eta \wi + \wo}{\|\eta \wi + \wo\|}
+    \wm = \frac{\eta_i \wi + \eta_o \wo}{\|\eta_i \wi + \eta_o \wo\|} =\frac{\eta \wi + \wo}{\|\eta \wi + \wo\|}
 \end{equation}
 
 where $\eta = \frac{\eta_i}{\eta_o}$ is the relative index of refraction (IOR).
-The transmission component is then given by:
+The transmission component is then the following, as derived by \textcite{walter2007}:
 
 \begin{equation}
-    f_t(\wi, \vec{x}, \wo) = \rho_t \frac{D(\NdotH) G(\n, \wi, \wo) (1 - F(\LdotH))}{(\LdotH + \VdotH / \eta)^2} \left|\frac{\LdotH \VdotH}{\NdotL \NdotL}\right|
+    f_t(\wi, \vec{x}, \wo) = \rho_t \frac{D(\NdotH) G(\n, \wi, \wo) (1 - F(\LdotH))}{(\LdotH + \VdotH / \eta)^2} \left|\frac{\LdotH \VdotH}{\NdotL \NdotV}\right|
 \end{equation}
 
 For the diffuse component, I simply use the Lambertian reflectance model:
@@ -164,4 +165,82 @@ For metals, the base color $\vec{c}$ is used directly as the $F_0$ to simulate w
 
 \section{Importance Sampling}
 
+As aforementioned, the variance of a Monte Carlo estimator can be reduced by sampling the integral using a probability distribution that is as proportional to the integrand as possible.
+Revisiting the rendering equation (\ref{eq:rendering_equation}), we first concentrate on sampling the term $f(\wi, \vec{x}, \wo) \cos(\theta_i)$ of the integrand.
+Also sampling $L_i(\vec{x}, \wi)$ is not that easy, because to obtain $L_i$ we would need to solve the rendering equation again.
+Yet, several approaches have been made to also take $L_i$ into account, notably direct light sampling \bcite{veach1997}, path guiding \bcite{muller2017,muller2019,lafortune1995,jensen1995} and ReSTIR \bcite{bitterli2020}.
+For my reference pathtracer, I will only employ BRDF sampling and direct light sampling (\ref{sec:mis}).
+
+For the diffuse component, as it is constant I only sample the cosine weighted hemisphere:
+
+\begin{equation}
+    p_d(\wi) = \frac{\cos(\theta_i)}{\pi} \quad \text{for } \wi \in \Omega
+\end{equation}
+
+For the specular and transmissive components, I sample the distribution of visible microfacet normals (VNDF) \bcite{heitz2014a} of the Trowbridge-Reitz NDF, which is given by:
+
+\begin{equation}
+    p_\mathrm{VNDF}(\wm \mid \wo) = \frac{G_1(\wo, \wm) D(\NdotH) |\VdotH|}{|\NdotV|}
+\end{equation}
+
+Sampling this instead of the NDF reduces the variance at grazing angles, where many microfacets are shadowed.
+To sample the VNDF, I use the method proposed by \textcite{benyoub2024}, which improves upon the original method \bcite{heitz2014a} and its follow-up \bcite{heitz2018}.
+
+To weigh the BRDF, the VNDF has first to be transformed into a probability distribution over the domain of incoming directions $\wi$ using the Jacobian of the reflection operator \bcite{walter2007,pharr2023}:
+
+% TODO: Check math
+\begin{equation}
+    p_s(\wi \mid \wo) = p_\mathrm{VNDF}(\wm) \left\|\frac{\partial \wm}{\partial \wi}\right\| =  \frac{p_\mathrm{VNDF}(\wm)}{4|\VdotH|} = \frac{G_1(\wo, \wm) D(\NdotH)}{4|\NdotV|}
+\end{equation}
+
+For the transmission component, I use the same approach, but with the Jacobian of the refraction operator \bcite{walter2007,pharr2023}:
+
+\begin{equation}
+    \begin{aligned}
+        p_t(\wi \mid \wo)
+        &= p_\mathrm{VNDF}(\wm) \left\|\frac{\partial \wm}{\partial \wi}\right\| \\
+        &= \frac{p_\mathrm{VNDF}(\wm) \eta_o^2 |\LdotH|}{|\eta_i \LdotH + \eta_o \VdotH|^2} \\
+        &= \frac{p_\mathrm{VNDF}(\wm) |\VdotH|}{|\LdotH + \VdotH / \eta|^2} \\
+        &= \frac{G_1(\wo, \wm) D(\NdotH) \VdotH^2 }{|\NdotV| |\LdotH + \VdotH / \eta|^2}
+        % &= \frac{G_1(\wo, \wm) D(\NdotH)}{|\LdotH + \VdotH / \eta|^2} \\
+    \end{aligned}
+\end{equation}
+
+To combine these three sampling strategies, one can use Russian Roulette again.
+To optimally weigh the sampling strategies, one can first precompute the relative luminance $Y$ of the directional albedo of the respective BRDF components, which is the expected value of the BRDF in a perfect white furnace environment.
+However, for performance reasons, I only approximate these weights by using the Fresnel term and the base color:
+
+\begin{equation}
+    \begin{aligned}
+        Y_d &= Y(\rho_d) &\quad
+        Y_s &= Y(F(\NdotV)) &\quad
+        Y_t &= Y(\rho_t) \\
+% TODO
+        % Y_t &= Y((1 - F(\NdotV)) \cdot \rho_t) \\
+        P_d &= \frac{Y_d}{Y_d + Y_s + Y_t} &\quad
+        P_s &= \frac{Y_s}{Y_d + Y_s + Y_t} &\quad
+        P_t &= \frac{Y_t}{Y_d + Y_s + Y_t} \\
+    \end{aligned}
+\end{equation}
+
+% TODO
+\begin{equation}
+    \expectationvar{\wi \sim p_\mathrm{VNDF}}{F(\VdotH)} \approx F(\NdotV)
+\end{equation}
+
+The combined sampling distribution is then given by:
+
+\begin{equation}
+    p(\wi \mid \wo) = P_d p_d(\wi) + P_s p_s(\wi \mid \wo) + P_t p_t(\wi \mid \wo)
+\end{equation}
+
+\section{Evaluation of the Weighted BRDF}
+
+Most of the time, we do not need to evaluate the BRDF directly, but rather the weighted BRDF, which is given by:
+
+\begin{equation}
+    w(\wi, \vec{x}, \wo) = \frac{f(\wi, \vec{x}, \wo) \cos(\wi)}{p(\wi \mid \wo)}
+\end{equation}
+
 \section{Multiple Importance Sampling}
+\label{sec:mis}

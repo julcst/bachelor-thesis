@@ -15,3 +15,10 @@ microfacet-based
 Lambertian
 Oren-Nayar
 Schlick
+ReSTIR
+pathtracer
+normals
+microfacets
+Jacobian
+ReLU
+CUDA
