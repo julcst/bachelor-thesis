@@ -12,7 +12,7 @@ The rendering equation is given by:
     L_o(\vec{x}, \wo) = L_e(\vec{x}, \wo) + \int_{\Omega} f(\wi, \vec{x}, \wo) L_i(\vec{x}, \wi) \cos(\theta_i) \diff\wi
 \end{equation}
 
-where $L_o$ is the outgoing radiance, $L_e$ is the emitted radiance, $f$ is the bidirectional reflectance distribution function (BRDF), and $L_i$ is the incoming radiance from direction $\omega_i$.
+where $L_o$ is the outgoing radiance, $L_e$ is the emitted radiance, $f$ is the bidirectional scattering distribution function (BSDF), and $L_i$ is the incoming radiance from direction $\omega_i$.
 
 \section{Monte Carlo Integration}
 
@@ -31,12 +31,12 @@ Applying this to the rendering equation, we can formulate an estimator for the o
 This is an unbiased estimator for the rendering equation, as can be easily shown:
 
 \begin{equation}
-\begin{aligned}
-    \expectation{\estimator{L_o(\vec{x}, \wo)}}
-    &= L_e(\vec{x}, \wo) + \cancel{\frac{1}{N}} \cancel{\sum_{i=1}^{N}} \expectationvar{\vec{\hat{\omega}}_i \sim p}{\frac{f(\vec{\hat{\omega}}_i, \vec{x}, \wo) \cos(\hat{\theta}_i)}{p(\vec{\hat{\omega}}_i)} L_i(\vec{x}, \vec{\hat{\omega}}_i)} \\
-    &= L_e(\vec{x}, \wo) + \int_{\Omega} \frac{f(\vec{\hat{\omega}}_i, \vec{x}, \wo) \cos(\hat{\theta}_i) \cancel{p(\vec{\hat{\omega}}_i)}}{\cancel{p(\vec{\hat{\omega}}_i)}} L_i(\vec{x}, \vec{\hat{\omega}}_i) \diff\wi \\
-    &= L_o(\vec{x}, \wo)
-\end{aligned}
+    \begin{aligned}
+        \expectation{\estimator{L_o(\vec{x}, \wo)}}
+        &= L_e(\vec{x}, \wo) + \cancel{\frac{1}{N}} \cancel{\sum_{i=1}^{N}} \expectationvar{\vec{\hat{\omega}}_i \sim p}{\frac{f(\vec{\hat{\omega}}_i, \vec{x}, \wo) \cos(\hat{\theta}_i)}{p(\vec{\hat{\omega}}_i)} L_i(\vec{x}, \vec{\hat{\omega}}_i)} \\
+        &= L_e(\vec{x}, \wo) + \int_{\Omega} \frac{f(\vec{\hat{\omega}}_i, \vec{x}, \wo) \cos(\hat{\theta}_i) \cancel{p(\vec{\hat{\omega}}_i)}}{\cancel{p(\vec{\hat{\omega}}_i)}} L_i(\vec{x}, \vec{\hat{\omega}}_i) \diff\wi \\
+        &= L_o(\vec{x}, \wo)
+    \end{aligned}
 \end{equation}
 
 Hence, by the law of large numbers this estimator converges to the true solution to the rendering equation for $N \to \infty$.
@@ -54,7 +54,7 @@ To handle the infinite recursion without introducing bias, I use Russian roulett
 The probability terms cancel out, hence this modification to the estimator does not introduce bias.
 I choose $p_\mathrm{continue}$ proportional to the relative luminance $Y$ \bcite{kirkpatrick2025} of the contribution of the current path segment, which measures the perceived linear brightness of that sample.
 
-% With this and by introducing a visibility term $V$, we can express the collected radiance along a complete path in an unbiased manner:
+% With this and by introducing a visibility term $V$, we can estimate the collected radiance along a complete path in an unbiased manner:
 
 % \begin{equation}
 %     L_o(\vec{x^0}, \wo^0) = \frac{1}{N} \sum_{i=1}^{N} L_e(\vec{x^1}, \wo^1) + \frac{f(\wi^1, \wo^1) \cos(\theta_i^1)}{p_\mathrm{continue} p(\wi^1)} \cdot \left( L_e(\vec{x^2}, \wo^2) + \frac{f(\wi^2, \wo^2) \cos(\theta_i^2)}{p_\mathrm{continue} p(\wi^2)} \cdot \left(\cdots\right) \right)
@@ -75,12 +75,12 @@ I use the scrambled Sobol' sequence from cuRAND \bcite{nvidiacorporation2024} wh
 Furthermore, I employ the same technique as the \textcite{blenderfoundation} and only precompute a single Sobol' sequence for the entire scene, which is then decorrelated between pixels using constant random per-pixel shifts modulo 1, also known as Cranley-Patterson rotations \bcite{cranley1976}.
 The Sobol' sequence is regularly recomputed in batches on the GPU to allow for unlimited progressive rendering, the per pixel shifts are only recomputed on frame buffer resize, which makes the technique relatively lightweight.
 
-\section{Principled BRDF}
+\section{Principled BSDF}
 
-As a material model I use a simplified physically based model, which is inspired by the Disney principled BRDF \bcite{burley2012} and conformant with the glTF PBR specification \bcite{thekhronosr3dformatsworkinggroup2021}.
+As a material model I use a simplified physically based model, which is inspired by the Disney principled BSDF \bcite{burley2012} and conformant with the glTF PBR specification \bcite{thekhronosr3dformatsworkinggroup2021}.
 I restrict myself to the diffuse, specular and transmission components, as they can already cover a wide range of interesting materials and suffice to showcase the strengths and weaknesses of the subsequent techniques.
 
-The BRDF is split into two parts: If the light direction $\wi$ and the view direction $\wo$ lie in the same hemisphere, the BRDF is composed of a diffuse and a specular component, otherwise it consists only of a transmission component:
+The BSDF is split into two parts: If the light direction $\wi$ and the view direction $\wo$ lie in the same hemisphere, the BRDF is composed of a diffuse and a specular lobe, otherwise it consists only of a transmission lobe:
 
 \begin{equation}
     f(\wi, \vec{x}, \wo) =
@@ -149,7 +149,7 @@ The Oren-Nayar model is rather computational expensive and not fully energy cons
 Burley's model suffers also from energy conservation issues, but renormalized versions exist \bcite{lagarde2014}.
 However, the Lambertian model has the nice property of being constant over the hemisphere, which can be advantageous for caching.
 
-To parameterize the BRDF, I use a base color $\vec{c} \in [0, 1]^3$, a metallic factor $m \in [0, 1]$, a roughness factor $r \in [0, 1]$ and a transmission factor $t \in [0, 1]$, as follows:
+To parameterize the BSDF, I use a base color $\vec{c} \in [0, 1]^3$, a metallic factor $m \in [0, 1]$, a roughness factor $r \in [0, 1]$ and a transmission factor $t \in [0, 1]$, as follows:
 
 \begin{equation}
     \begin{aligned}
@@ -169,7 +169,7 @@ As aforementioned, the variance of a Monte Carlo estimator can be reduced by sam
 Revisiting the rendering equation (\ref{eq:rendering_equation}), we first concentrate on sampling the term $f(\wi, \vec{x}, \wo) \cos(\theta_i)$ of the integrand.
 Also sampling $L_i(\vec{x}, \wi)$ is not that easy, because to obtain $L_i$ we would need to solve the rendering equation again.
 Yet, several approaches have been made to also take $L_i$ into account, notably direct light sampling \bcite{veach1997}, path guiding \bcite{muller2017,muller2019,lafortune1995,jensen1995} and ReSTIR \bcite{bitterli2020}.
-For my reference pathtracer, I will only employ BRDF sampling and direct light sampling (\ref{sec:mis}).
+For my reference pathtracer, I will only employ BSDF sampling and direct light sampling (\ref{sec:mis}).
 
 For the diffuse component, as it is constant I only sample the cosine weighted hemisphere:
 
@@ -186,29 +186,38 @@ For the specular and transmissive components, I sample the distribution of visib
 Sampling this instead of the NDF reduces the variance at grazing angles, where many microfacets are shadowed.
 To sample the VNDF, I use the method proposed by \textcite{benyoub2024}, which improves upon the original method \bcite{heitz2014a} and its follow-up \bcite{heitz2018}.
 
-To weigh the BRDF, the VNDF has first to be transformed into a probability distribution over the domain of incoming directions $\wi$ using the Jacobian of the reflection operator \bcite{walter2007,pharr2023}:
+To weigh the BSDF, the VNDF has first to be transformed into a probability distribution over the domain of incoming directions $\wi$ using the Jacobian of the reflection operator \bcite{walter2007}:
 
 % TODO: Check math
 \begin{equation}
-    p_s(\wi \mid \wo) = p_\mathrm{VNDF}(\wm) \left\|\frac{\partial \wm}{\partial \wi}\right\| =  \frac{p_\mathrm{VNDF}(\wm)}{4|\VdotH|} = \frac{G_1(\wo, \wm) D(\NdotH)}{4|\NdotV|}
+    \begin{aligned}
+        \wi &= \reflect(\wo, \wm), \quad \wm \sim p_\mathrm{VNDF}(\wm \mid \wo)\\
+        p_s(\wi \mid \wo)
+        &= p_\mathrm{VNDF}(\wm) \left\|\frac{\partial \wm}{\partial \wi}\right\|
+        = \frac{p_\mathrm{VNDF}(\wm)}{4|\VdotH|}
+        = \frac{G_1(\wo, \wm) D(\NdotH)}{4|\NdotV|}
+    \end{aligned}
 \end{equation}
 
-For the transmission component, I use the same approach, but with the Jacobian of the refraction operator \bcite{walter2007,pharr2023}:
+$\left\|\frac{\partial \wm}{\partial \wi}\right\|$ denotes the absolute value of the determinant of the Jacobian for the transform from $\wm$ to $\wi$ and was derived by \textcite{walter2007}.
 
+For the transmission component, I use the same approach, but with the Jacobian of the refraction operator \bcite{walter2007}:
+
+% TODO: TIR
 \begin{equation}
     \begin{aligned}
+        \wi &= \refract(\wo, \wm), \quad \wm \sim p_\mathrm{VNDF}(\wm \mid \wo)\\
         p_t(\wi \mid \wo)
         &= p_\mathrm{VNDF}(\wm) \left\|\frac{\partial \wm}{\partial \wi}\right\| \\
-        &= \frac{p_\mathrm{VNDF}(\wm) \eta_o^2 |\LdotH|}{|\eta_i \LdotH + \eta_o \VdotH|^2} \\
-        &= \frac{p_\mathrm{VNDF}(\wm) |\VdotH|}{|\LdotH + \VdotH / \eta|^2} \\
-        &= \frac{G_1(\wo, \wm) D(\NdotH) \VdotH^2 }{|\NdotV| |\LdotH + \VdotH / \eta|^2}
-        % &= \frac{G_1(\wo, \wm) D(\NdotH)}{|\LdotH + \VdotH / \eta|^2} \\
+        &= p_\mathrm{VNDF}(\wm) \frac{\eta_i^2 |\LdotH|}{|\eta_i \LdotH + \eta_o \VdotH|^2} \\
+        &= \frac{G_1(\wo, \wm) D(\NdotH) |\VdotH|}{|\NdotV|} \frac{|\LdotH|}{|\LdotH + \VdotH / \eta|^2} \\
+        &= \frac{G_1(\wo, \wm) D(\NdotH) |\LdotH \VdotH|}{|\NdotV| |\LdotH + \VdotH / \eta|^2}
     \end{aligned}
 \end{equation}
 
 To combine these three sampling strategies, one can use Russian Roulette again.
-To optimally weigh the sampling strategies, one can first precompute the relative luminance $Y$ of the directional albedo of the respective BRDF components, which is the expected value of the BRDF in a perfect white furnace environment.
-However, for performance reasons, I only approximate these weights by using the Fresnel term and the base color:
+To optimally weigh the sampling strategies, one can first precompute the relative luminance $Y$ of the directional albedo of the respective BSDF components, which is the expected value of the BSDF in a perfect white furnace environment.
+However, for performance reasons, I only approximate these weights by using the Fresnel term of a perfectly smooth surface and the base colors:
 
 \begin{equation}
     \begin{aligned}
@@ -223,24 +232,89 @@ However, for performance reasons, I only approximate these weights by using the 
     \end{aligned}
 \end{equation}
 
-% TODO
-\begin{equation}
-    \expectationvar{\wi \sim p_\mathrm{VNDF}}{F(\VdotH)} \approx F(\NdotV)
-\end{equation}
-
 The combined sampling distribution is then given by:
 
 \begin{equation}
     p(\wi \mid \wo) = P_d p_d(\wi) + P_s p_s(\wi \mid \wo) + P_t p_t(\wi \mid \wo)
 \end{equation}
 
-\section{Evaluation of the Weighted BRDF}
+\section{Evaluation of the Weighted BSDF}
 
-Most of the time, we do not need to evaluate the BRDF directly, but rather the weighted BRDF, which is given by:
+Most of the time, we do not need to evaluate the BSDF directly, but rather the weighted BSDF, which is given by:
 
 \begin{equation}
-    w(\wi, \vec{x}, \wo) = \frac{f(\wi, \vec{x}, \wo) \cos(\wi)}{p(\wi \mid \wo)}
+    \begin{aligned}
+        w(\wi, \vec{x}, \wo)
+        &= \frac{f(\wi, \vec{x}, \wo) \cos(\theta_i)}{p(\wi \mid \wo)}\\
+        &= \begin{cases}
+            \frac{(f_d(\wi, \vec{x}, \wo) + f_s(\wi, \vec{x}, \wo)) \NdotL}{P_d p_d(\wi) + P_s p_s(\wi \mid \wo)} & \text{if } \NdotL \NdotV > 0 \\
+            \frac{f_t(\wi, \vec{x}, \wo) \NdotL}{P_t p_t(\wi \mid \wo)} & \text{otherwise}
+        \end{cases}
+    \end{aligned}
+\end{equation}
+
+Using this formulation is more efficient because large parts cancel out, improving numerical stability and performance.
+For the reflective part we then get:
+
+\begin{equation}
+    \begin{aligned}
+        w_r{(\wi, \vec{x}, \wo)}
+        &= \frac{(f_d(\wi, \vec{x}, \wo) + f_s(\wi, \vec{x}, \wo)) \NdotL}{P_d p_d(\wi) + P_s p_s(\wi \mid \wo)}
+        = \frac{G_1^{-1} (k G^{-1} \rho_d + \pi D F)}{G^{-1} (k G_1^{-1} P_d + \pi D P_s)},\\
+        k &= 4 \NdotL \NdotV
+    \end{aligned}
+\end{equation}
+
+And for the transmissive part:
+
+\begin{equation}
+    \begin{aligned}
+        w_t(\wi, \vec{x}, \wo)
+        = \frac{f_t(\wi, \vec{x}, \wo) \NdotL}{P_t p_t(\wi \mid \wo)}
+        = \rho_t \frac{G (1 - F)}{G_1 P_t}
+        = \rho_t \frac{G_1^{-1} (1 - F)}{G^{-1} P_t}
+    \end{aligned}
+\end{equation}
+
+Here I used the fact that $G$ and $G_1$ are both reciprocals to eliminate unnecessary divisions:
+
+\begin{equation}
+    \begin{aligned}
+        G^{-1} = 1 + \Lambda(\NdotL) + \Lambda(\NdotV)\quad \text{and} \quad
+        G_1^{-1} = 1 + \Lambda(\NdotV)
+    \end{aligned}
 \end{equation}
 
 \section{Multiple Importance Sampling}
 \label{sec:mis}
+
+BSDF importance sampling already works well for glossy materials and diffuse lighting, when it comes to diffuse materials and direct lighting however, it has rather high variance and does not work at all for infinitesimal light sources.
+In these scenarios, direct light sampling is much more efficient, which samples the light sources instead of the BSDF.
+
+To maximize path reuse, a common strategy is to draw from both sampling strategies at every path vertex, using the BSDF sampling for path continuation and the light sampling for light collection.
+This technique is called Next Event Estimation (NEE).
+
+A general approach to combine multiple sampling strategies is given by the Multiple Importance Sampling (MIS) estimator, which was first introduced by \textcite{veach1997}:
+
+\begin{equation}
+    \estimator{I_\mathrm{MIS}} = \sum_{i=1}^{N} \frac{1}{N_i} \sum_{j=1}^{N_i} w_i(\hat{x}_{i,j}) \frac{f(\hat{x}_{i,j})}{p_i(\hat{x}_{i,j})}, \quad \hat{x}_{i,j} \sim p_i
+\end{equation}
+
+where $N$ is the number of sampling strategies, $N_i$ is the number of samples drawn from the $i$-th sampling strategy, $p_i$ is the probability distribution of the $i$-th sampling strategy and $w_i(\hat{x})$ is the weight of the sample $\hat{x}$ drawn from the $i$-th sampling strategy with $\sum w_i(\hat{x}) = 1$.
+This estimator is again trivially unbiased.
+
+A naïve way to combine these two sampling strategies would be to simply weigh them equally, however this is suboptimal, as the resulting variance is then simply the average of the variances of both sampling strategies.
+Instead, \textcite{veach1997} also introduced a provably optimal way to combine multiple sampling strategies, called the balance heuristic:
+
+\begin{equation}
+    w_i(\hat{x}) = \frac{N_i p_i(\hat{x})}{\sum_{j} N_j p_j(\hat{x})}
+\end{equation}
+
+Intuitively spoken, each sampling strategy is weighted according to how likely it is to produce the given sample.
+Thus, a sample is weighted lower, if it is in an outlier of the generating distribution.
+
+As suggested by \textcite{veach1997}, I use the power heuristic generalization with a sharpening exponent of $\beta=2$ to combine BSDF and light sampling:
+
+\begin{equation}
+    w_i^{\beta}(\hat{x}) = \frac{(N_i p_i(\hat{x}))^\beta}{\sum_{j} (N_j p_j(\hat{x}))^{\beta}}
+\end{equation}

@@ -1038,6 +1038,14 @@
   file = {/Users/julianstamm/Zotero/storage/LSMXV8PD/Oat_GDC2005_IrradianceVolumesForGames.pdf}
 }
 
+@report{OpenPBR,
+  title = {{{OpenPBR Surface Specification}}},
+  author = {Andersson, Zap and Edmondson, Paul and Guertault, Julien and Herubel, Adrien and King, Alan and Kutz, Peter and Machizaud, Andréa and Portsmouth, Jamie and Servant, Frédéric and Stone, Jonathan},
+  date = {2024},
+  institution = {Academy Software Foundation (ASWF)},
+  url = {https://academysoftwarefoundation.github.io/OpenPBR/}
+}
+
 @inproceedings{oren1994,
   title = {Generalization of {{Lambert}}'s Reflectance Model},
   booktitle = {Proceedings of the 21st Annual Conference on {{Computer}} Graphics and Interactive Techniques  - {{SIGGRAPH}} '94},
@@ -1152,6 +1160,19 @@
   abstract = {Photon mapping (PM) has been widely regarded as an efficient solution for light transport simulation, including challenging caustics paths and many-bounce indirect lighting. The efficiency of PM comes from reusing traced photons. However, the handling of photon gathering in existing PM algorithms is universally biased -- the expected value of their results does not necessarily agree with the true solution of the rendering equation. We present a novel photon gathering method to efficiently achieve unbiased rendering with photon mapping. Instead of aggregating the gathered photons into an estimated density as in classical photon mapping, we process each photon individually and connect the corresponding light sub-path with the eye sub-path that generates the gather point, creating an unbiased path sample. The Monte Carlo estimate for such a path sample is calculated by evaluating all relevant terms in a strict and unbiased way, leading to a self-contained unbiased sampling technique. We further develop a set of multiple importance sampling (MIS) weights that allow our method to be optimally combined with bidirectional path tracing (BDPT), resulting in an unbiased rendering algorithm that can efficiently handle a wide variety of light paths and that compares favorably with previous algorithms. Experiments demonstrate the efficacy and robustness of our method.},
   langid = {english},
   file = {/Users/julianstamm/Zotero/storage/K32QSZVB/Qin et al. - 2015 - Unbiased photon gathering for light transport simulation.pdf}
+}
+
+@article{ren2013,
+  title = {Global Illumination with Radiance Regression Functions.},
+  author = {Ren, Peiran and Wang, Jiaping and Gong, Minmin and Lin, Stephen and Tong, Xin and Guo, Baining},
+  date = {2013},
+  journaltitle = {ACM Trans. Graph.},
+  volume = {32},
+  number = {4},
+  pages = {130--1},
+  url = {https://www.academia.edu/download/54395664/Global_illumination_with_radiance_regres20170910-8835-10klmux.pdf},
+  urldate = {2025-06-29},
+  file = {/Users/julianstamm/Zotero/storage/9VKADXDR/Ren et al. - 2013 - Global illumination with radiance regression functions..pdf}
 }
 
 @online{reynolds2016,
@@ -1318,7 +1339,8 @@
 @report{thekhronosr3dformatsworkinggroup2021,
   title = {{{glTF}}™  2.0 {{Specification}}},
   author = {{The Khronos® 3D Formats Working Group}},
-  date = {2021-10-11}
+  date = {2021-10-11},
+  url = {https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html}
 }
 
 @article{torrance1967,
@@ -1428,6 +1450,22 @@
   abstract = {An efficient ray tracing method is presented for calculating interreflections between surfaces with both diffuse and specular components. A Monte Carlo technique computes the indirect contributions to illuminance at locations chosen by the rendering process. The indirect illuminance values are averaged over surfaces and used in place of a constant "ambient" term. Illuminance calculations are made only for those areas participating in the selected view, and the results are stored so that subsequent views can reuse common values. The density of the calculation is adjusted to maintain a constant accuracy, permitting less populated portions of the scene to be computed quickly. Successive reflections use proportionally fewer samples, which speeds the process and provides a natural limit to recursion. The technique can also model diffuse transmission and illumination from large area sources, such as the sky.},
   langid = {english},
   file = {/Users/julianstamm/Zotero/storage/X22JZBZ4/Ward et al. - 1988 - A ray tracing solution for diffuse interreflection.pdf}
+}
+
+@online{wu2024,
+  title = {Neural {{Directional Encoding}} for {{Efficient}} and {{Accurate View-Dependent Appearance Modeling}}},
+  author = {Wu, Liwen and Bi, Sai and Xu, Zexiang and Luan, Fujun and Zhang, Kai and Georgiev, Iliyan and Sunkavalli, Kalyan and Ramamoorthi, Ravi},
+  date = {2024-05-23},
+  eprint = {2405.14847},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2405.14847},
+  url = {http://arxiv.org/abs/2405.14847},
+  urldate = {2025-06-29},
+  abstract = {Novel-view synthesis of specular objects like shiny metals or glossy paints remains a significant challenge. Not only the glossy appearance but also global illumination effects, including reflections of other objects in the environment, are critical components to faithfully reproduce a scene. In this paper, we present Neural Directional Encoding (NDE), a view-dependent appearance encoding of neural radiance fields (NeRF) for rendering specular objects. NDE transfers the concept of feature-grid-based spatial encoding to the angular domain, significantly improving the ability to model high-frequency angular signals. In contrast to previous methods that use encoding functions with only angular input, we additionally cone-trace spatial features to obtain a spatially varying directional encoding, which addresses the challenging interreflection effects. Extensive experiments on both synthetic and real datasets show that a NeRF model with NDE (1) outperforms the state of the art on view synthesis of specular objects, and (2) works with small networks to allow fast (real-time) inference. The project webpage and source code are available at: \textbackslash url\{https://lwwu2.github.io/nde/\}.},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition},
+  file = {/Users/julianstamm/Zotero/storage/BZK7HF7I/Wu et al. - 2024 - Neural Directional Encoding for Efficient and Accurate View-Dependent Appearance Modeling.pdf}
 }
 
 @inproceedings{zheng2024,

@@ -3,9 +3,11 @@
 \label{chap:nrc}
 
 A weak point of the reference Monte Carlo pathtracer motivated in \ref{chap:pathtracing} is, that we have to start from zero, every time the scene or camera changes.
-It would make sense to keep samples around that can be reused when similar paths occur in the evaluation of the global illumination integral.
+It would make sense to keep samples around that can be reused when temporally and spatially similar paths occur in the evaluation of the global illumination integral.
 \textcite{muller2021} introduced Neural Radiance Caching (NRC) to address this problem.
 The idea is to train a neural network on collected radiance samples and use it to accumulate and interpolate these samples online.
+
+Essentially, the idea is, to replace the recursive path tracing integral with a neural estimate of the radiance when the variance along the path becomes too high.
 
 \section{Network Architecture}
 
@@ -13,6 +15,7 @@ Because the network has to be trained and evaluated in real-time, \textcite{mull
 They use a fully connected network with 5 hidden layers, with 64 neurons and ReLU activation each.
 The output layer has 3 neurons, one for each color channel.
 Additionally, they omit biases as they did not observe a measurable benefit and it simplifies the implementation.
+Because of the shallow architecture, skip connections are not needed to preserve the gradient flow.
 
 To maximize the inference and training performance, \textcite{muller2021} introduce a fully fused implementation of the network, which fully utilizes shared memory and per-thread registers.
 For this, the whole network is implemented as a single CUDA kernel, with each block handling a batch of 128 64-dimensional input vectors and keeping the $64\times128$ activations in shared memory.
@@ -22,20 +25,31 @@ With this hardware-optimized implementation, \textcite{muller2021} achieve a spe
 
 \section{Input Encodings}
 
+As shown by \textcite{ren2013}, only parametrizing the network with the outgoing direction $\wo$ and the position $\mathbf{x}$ is not sufficient for an accurate representation of the radiance field.
+
 \subsection{Instant Neural Graphic Primitives}
 
 \subsection{One Blob and One Blob Diffuse Encoding}
 
-\section{Collecting Training Data}
+\subsection{Reflectance Factorization}
 
-To store the training data I use a fixed-size ring buffer with an atomic counter to ensure thread safety.
+\subsection{Emission Factorization}
+
+\section{Training}
+
+\subsection{Collecting Training Data}
+
+To store the training data, I use a fixed-size ring buffer with an atomic counter to ensure thread safety.
 This is not ideal, as it may lead to serialization of the GPU threads and thus potentially introduces a performance bottleneck, but it allows me to write dynamic amounts of data per thread.
 Further research could be done to find a more efficient way to store the training data, for example using warp aggregation and compaction, but this is not straightforward as OptiX does not expose shared memory to allow for Shader Execution Reordering.
 
-\section{Reflectance Factorization}
+\subsection{Self-Learning}
 
-\section{Self-Learning}
+\section{Inference}
 
-\section{Inference Strategies}
+\subsection{Temporal Stability}
 
-\section{Emission Factorization}
+\subsection{Path Termination Strategies}
+
+\subsection{Temporal Stability}
+
