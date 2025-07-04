@@ -25,11 +25,14 @@ With this hardware-optimized implementation, \textcite{muller2021} achieve a spe
 
 \section{Input Encodings}
 
-As shown by \textcite{ren2013}, only parametrizing the network with the outgoing direction $\wo$ and the position $\mathbf{x}$ is not sufficient for an accurate representation of the radiance field.
+As shown by \textcite{ren2013}, parametrizing the network with the outgoing direction $\wo$ and the position $\mathbf{x}$ alone is not sufficient for an accurate representation of the radiance field.
+Instead, it proves beneficial to include the surface normal $\mathbf{n}$, surface roughness $r$ and the expected diffuse and specular reflectance terms $\mathbf{F}_d$ and $\mathbf{F}_s$ as well.
 
 \subsection{Instant Neural Graphic Primitives}
 
 \subsection{One Blob and One Blob Diffuse Encoding}
+
+\subsection{Reflected One Blob Octahedral Encoding}
 
 \subsection{Reflectance Factorization}
 
@@ -50,6 +53,4 @@ Further research could be done to find a more efficient way to store the trainin
 \subsection{Temporal Stability}
 
 \subsection{Path Termination Strategies}
-
-\subsection{Temporal Stability}
 

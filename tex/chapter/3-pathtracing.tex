@@ -23,7 +23,7 @@ Thus, we utilize probabilistic approaches to solve it, in my reference implement
 The idea is, to sample the integral using random samples drawn from a probability distribution, which ideally is chosen as proportional to the integrand as possible.
 
 Applying this to the rendering equation, we can formulate an estimator for the outgoing radiance $L_o$:
-
+% TODO: Clarify \vec{\hat{\omega}}_i \sim p(\vec{\hat{\omega}}_i \mid \wo)
 \begin{equation}
     \estimator{L_o(\vec{x}, \wo)} = L_e(\vec{x}, \wo) + \frac{1}{N} \sum_{i=1}^{N} \frac{f(\vec{\hat{\omega}}_i, \vec{x}, \wo) \cos(\hat{\theta}_i)}{p(\vec{\hat{\omega}}_i)} L_i(\vec{x}, \vec{\hat{\omega}}_i), \quad \vec{\hat{\omega}}_i \sim p
 \end{equation}
@@ -90,7 +90,7 @@ The BSDF is split into two parts: If the light direction $\wi$ and the view dire
     \end{cases}
 \end{equation}
 
-For the specular component, I use the Torrance-Sparrow/Cook-Torrance microfacet model \bcite{torrance1967, cook1982}:
+For the specular component, I use the Torrance-Sparrow/Cook-Torrance microfacet model \bcite{torrance1967, cook1982} with the corrected normalization factor from \textcite{walter2007}:
 
 \begin{equation}
     f_s(\wi, \vec{x}, \wo) = \frac{D(\NdotH) G(\n, \wi, \wo) F(\LdotH)}{4 \NdotL \NdotV}
@@ -126,7 +126,7 @@ For the Fresnel term $F$, I use the Schlick approximation \bcite{schlick1994}:
 \end{equation}
 
 In the case of transmission, the normal of an ideally refracting microfacet is given by:
-
+% TODO: Figure
 \begin{equation}
     \wm = \frac{\eta_i \wi + \eta_o \wo}{\|\eta_i \wi + \eta_o \wo\|} =\frac{\eta \wi + \wo}{\|\eta \wi + \wo\|}
 \end{equation}
@@ -172,7 +172,7 @@ Yet, several approaches have been made to also take $L_i$ into account, notably 
 For my reference pathtracer, I will only employ BSDF sampling and direct light sampling (\ref{sec:mis}).
 
 For the diffuse component, as it is constant I only sample the cosine weighted hemisphere:
-
+% TODO: (1-specular_albedo) should be right
 \begin{equation}
     p_d(\wi) = \frac{\cos(\theta_i)}{\pi} \quad \text{for } \wi \in \Omega
 \end{equation}
