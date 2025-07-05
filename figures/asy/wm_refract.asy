@@ -1,5 +1,6 @@
 import geometry;
 import settings;
+import fontsize;
 outformat="pdf";
 usepackage("bm");
 size(6cm);
@@ -33,13 +34,13 @@ pair wo = refract(wi, wm, 1 / eta);
 draw((0,0)--wi, mediumgreen, Arrow);
 label("$\bm{\omega}_i$", wi, W);
 draw((0,dot(wi,wm))--wi);
-label(scale(0.5)*"$\sin(\theta_i)$", wi+(0.3,0), N);
+label("$\sin(\theta_i)$", wi+(0.3,0), N, fontsize(4pt));
 markangle("$\theta_i$", wm, (0,0), wi, radius=8);
 
 draw((0,0)--etai*wi, mediumgreen+dotted, Arrow);
 label("$\eta_i\bm{\omega}_i$", etai*wi, W);
 draw((0,dot(etai*wi,wm))--etai*wi, dotted);
-label(scale(0.5)*"$\eta_i\sin(\theta_i)$", etai*wi+(0.5,0), N);
+label("$\eta_i\sin(\theta_i)$", etai*wi+(0.5,0), N, fontsize(4pt));
 
 draw(etao*wo--etai*wi+etao*wo, mediumgreen+dotted, Arrow);
 
@@ -47,13 +48,13 @@ draw(etao*wo--etai*wi+etao*wo, mediumgreen+dotted, Arrow);
 draw((0,0)--wo, mediumred, Arrow);
 label("$\bm{\omega}_o$", wo, E);
 draw((0,dot(wo,wm))--wo);
-label(scale(0.5)*"$\sin(\theta_o)$", wo-(0.2,0), S);
+label("$\sin(\theta_o)$", wo-(0.2,0), S, fontsize(4pt));
 markangle("$\theta_o$", -wm, (0,0), wo, radius=8);
 
 draw((0,0)--etao*wo, mediumred+dotted, Arrow);
 label("$\eta_o\bm{\omega}_o$", etao*wo, E);
 draw((0,dot(etao*wo,wm))--etao*wo, dotted);
-label(scale(0.5)*"$\eta_o\sin(\theta_o)$", etao*wo-(0.5,0), S);
+label("$\eta_o\sin(\theta_o)$", etao*wo-(0.5,0), S, fontsize(4pt));
 
 draw(etai*wi--etao*wo+etai*wi, mediumred+dotted, Arrow);
 
