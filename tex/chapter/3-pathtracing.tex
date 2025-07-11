@@ -38,6 +38,7 @@ Hence, by the law of large numbers this estimator converges to the true solution
 
 To handle the infinite recursion without introducing bias, I use Russian roulette termination as motivated by \textcite{veach1997}, which probabilistically terminates the recursion based on the contribution of the current path segment:
 \begin{equation}
+\label{eq:rr}
     \estimator{I_\mathrm{RR}} =
     \begin{cases}
         \frac{\estimator{I_\mathrm{MC}}}{p_\mathrm{continue}} & \text{with probability } p_\mathrm{continue} \\

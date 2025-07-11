@@ -532,6 +532,21 @@
   file = {/Users/julianstamm/Zotero/storage/9LMSPYEB/Heckbert - 1990 - Adaptive radiosity textures for bidirectional ray tracing.pdf}
 }
 
+@article{hedstrom2025,
+  title = {{{ReSTIR BDPT}}: {{Bidirectional ReSTIR Path Tracing}} with {{Caustics}}},
+  shorttitle = {{{ReSTIR BDPT}}},
+  author = {Hedstrom, Trevor and Kettunen, Markus and Lin, Daqi and Wyman, Chris and Li, Tzu-Mao},
+  date = {2025-06-17},
+  journaltitle = {ACM Trans. Graph.},
+  issn = {0730-0301},
+  doi = {10.1145/3744898},
+  url = {https://dl.acm.org/doi/10.1145/3744898},
+  urldate = {2025-07-10},
+  abstract = {Recent spatiotemporal resampling algorithms (ReSTIR) accelerate real-time path tracing by reusing samples between pixels and frames. However, existing methods are limited by the sampling quality of path tracing, making them inefficient for scenes with caustics and hard-to-reach lights. We develop a ReSTIR variant incorporating bidirectional path tracing that significantly improves the sampling quality in these scenes. Combining bidirectional path tracing and ReSTIR introduces multiple challenges: the generalized resampled importance sampling (GRIS) behind ReSTIR is, by default, not aware of how a path was sampled, which complicates reuse of bidirectional paths. Light tracing is also challenging since light subpaths can contribute to all pixels. To address these challenges, we apply GRIS in a sampling technique-aware extended path space, design a bidirectional hybrid shift mapping, and introduce caustics reservoirs that can accumulate caustics across frames. Our method takes around 50ms per frame across our test scenes, and achieves significantly lower error compared to prior unidirectional ReSTIR variants running in equal time.},
+  annotation = {Just Accepted},
+  file = {/Users/julianstamm/Zotero/storage/3ASKHNZD/Hedstrom et al. - 2025 - ReSTIR BDPT Bidirectional ReSTIR Path Tracing with Caustics.pdf}
+}
+
 @article{heinrich1994,
   title = {Quasi-{{Monte Carlo Methods}} in {{Computer Graphics Part II}}: {{The Radiance Equation}}},
   shorttitle = {Quasi-{{Monte Carlo Methods}} in {{Computer Graphics Part II}}},
@@ -959,6 +974,25 @@
   file = {/Users/julianstamm/Zotero/storage/M7WN8MUS/www.mikktspace.com.html}
 }
 
+@article{mildenhall2022,
+  title = {{{NeRF}}: Representing Scenes as Neural Radiance Fields for View Synthesis},
+  shorttitle = {{{NeRF}}},
+  author = {Mildenhall, Ben and Srinivasan, Pratul P. and Tancik, Matthew and Barron, Jonathan T. and Ramamoorthi, Ravi and Ng, Ren},
+  date = {2022-01},
+  journaltitle = {Communications of the ACM},
+  shortjournal = {Commun. ACM},
+  volume = {65},
+  number = {1},
+  pages = {99--106},
+  issn = {0001-0782, 1557-7317},
+  doi = {10.1145/3503250},
+  url = {https://dl.acm.org/doi/10.1145/3503250},
+  urldate = {2025-07-06},
+  abstract = {We present a method that achieves state-of-the-art results for synthesizing novel views of complex scenes by optimizing an underlying continuous volumetric scene function using a sparse set of input views. Our algorithm represents a scene using a fully connected (nonconvolutional) deep network, whose input is a single continuous 5D coordinate (spatial location (               x               ,               y               ,               z               ) and viewing direction (               θ, ϕ               )) and whose output is the volume density and view-dependent emitted radiance at that spatial location. We synthesize views by querying 5D coordinates along camera rays and use classic volume rendering techniques to project the output colors and densities into an image. Because volume rendering is naturally differentiable, the only input required to optimize our representation is a set of images with known camera poses. We describe how to effectively optimize neural radiance fields to render photorealistic novel views of scenes with complicated geometry and appearance, and demonstrate results that outperform prior work on neural rendering and view synthesis.},
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/NX2XP3W8/Mildenhall et al. - 2022 - NeRF representing scenes as neural radiance fields for view synthesis.pdf}
+}
+
 @article{muller2017,
   title = {Practical {{Path Guiding}} for {{Efficient Light}}‐{{Transport Simulation}}},
   author = {Müller, Thomas and Gross, Markus and Novák, Jan},
@@ -991,6 +1025,22 @@
   pubstate = {prepublished},
   keywords = {Computer Science - Graphics,Computer Science - Machine Learning,Statistics - Machine Learning},
   file = {/Users/julianstamm/Zotero/storage/E65E8WYE/Müller et al. - 2019 - Neural Importance Sampling.pdf;/Users/julianstamm/Zotero/storage/EPNMQZR3/1808.html}
+}
+
+@online{muller2020,
+  title = {Neural {{Control Variates}}},
+  author = {Müller, Thomas and Rousselle, Fabrice and Novák, Jan and Keller, Alexander},
+  date = {2020-09-04},
+  eprint = {2006.01524},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2006.01524},
+  url = {http://arxiv.org/abs/2006.01524},
+  urldate = {2025-07-06},
+  abstract = {We propose neural control variates (NCV) for unbiased variance reduction in parametric Monte Carlo integration. So far, the core challenge of applying the method of control variates has been finding a good approximation of the integrand that is cheap to integrate. We show that a set of neural networks can face that challenge: a normalizing flow that approximates the shape of the integrand and another neural network that infers the solution of the integral equation. We also propose to leverage a neural importance sampler to estimate the difference between the original integrand and the learned control variate. To optimize the resulting parametric estimator, we derive a theoretically optimal, variance-minimizing loss function, and propose an alternative, composite loss for stable online training in practice. When applied to light transport simulation, neural control variates are capable of matching the state-of-the-art performance of other unbiased approaches, while providing means to develop more performant, practical solutions. Specifically, we show that the learned light-field approximation is of sufficient quality for high-order bounces, allowing us to omit the error correction and thereby dramatically reduce the noise at the cost of negligible visible bias.},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Graphics,Computer Science - Machine Learning,Statistics - Machine Learning},
+  file = {/Users/julianstamm/Zotero/storage/J9YS54S2/Müller et al. - 2020 - Neural Control Variates.pdf;/Users/julianstamm/Zotero/storage/RBZT2ID6/2006.html}
 }
 
 @article{muller2021,
@@ -1319,6 +1369,18 @@
   file = {/Users/julianstamm/Zotero/storage/5PV4YKD5/Takikawa et al. - 2023 - Compact Neural Graphics Primitives with Learned Hash Probing.pdf;/Users/julianstamm/Zotero/storage/FQX3VKFC/Takikawa et al. - 2023 - Compact Neural Graphics Primitives with Learned Hash Probing.pdf}
 }
 
+@article{tancik2020,
+  title = {Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional Domains},
+  author = {Tancik, Matthew and Srinivasan, Pratul and Mildenhall, Ben and Fridovich-Keil, Sara and Raghavan, Nithin and Singhal, Utkarsh and Ramamoorthi, Ravi and Barron, Jonathan and Ng, Ren},
+  date = {2020},
+  journaltitle = {Advances in neural information processing systems},
+  volume = {33},
+  pages = {7537--7547},
+  url = {https://proceedings.neurips.cc/paper_files/paper/2020/hash/55053683268957697aa39fba6f231c68-Abstract.html},
+  urldate = {2025-07-07},
+  file = {/Users/julianstamm/Zotero/storage/AP9ISDGE/Tancik et al. - 2020 - Fourier features let networks learn high frequency functions in low dimensional domains.pdf}
+}
+
 @article{tatzgern2024,
   title = {Radiance {{Caching}} with {{On-Surface Caches}} for {{Real-Time Global Illumination}}},
   author = {Tatzgern, Wolfgang and Weinrauch, Alexander and Stadlbauer, Pascal and Mueller, Joerg H. and Winter, Martin and Steinberger, Markus},
@@ -1394,6 +1456,17 @@
   url = {https://cs.stanford.edu/people/eroberts/courses/soco/projects/1997-98/ray-tracing/types.html},
   urldate = {2025-04-24},
   file = {/Users/julianstamm/Zotero/storage/LQ5M3P3Z/types.html}
+}
+
+@article{vaswani2017,
+  title = {Attention Is All You Need},
+  author = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, Łukasz and Polosukhin, Illia},
+  date = {2017},
+  journaltitle = {Advances in neural information processing systems},
+  volume = {30},
+  url = {https://proceedings.neurips.cc/paper/2017/hash/3f5ee243547dee91fbd053c1c4a845aa-Abstract.html},
+  urldate = {2025-07-08},
+  file = {/Users/julianstamm/Zotero/storage/9MTXSP7E/Vaswani et al. - 2017 - Attention is all you need.pdf}
 }
 
 @article{veach,
@@ -1483,6 +1556,23 @@
   pubstate = {prepublished},
   keywords = {Computer Science - Computer Vision and Pattern Recognition},
   file = {/Users/julianstamm/Zotero/storage/BZK7HF7I/Wu et al. - 2024 - Neural Directional Encoding for Efficient and Accurate View-Dependent Appearance Modeling.pdf}
+}
+
+@inproceedings{wyman2023,
+  title = {A {{Gentle Introduction}} to {{ReSTIR Path Reuse}} in {{Real-Time}}},
+  booktitle = {{{ACM SIGGRAPH}} 2023 {{Courses}}},
+  author = {Wyman, Chris and Kettunen, Markus and Lin, Daqi and Bitterli, Benedikt and Yuksel, Cem and Jarosz, Wojciech and Kozlowski, Pawel},
+  date = {2023-07-24},
+  series = {{{SIGGRAPH}} '23},
+  pages = {1--38},
+  publisher = {Association for Computing Machinery},
+  location = {New York, NY, USA},
+  doi = {10.1145/3587423.3595511},
+  url = {https://dl.acm.org/doi/10.1145/3587423.3595511},
+  urldate = {2025-07-11},
+  abstract = {In recent years, reservoir-based spatiotemporal importance resampling (ReSTIR) algorithms appeared out of nowhere to take parts of the realtime rendering community by storm, with sample reuse speeding direct lighting from millions of dynamic lights [1], diffuse multi-bounce lighting [2], participating media [3], and even complex global illumination paths [4]. Highly optimized variants (e.g. [5]) can give 100x efficiency improvement over traditional ray- and path-tracing methods; this is key to achieve 30 or 60 Hz framerates. In production engines, tracing even one ray or path per pixel may only be feasible on the highest-end systems, so maximizing image quality per sample is vital.ReSTIR builds on the math in Talbot et al.'s [6] resampled importance sampling (RIS), which previously was not widely used or taught, leaving many practitioners missing key intuitions and theoretical grounding. A firm grounding is vital, as seemingly obvious "optimizations" arising during ReSTIR engine integration can silently introduce conditional probabilities and dependencies that, left ignored, add uncontrollable bias to the results.In this course, we plan to:1. Provide concrete motivation and intuition for why ReSTIR works, where it applies, what assumptions it makes, and the limitations of today's theory and implementations;2. Gently develop the theory, targeting attendees with basic Monte Carlo sampling experience but without prior knowledge of resampling algorithms (e.g., Talbot et al. [6]);3. Give explicit algorithmic samples and pseudocode, pointing out easily-encountered pitfalls when implementing ReSTIR;4. Discuss actual game integrations, highlighting the gotchas, challenges, and corner cases we encountered along the way, and highlighting ReSTIR's practical benefits.},
+  isbn = {979-8-4007-0145-0},
+  file = {/Users/julianstamm/Zotero/storage/34Q29SU3/2023ReSTIR_Course_DirectLight_and_Spatiotemporal.pdf;/Users/julianstamm/Zotero/storage/9PEEPS62/2023ReSTIR_Course_Cyberpunk_2077_Integration.pdf;/Users/julianstamm/Zotero/storage/EPC8JZR4/Wyman et al. - 2023 - A Gentle Introduction to ReSTIR Path Reuse in Real-Time.pdf;/Users/julianstamm/Zotero/storage/FIS8FF2B/2023ReSTIR_Course_AlgorithmicOptimizations.pdf;/Users/julianstamm/Zotero/storage/NT9KC9RH/2023ReSTIR_Course_RIS.pdf;/Users/julianstamm/Zotero/storage/Q7LW9NG7/2023ReSTIR_Course_Welcome.pdf;/Users/julianstamm/Zotero/storage/UHGZYUM3/2023ReSTIR_Course_LowLevelOptimizations.pdf;/Users/julianstamm/Zotero/storage/VMBZT6TA/214-restir.mp4;/Users/julianstamm/Zotero/storage/WSEA5CRA/2023ReSTIR_Course_ExtendingReuse.pdf;/Users/julianstamm/Zotero/storage/ZBKR6PHG/2023ReSTIR_Course_Preliminaries.pdf;/Users/julianstamm/Zotero/storage/ZSALJTKX/2023ReSTIR_Course_ReuseBetweenDomains.pdf}
 }
 
 @inproceedings{zheng2024,

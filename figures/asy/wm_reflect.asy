@@ -11,12 +11,12 @@ pair wm = dir(90)*5;
 pair wo = reflect((0,0),(wm))*wi;
 
 // draw wi
-draw((0,0)--wi, mediumgreen, Arrow);
+draw((0,0)--wi, green, Arrow);
 label("$\bm{\omega}_i$", wi, W);
 markangle("$\theta_i$", wm, (0,0), wi, radius=8);
 
 // draw wo
-draw((0,0)--wo, mediumred, Arrow);
+draw((0,0)--wo, red, Arrow);
 label("$\bm{\omega}_o$", wo, E);
 markangle("$\theta_o$", wo, (0,0), wm, radius=8);
 

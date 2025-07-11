@@ -48,7 +48,7 @@ def one_blob_field(x, num_bins_log2, cdf=cdf_no_wrap):
 x = np.linspace(0, 1, 100)
 
 activations = one_blob_field(x, 2, cdf_wrap)
-plt.figure(figsize=(5, 3))
+plt.figure(figsize=(3, 2))
 for i, y in enumerate(activations):
     plt.plot(x, y, label=f'bin={i}')
 plt.title("Wrapped Quartic Bin Integration")
@@ -61,7 +61,7 @@ plt.savefig('oneblob_wrap.pgf', bbox_inches='tight')
 plt.show()
 
 activations = one_blob_field(x, 2, cdf_no_wrap)
-plt.figure(figsize=(5, 3))
+plt.figure(figsize=(3, 2))
 for i, y in enumerate(activations):
     plt.plot(x, y, label=f'bin={i}')
 plt.title("Standard Quartic Bin Integration")
