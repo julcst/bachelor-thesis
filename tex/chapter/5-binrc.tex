@@ -18,23 +18,26 @@ Radiance caching generally can be broken down into four steps:
     \begin{enumerate}
         \item \textbf{Query Sampling} We sample queries $q = (\vec{x}, \vec{\omega}_o)$ according to a distribution $Q(q)$.
         \item \textbf{Interpolation} Given a query $q$, we want to approximate the outgoing radiance $\hat{L}_o(q)$ by interpolating the radiance estimates of spatiotemporally nearby query predictions $\hat{q}$.
-        We can use any interpolation or storing technique for this, such as nearest neighbor, linear interpolation or in our case the NRC.
+        We can use any combination of storing and interpolation technique for this, such as nearest neighbor, linear interpolation or, in our case, the NRC.
         Note however, that this step generally introduces \textbf{bias}.
     \end{enumerate}
 \end{enumerate}
 
-\textbf{Note}, that using this framework we can observe that the \textbf{cache efficiency} is optimal if the query prediction distribution $\hat{Q}(\hat{q})$ is equal to the query sampling distribution $Q(q)$.
-Conversely, if we sample a query $q^*$ that can not be predicted by the query predictor (i.e. $\hat{Q}(q^*)=0 \implies Q \not\subseteq \hat{Q}$), we introduce fundamental bias into the radiance cache $\hat{L}_o(q^*)$.
+\textbf{Note:} Using this framework we can observe that the \textbf{cache efficiency} is optimal if the query prediction distribution $\hat{Q}(\hat{q})$ is equal to the query sampling distribution $Q(q)$.
+Conversely, if we sample a query $q^*$ that can not be predicted by the query predictor (i.e. $\hat{Q}(q^*)=0$), we introduce fundamental bias into the radiance cache $\hat{L}_o(q^*)$, because the radiance cache will not contain an accurate radiance estimate for that query.
+This happens, whenever the support of the query sampling distribution $Q$ is not contained in the support of the query prediction distribution $\hat{Q}$, i.e. $\supp(Q) \not\subseteq \supp(\hat{Q})$.
 
 \textbf{Discussion:} It may be possible, to derive an unbiased radiance cache by storing the radiance estimates $L_o(\hat{q})$ in a spatial data structure and reconnecting the queries $q$ to the query predictions $\hat{q}$ similarly to Vertex Connection and Merging (VCM). % TODO: Check and cite
 
+\section{Inference}
+
 \section{Path Tracing}
+
+\section{Bidirectional Training}
 
 \section{Light Tracing}
 
-\section{Fully Connected Light Tracing}
-
-\section{Balanced Light Tracing}
+\section{Balancing}
 
 \section{Path Spaced Denoised Sparse Photon Mapping}
 

@@ -143,6 +143,23 @@
   file = {/Users/julianstamm/Zotero/storage/ZJ4PLDZQ/sampling_patterns.html}
 }
 
+@online{boisse2023,
+  title = {{{GI-1}}.0: {{A Fast}} and {{Scalable Two-level Radiance Caching Scheme}} for {{Real-time Global Illumination}}},
+  shorttitle = {{{GI-1}}.0},
+  author = {Boissé, Guillaume and Meunier, Sylvain and family=Dinechin, given=Heloise, prefix=de, useprefix=false and Bartels, Pieterjan and Veselov, Alexander and Eto, Kenta and Harada, Takahiro},
+  date = {2023-10-30},
+  eprint = {2310.19855},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2310.19855},
+  url = {http://arxiv.org/abs/2310.19855},
+  urldate = {2025-08-02},
+  abstract = {Real-time global illumination is key to enabling more dynamic and physically realistic worlds in performance-critical applications such as games or any other applications with real-time constraints.Hardware-accelerated ray tracing in modern GPUs allows arbitrary intersection queries against the geometry, making it possible to evaluate indirect lighting entirely at runtime. However, only a small number of rays can be traced at each pixel to maintain high framerates at ever-increasing image resolutions. Existing solutions, such as probe-based techniques, approximate the irradiance signal at the cost of a few rays per frame but suffer from a lack of details and slow response times to changes in lighting. On the other hand, reservoir-based resampling techniques capture much more details but typically suffer from poorer performance and increased amounts of noise, making them impractical for the current generation of hardware and gaming consoles. To find a balance that achieves high lighting fidelity while maintaining a low runtime cost, we propose a solution that dynamically estimates global illumination without needing any content preprocessing, thus enabling easy integration into existing real-time rendering pipelines.},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Graphics},
+  file = {/Users/julianstamm/Zotero/storage/IR4GF924/Boissé et al. - 2023 - GI-1.0 A Fast and Scalable Two-level Radiance Caching Scheme for Real-time Global Illumination.pdf;/Users/julianstamm/Zotero/storage/BH5FLED4/2310.html}
+}
+
 @unpublished{boksanksky,
   title = {Advancing {{Real-Time Path Tracing}} with {{Neural Radiance Cache}} | {{GTC Digital Spring}} 2023 | {{NVIDIA On-Demand}}},
   author = {Boksanksky, Jakub and Mihuț, Ana},
@@ -361,6 +378,20 @@
   file = {/Users/julianstamm/Zotero/storage/4RQM7LNR/Dupuy and Benyoub - 2023 - Sampling Visible GGX Normals with Spherical Caps.pdf;/Users/julianstamm/Zotero/storage/W77TVJH5/2306.html}
 }
 
+@online{dynamicdiffuseglobalillumination,
+  title = {Dynamic {{Diffuse Global Illumination}}},
+  url = {https://morgan3d.github.io/articles/2019-04-01-ddgi/},
+  urldate = {2025-07-29},
+  file = {/Users/julianstamm/Zotero/storage/JD7YBCX5/2019-04-01-ddgi.html}
+}
+
+@online{dynamicdiffuseglobalilluminationraytracedirradiancefieldsjcgt,
+  title = {Dynamic {{Diffuse Global Illumination}} with {{Ray-Traced Irradiance Fields}} ({{JCGT}})},
+  url = {https://jcgt.org/published/0008/02/01/},
+  urldate = {2025-07-29},
+  file = {/Users/julianstamm/Zotero/storage/LQVEMFD4/01.html}
+}
+
 @inproceedings{engelhardt2008,
   title = {Octahedron {{Environment Maps}}.},
   booktitle = {{{VMV}}},
@@ -400,6 +431,20 @@
   url = {https://mimosa-pudica.net/improved-oren-nayar.html},
   urldate = {2025-06-14},
   file = {/Users/julianstamm/Zotero/storage/W8I95P44/undefined}
+}
+
+@article{gao2022,
+  title = {Neural Global Illumination: {{Interactive}} Indirect Illumination Prediction under Dynamic Area Lights},
+  shorttitle = {Neural Global Illumination},
+  author = {Gao, Duan and Mu, Haoyuan and Xu, Kun},
+  date = {2022},
+  journaltitle = {IEEE Transactions on Visualization and Computer Graphics},
+  volume = {29},
+  number = {12},
+  pages = {5325--5341},
+  publisher = {IEEE},
+  url = {https://ieeexplore.ieee.org/abstract/document/9904431/},
+  urldate = {2025-07-29}
 }
 
 @online{generatingraytracedcausticeffectsunrealengine4part12020,
@@ -879,6 +924,21 @@
   file = {/Users/julianstamm/Zotero/storage/LYTTIGJN/Knaus and Zwicker - 2011 - Progressive photon mapping A probabilistic approach.pdf}
 }
 
+@article{krivanek2005,
+  title = {Radiance Caching for Efficient Global Illumination Computation},
+  author = {Krivánek, Jaroslav and Gautron, Pascal and Pattanaik, Sumanta and Bouatouch, Kadi},
+  date = {2005},
+  journaltitle = {IEEE Transactions on Visualization and Computer Graphics},
+  volume = {11},
+  number = {5},
+  pages = {550--561},
+  publisher = {IEEE},
+  url = {https://ieeexplore.ieee.org/abstract/document/1471692/},
+  urldate = {2025-07-28},
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/74CLW8PF/Krivánek et al. - 2005 - Radiance caching for efficient global illumination computation.pdf}
+}
+
 @book{krivanek2022,
   title = {Practical {{Global Illumination}} with {{Irradiance Caching}}},
   author = {Krivanek, Jaroslav and Gautron, Pascal},
@@ -928,6 +988,23 @@
   file = {/Users/julianstamm/Zotero/storage/C5BT57M4/Physically Based Material Where Are We.pdf}
 }
 
+@online{lehtinen2018,
+  title = {{{Noise2Noise}}: {{Learning Image Restoration}} without {{Clean Data}}},
+  shorttitle = {{{Noise2Noise}}},
+  author = {Lehtinen, Jaakko and Munkberg, Jacob and Hasselgren, Jon and Laine, Samuli and Karras, Tero and Aittala, Miika and Aila, Timo},
+  date = {2018-10-29},
+  eprint = {1803.04189},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.1803.04189},
+  url = {http://arxiv.org/abs/1803.04189},
+  urldate = {2025-08-02},
+  abstract = {We apply basic statistical reasoning to signal reconstruction by machine learning -- learning to map corrupted observations to clean signals -- with a simple and powerful conclusion: it is possible to learn to restore images by only looking at corrupted examples, at performance at and sometimes exceeding training using clean data, without explicit image priors or likelihood models of the corruption. In practice, we show that a single model learns photographic noise removal, denoising synthetic Monte Carlo images, and reconstruction of undersampled MRI scans -- all corrupted by different processes -- based on noisy data only.},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning,Statistics - Machine Learning},
+  file = {/Users/julianstamm/Zotero/storage/6HSP7GAZ/Lehtinen et al. - 2018 - Noise2Noise Learning Image Restoration without Clean Data.pdf;/Users/julianstamm/Zotero/storage/AWGE2CHZ/1803.html}
+}
+
 @article{lin2022,
   title = {Generalized Resampled Importance Sampling: Foundations of {{ReSTIR}}},
   shorttitle = {Generalized Resampled Importance Sampling},
@@ -958,6 +1035,35 @@
   urldate = {2025-05-04},
   abstract = {We  introduce two  new  techniques for  density estimation.  Our ap(cid:173) proach poses the problem as  a  supervised learning task which  can  be  performed  using  Neural  Networks.  We  introduce  a  stochas(cid:173) tic method for  learning the cumulative distribution  and an  analo(cid:173) gous  deterministic technique.  We  demonstrate convergence of our  methods  both theoretically and experimentally, and provide com(cid:173) parisons with the Parzen estimate.  Our theoretical results demon(cid:173) strate better convergence properties than the Parzen estimate.},
   file = {/Users/julianstamm/Zotero/storage/9636C9J9/Magdon-Ismail and Atiya - 1998 - Neural Networks for Density Estimation.pdf}
+}
+
+@article{majercik2019,
+  title = {Dynamic Diffuse Global Illumination with Ray-Traced Irradiance Fields},
+  author = {Majercik, Zander and Guertin, Jean-Philippe and Nowrouzezahrai, Derek and McGuire, Morgan},
+  date = {2019},
+  journaltitle = {Journal of Computer Graphics Techniques},
+  volume = {8},
+  number = {2},
+  url = {https://cim.mcgill.ca/~derek/files/DDGI-lowres.pdf},
+  urldate = {2025-07-29},
+  file = {/Users/julianstamm/Zotero/storage/SGGZFATX/Majercik et al. - 2019 - Dynamic diffuse global illumination with ray-traced irradiance fields.pdf}
+}
+
+@inproceedings{majercik2021,
+  title = {Dynamic {{Diffuse Global Illumination Resampling}}},
+  booktitle = {{{ACM SIGGRAPH}} 2021 {{Talks}}},
+  author = {Majercik, Zander and Mueller, Thomas and Keller, Alexander and Nowrouzezahrai, Derek and McGuire, Morgan},
+  date = {2021-07-31},
+  pages = {1--2},
+  publisher = {ACM},
+  location = {Virtual Event USA},
+  doi = {10.1145/3450623.3464635},
+  url = {https://dl.acm.org/doi/10.1145/3450623.3464635},
+  urldate = {2025-07-29},
+  eventtitle = {{{SIGGRAPH}} '21: {{Special Interest Group}} on {{Computer Graphics}} and {{Interactive Techniques Conference}}},
+  isbn = {978-1-4503-8373-8},
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/AEMPQYJF/Majercik et al. - 2021 - Dynamic Diffuse Global Illumination Resampling.pdf;/Users/julianstamm/Zotero/storage/67GIU2IK/3450623.html}
 }
 
 @inproceedings{mara2013,
@@ -1450,6 +1556,23 @@
   url = {https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html}
 }
 
+@online{thomas2018,
+  title = {Deep {{Illumination}}: {{Approximating Dynamic Global Illumination}} with {{Generative Adversarial Network}}},
+  shorttitle = {Deep {{Illumination}}},
+  author = {Thomas, Manu Mathew and Forbes, Angus G.},
+  date = {2018-05-22},
+  eprint = {1710.09834},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.1710.09834},
+  url = {http://arxiv.org/abs/1710.09834},
+  urldate = {2025-07-29},
+  abstract = {We present Deep Illumination, a novel machine learning technique for approximating global illumination (GI) in real-time applications using a Conditional Generative Adversarial Network. Our primary focus is on generating indirect illumination and soft shadows with offline rendering quality at interactive rates. Inspired from recent advancement in image-to-image translation problems using deep generative convolutional networks, we introduce a variant of this network that learns a mapping from Gbuffers (depth map, normal map, and diffuse map) and direct illumination to any global illumination solution. Our primary contribution is showing that a generative model can be used to learn a density estimation from screen space buffers to an advanced illumination model for a 3D environment. Once trained, our network can approximate global illumination for scene configurations it has never encountered before within the environment it was trained on. We evaluate Deep Illumination through a comparison with both a state of the art real-time GI technique (VXGI) and an offline rendering GI technique (path tracing). We show that our method produces effective GI approximations and is also computationally cheaper than existing GI techniques. Our technique has the potential to replace existing precomputed and screen-space techniques for producing global illumination effects in dynamic scenes with physically-based rendering quality.},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Graphics},
+  file = {/Users/julianstamm/Zotero/storage/Q54ZIXM9/Thomas and Forbes - 2018 - Deep Illumination Approximating Dynamic Global Illumination with Generative Adversarial Network.pdf}
+}
+
 @article{torrance1967,
   title = {Theory for {{Off-Specular Reflection From Roughened Surfaces}}*},
   author = {Torrance, Kenneth E. and Sparrow, Ephraim M.},
@@ -1537,9 +1660,10 @@
   file = {/Users/julianstamm/Zotero/storage/5PLIJRDX/veach1997.pdf;/Users/julianstamm/Zotero/storage/FHZR7F3K/veach-chapter9.pdf}
 }
 
-@article{vorba,
+@article{vorba2011,
   title = {Bidirectional {{Photon Mapping}}},
   author = {Vorba, Jiˇrı},
+  date = {2011},
   abstract = {This paper introduces a method for optimal combination of light paths generated from the camera and from the light sources in the photon mapping algorithm used for computing global illumination. Our method is based on Multiple Importance Sampling, a general approach, introduced by Veach, for adaptive path connection in bi-directional pathtracing. Our goal is to examine this method in connection with the biased algorithm of photon mapping and to improve the ineffective final gather heuristic used in the original version of this algorithm. This heuristic is usually problematic when applied to the scenes where highly glossy materials prevail.},
   langid = {english},
   file = {/Users/julianstamm/Zotero/storage/T4U58Q9V/Vorba - Bidirectional Photon Mapping.pdf}
@@ -1606,6 +1730,19 @@
   abstract = {In recent years, reservoir-based spatiotemporal importance resampling (ReSTIR) algorithms appeared out of nowhere to take parts of the realtime rendering community by storm, with sample reuse speeding direct lighting from millions of dynamic lights [1], diffuse multi-bounce lighting [2], participating media [3], and even complex global illumination paths [4]. Highly optimized variants (e.g. [5]) can give 100x efficiency improvement over traditional ray- and path-tracing methods; this is key to achieve 30 or 60 Hz framerates. In production engines, tracing even one ray or path per pixel may only be feasible on the highest-end systems, so maximizing image quality per sample is vital.ReSTIR builds on the math in Talbot et al.'s [6] resampled importance sampling (RIS), which previously was not widely used or taught, leaving many practitioners missing key intuitions and theoretical grounding. A firm grounding is vital, as seemingly obvious "optimizations" arising during ReSTIR engine integration can silently introduce conditional probabilities and dependencies that, left ignored, add uncontrollable bias to the results.In this course, we plan to:1. Provide concrete motivation and intuition for why ReSTIR works, where it applies, what assumptions it makes, and the limitations of today's theory and implementations;2. Gently develop the theory, targeting attendees with basic Monte Carlo sampling experience but without prior knowledge of resampling algorithms (e.g., Talbot et al. [6]);3. Give explicit algorithmic samples and pseudocode, pointing out easily-encountered pitfalls when implementing ReSTIR;4. Discuss actual game integrations, highlighting the gotchas, challenges, and corner cases we encountered along the way, and highlighting ReSTIR's practical benefits.},
   isbn = {979-8-4007-0145-0},
   file = {/Users/julianstamm/Zotero/storage/34Q29SU3/2023ReSTIR_Course_DirectLight_and_Spatiotemporal.pdf;/Users/julianstamm/Zotero/storage/9PEEPS62/2023ReSTIR_Course_Cyberpunk_2077_Integration.pdf;/Users/julianstamm/Zotero/storage/EPC8JZR4/Wyman et al. - 2023 - A Gentle Introduction to ReSTIR Path Reuse in Real-Time.pdf;/Users/julianstamm/Zotero/storage/FIS8FF2B/2023ReSTIR_Course_AlgorithmicOptimizations.pdf;/Users/julianstamm/Zotero/storage/NT9KC9RH/2023ReSTIR_Course_RIS.pdf;/Users/julianstamm/Zotero/storage/Q7LW9NG7/2023ReSTIR_Course_Welcome.pdf;/Users/julianstamm/Zotero/storage/UHGZYUM3/2023ReSTIR_Course_LowLevelOptimizations.pdf;/Users/julianstamm/Zotero/storage/VMBZT6TA/214-restir.mp4;/Users/julianstamm/Zotero/storage/WSEA5CRA/2023ReSTIR_Course_ExtendingReuse.pdf;/Users/julianstamm/Zotero/storage/ZBKR6PHG/2023ReSTIR_Course_Preliminaries.pdf;/Users/julianstamm/Zotero/storage/ZSALJTKX/2023ReSTIR_Course_ReuseBetweenDomains.pdf}
+}
+
+@article{xing2024,
+  title = {Real-Time All-Frequency Global Illumination with Radiance Caching},
+  author = {Xing, Youxin and Pan, Gaole and Chen, Xiang and Wu, Ji and Wang, Lu and Wang, Beibei},
+  date = {2024},
+  journaltitle = {Computational Visual Media},
+  volume = {10},
+  number = {5},
+  pages = {923--936},
+  publisher = {TUP},
+  url = {https://ieeexplore.ieee.org/abstract/document/10885008/},
+  urldate = {2025-07-28}
 }
 
 @inproceedings{zheng2024,

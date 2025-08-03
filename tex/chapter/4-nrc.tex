@@ -114,7 +114,7 @@ However, the azimuthal angle is periodic, so the encoding has also to be periodi
 To achieve this, \textcite{muller2021} use a wrapped CDF (see \autoref{fig:oneblob}), which comes with the added benefit of being able to compute just one boundary per thread and obtaining the other through warp shuffling.
 However, this encoding is not perfect as it establishes visible discontinuities at the poles.
 
-To avoid these discontinuities, I implemented a variant of the One Blob Encoding which can be disabled for diffuse surfaces.
+To avoid these discontinuities, I implemented a variant of the One Blob Encoding which can be selectively disabled for diffuse surfaces by passing IEEE 754 NaNs as input.
 For such surfaces, the direction vector $\wo$ is irrelevant, as we use the constant Lambertian reflectance model.
 Thus, to omit $\wo$ without breaking the encoding, I assume that the distribution of the input values converges to a uniform distribution over all bins, which is equivalent to a constant activation value of $1 / n$ for each bin.
 
@@ -167,14 +167,23 @@ Further research could be done to find a more efficient way to store the trainin
 \subsection{Self-Learning}
 Furthermore, \textcite{muller2021} propose a self-learning approach, which trades additional bias for reduced variance in the training data.
 The idea is, to terminate the training paths into the radiance cache from the previous frame to simulate infinite length paths.
+Because this can amplify the existing bias in the network prediction, they terminate $1/16$ of the training paths in an unbiased manner without self-learning but by Russian Roulette.
 % TODO: Russian Roulette
 
 \subsection{Loss Function}
-Because we use Monte Carlo Sampling to generate the training data, we want the network to learn the mean of the samples in a local region and we assume the samples to be normally distributed, so the loss function should be the mean squared error (MSE).
+Because we use Monte Carlo Sampling to generate the training data, we want the network to learn the mean of the samples in a local region and we assume the samples to be normally distributed by the central limit theorem, so the loss function should be the squared error loss (L2).
+
+However, the network prediction may cover a high dynamic range, especially when the scene contains caustics or highly glossy materials.
+The traditional L2 loss would thus disproportionately penalize losses in these regions, leading to possible overfitting on bright regions and bad representation of dark regions.
+To mitigate this, \textcite{lehtinen2018} propose to normalize the L2 loss by the squared prediction of the network.
+I use the modification of \textcite{muller2021}, who use the squared \emph{luminance} of the prediction instead to prevent overfitting onto individual color channels.
 
 \section{Inference}
 Using the described training process, the Neural Radiance Cache learns an approximation of the outgoing radiance field, denoted as $\widehat{L}(\vec{x}, \wo)$.
 
 \subsection{Temporal Stability}
+Because the neural network is trained continuously with a relatively high learning rate on highly dynamic data, the output of the network can become temporally unstable.
+As a solution to this apparent flickering effect, \textcite{muller2021} propose to use an exponential moving average over the network weights for inference.
+Note, however, that this is used exclusively for inference, leaving the training process unchanged.
 
 \subsection{Path Termination Strategies}
