@@ -130,6 +130,8 @@ To help the neural network learn the radiance field, \textcite{muller2021} propo
 This way the variance in the training data is reduced, as the remaining part is approximately reduced to just the incoming radiance which is commonly low frequent.
 Note however, that these terms are nonetheless given as input, so this information is already available to the network and this is merely a normalization of the training data.
 % TODO: Check
+% TODO: Mean BRDF
+% TODO: Explain missing transmissive term
 
 \subsection{Emission Factorization}
 Besides the reflectance factorization, I chose to exclude the emission term from the Neural Radiance Cache and only learn the integral part of the outgoing radiance:
@@ -180,10 +182,19 @@ I use the modification of \textcite{muller2021}, who use the squared \emph{lumin
 
 \section{Inference}
 Using the described training process, the Neural Radiance Cache learns an approximation of the outgoing radiance field, denoted as $\widehat{L}(\vec{x}, \wo)$.
+For inference, short paths are traced from the camera to the scene using BSDF sampling, the resulting contribution $I$ is then the throughput along the path multiplied with the radiance estimate at the terminal vertex.
+The length of the inference paths is a trade-off between bias and variance, as longer paths can cover up cache inaccuracies but introduce Monte Carlo noise.
+This is analogous to Final Gathering in Photon Mapping \bcite{jensen1996}.
+In the following, I will thus discuss different strategies for path termination.
+
+\subsection{Path Termination Strategies}
+\textbf{1st Vertex} Terminating directly at the first path vertex is a simple strategy that is well suited to visualize the weaknesses of the radiance cache, but is a rather poor choice for glossy vertices that expose high frequency details in the radiance field.
+
+\textbf{Variance Heuristic} \textcite{muller2021} propose to terminate paths instead based on the estimated variance of the sampled path.
+Low variance paths should be path traced, because they exhibit high frequent detail and importance sampling these paths is likely to yield a good estimate.
+High variance paths on the other hand result in high Monte Carlo noise
 
 \subsection{Temporal Stability}
 Because the neural network is trained continuously with a relatively high learning rate on highly dynamic data, the output of the network can become temporally unstable.
 As a solution to this apparent flickering effect, \textcite{muller2021} propose to use an exponential moving average over the network weights for inference.
 Note, however, that this is used exclusively for inference, leaving the training process unchanged.
-
-\subsection{Path Termination Strategies}

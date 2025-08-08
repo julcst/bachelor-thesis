@@ -27,7 +27,7 @@ Radiance caching generally can be broken down into four steps:
 Conversely, if we sample a query $q^*$ that can not be predicted by the query predictor (i.e. $\hat{Q}(q^*)=0$), we introduce fundamental bias into the radiance cache $\hat{L}_o(q^*)$, because the radiance cache will not contain an accurate radiance estimate for that query.
 This happens, whenever the support of the query sampling distribution $Q$ is not contained in the support of the query prediction distribution $\hat{Q}$, i.e. $\supp(Q) \not\subseteq \supp(\hat{Q})$.
 
-\textbf{Discussion:} It may be possible, to derive an unbiased radiance cache by storing the radiance estimates $L_o(\hat{q})$ in a spatial data structure and reconnecting the queries $q$ to the query predictions $\hat{q}$ similarly to Vertex Connection and Merging (VCM). % TODO: Check and cite
+\textbf{Discussion:} It may be possible, to derive an unbiased radiance cache for diffuse queries by storing the radiance estimates $L_o(\hat{q})$ in a spatial data structure and reconnecting the queries $q$ to the query predictions $\hat{q}$ similarly to Vertex Connection and Merging (VCM). % TODO: Check and cite
 
 \section{Inference}
 
