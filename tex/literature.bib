@@ -81,6 +81,32 @@
   file = {/Users/julianstamm/Zotero/storage/WCS3UR6R/Bauer et al. - 2024 - Photon Field Networks for Dynamic Real-Time Volumetric Global Illumination.pdf;/Users/julianstamm/Zotero/storage/RMJ3ZGPB/10297590.html}
 }
 
+@article{bekaert2003,
+  title = {A Custom Designed Density Estimation Method for Light Transport},
+  author = {Bekaert, Philippe and Slusallek, Philipp and Cools, Ronald and Havran, Vlastimil and Seidel, Hans-Peter},
+  date = {2003},
+  publisher = {Max-Planck-Institut für Informatik},
+  url = {https://pure.mpg.de/pubman/faces/ViewItemOverviewPage.jsp?itemId=item_1819214},
+  urldate = {2025-08-03},
+  file = {/Users/julianstamm/Zotero/storage/4IQ6C3AU/Bekaert et al. - 2003 - A custom designed density estimation method for light transport.pdf}
+}
+
+@article{belcour2013,
+  title = {{{5D Covariance}} Tracing for Efficient Defocus and Motion Blur},
+  author = {Belcour, Laurent and Soler, Cyril and Subr, Kartic and Holzschuch, Nicolas and Durand, Fredo},
+  date = {2013-07-04},
+  journaltitle = {ACM Trans. Graph.},
+  volume = {32},
+  number = {3},
+  pages = {31:1--31:18},
+  issn = {0730-0301},
+  doi = {10.1145/2487228.2487239},
+  url = {https://dl.acm.org/doi/10.1145/2487228.2487239},
+  urldate = {2025-08-03},
+  abstract = {The rendering of effects such as motion blur and depth-of-field requires costly 5D integrals. We accelerate their computation through adaptive sampling and reconstruction based on the prediction of the anisotropy and bandwidth of the integrand. For this, we develop a new frequency analysis of the 5D temporal light-field, and show that first-order motion can be handled through simple changes of coordinates in 5D. We further introduce a compact representation of the spectrum using the covariance matrix and Gaussian approximations. We derive update equations for the 5 × 5 covariance matrices for each atomic light transport event, such as transport, occlusion, BRDF, texture, lens, and motion. The focus on atomic operations makes our work general, and removes the need for special-case formulas. We present a new rendering algorithm that computes 5D covariance matrices on the image plane by tracing paths through the scene, focusing on the single-bounce case. This allows us to reduce sampling rates when appropriate and perform reconstruction of images with complex depth-of-field and motion blur effects.},
+  file = {/Users/julianstamm/Zotero/storage/JND5UK7F/Belcour et al. - 2013 - 5D Covariance tracing for efficient defocus and motion blur.pdf}
+}
+
 @online{benyoub2024,
   title = {{{VNDF}} Importance Sampling for an Isotropic {{Smith-GGX}} Distribution},
   author = {Benyoub, Anis},
@@ -477,7 +503,7 @@
 
 @article{green,
   title = {Spherical {{Harmonic Lighting}}: {{The Gritty Details}}},
-  author = {Green, Robin and Programmer, D},
+  author = {Green, Robin},
   langid = {english},
   file = {/Users/julianstamm/Zotero/storage/U83XVBU4/Green and Programmer - Spherical Harmonic Lighting The Gritty Details.pdf}
 }
@@ -555,6 +581,24 @@
   abstract = {Accurate global illumination rendering using GPUs is gaining attention because of the highly parallel nature of global illumination algorithms. For example, computing the radiance of each pixel using path tracing is embarrassingly parallel. Some major commercial rendering software also started adopting global illumination on GPUs.},
   isbn = {978-1-4503-0523-5},
   file = {/Users/julianstamm/Zotero/storage/CSY6HFUG/Hachisuka and Jensen - 2010 - Parallel progressive photon mapping on GPUs.pdf}
+}
+
+@article{hachisuka2012,
+  title = {A Path Space Extension for Robust Light Transport Simulation},
+  author = {Hachisuka, Toshiya and Pantaleoni, Jacopo and Jensen, Henrik Wann},
+  date = {2012-11},
+  journaltitle = {ACM Transactions on Graphics},
+  shortjournal = {ACM Trans. Graph.},
+  volume = {31},
+  number = {6},
+  pages = {1--10},
+  issn = {0730-0301, 1557-7368},
+  doi = {10.1145/2366145.2366210},
+  url = {https://dl.acm.org/doi/10.1145/2366145.2366210},
+  urldate = {2025-08-03},
+  abstract = {We present a new sampling space for light transport paths that makes it possible to describe Monte Carlo path integration and photon density estimation in the same framework. A key contribution of our paper is the introduction of vertex perturbations, which extends the space of paths with loosely coupled connections. The new framework enables the computation of path probabilities in the same space under the same measure, which allows us to use multiple importance sampling to combine Monte Carlo path integration and photon density estimation. The resulting algorithm,               unified path sampling               , can robustly render complex combinations and glossy surfaces and caustics that are problematic for existing light transport simulation methods.},
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/YVYVZYPY/Hachisuka et al. - 2012 - A path space extension for robust light transport simulation.pdf}
 }
 
 @article{heckbert1990,
@@ -1092,6 +1136,23 @@
   journaltitle = {Software available from tensorflow. org},
   volume = {7},
   url = {tensorflow.org}
+}
+
+@article{metropolis1949,
+  title = {The {{Monte Carlo Method}}},
+  author = {Metropolis, Nicholas and Ulam, S.},
+  date = {1949-09},
+  journaltitle = {Journal of the American Statistical Association},
+  shortjournal = {Journal of the American Statistical Association},
+  volume = {44},
+  number = {247},
+  pages = {335--341},
+  issn = {0162-1459, 1537-274X},
+  doi = {10.1080/01621459.1949.10483310},
+  url = {http://www.tandfonline.com/doi/abs/10.1080/01621459.1949.10483310},
+  urldate = {2025-08-08},
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/47TTW5A9/Metropolis and Ulam - 1949 - The Monte Carlo Method.pdf}
 }
 
 @online{mihut,

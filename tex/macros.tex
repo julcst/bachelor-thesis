@@ -152,3 +152,19 @@
 \DeclareMathOperator{\refract}{refract}
 
 \DeclareMathOperator{\supp}{\mathrm{supp}}
+
+% Short arrow from https://tex.stackexchange.com/a/395014
+\newcommand{\veryshortarrow}[1][3pt]{\mathrel{%
+   \hbox{\rule[\dimexpr\fontdimen22\textfont2-.2pt\relax]{#1}{.4pt}}%
+   \mkern-4mu\hbox{\usefont{U}{lasy}{m}{n}\symbol{41}}}}
+
+\newcommand{\pto}{\mathrel{\mkern-1mu\veryshortarrow[5pt]\mkern-1mu}}
+\newcommand{\ptrip}[3]{\vec{x}_{#1} \pto \vec{x}_{#2} \pto \vec{x}_{#3}}
+\newcommand{\pdir}[2]{\vec{x}_{#1} \pto \vec{x}_{#2}}
+\newcommand{\pbidir}[2]{\vec{x}_{#1} \leftrightarrow  \vec{x}_{#2}}
+
+\newcommand{\G}[2]{G(\pbidir{#1}{#2})}
+\newcommand{\f}[3]{f(\ptrip{#1}{#2}{#3})}
+
+% \newcommand{\G}[2]{G_{#1 \leftrightarrow #2}}
+% \newcommand{\f}[3]{f_{#1 \veryshortarrow #2 \veryshortarrow #3}}

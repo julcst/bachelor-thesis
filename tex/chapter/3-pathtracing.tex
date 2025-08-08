@@ -17,8 +17,9 @@ where $L_o$ is the outgoing radiance, $L_e$ is the emitted radiance, $f$ is the 
 The rendering equation is an infinite recursive integral over all possible light paths, for which no closed-form solution exists in general.
 Hence, to solve it we need to resort to numerical integration strategies.
 Deterministic integration methods suffer from the curse of dimensionality as the rendering equation is notoriously high dimensional.
-Thus, we utilize probabilistic approaches to solve it, in my reference implementation I use Monte Carlo integration, which was first introduced to rendering by \textcite{kajiya1986}.
-The idea is, to sample the integral using random samples drawn from a probability distribution, which ideally is chosen as proportional to the integrand as possible.
+Thus, we utilize probabilistic approaches to solve it.
+In my reference implementation I use Monte Carlo integration, which was originally developed by \textcite{metropolis1949} as part of the Manhattan Project and first introduced to rendering by \textcite{kajiya1986}.
+The idea is, to compute the integral using random samples drawn from a probability distribution, which ideally is chosen as proportional to the integrand as possible.
 
 Applying this to the rendering equation, we can formulate an estimator for the outgoing radiance $L_o$:
 \begin{equation}
@@ -36,7 +37,7 @@ This is an unbiased estimator for the rendering equation, as can be easily shown
 \end{equation}
 Hence, by the law of large numbers this estimator converges to the true solution to the rendering equation for $N \to \infty$.
 
-To handle the infinite recursion without introducing bias, I use Russian roulette termination as motivated by \textcite{veach1997}, which probabilistically terminates the recursion based on the contribution of the current path segment:
+To handle the infinite recursion without introducing bias, I use Russian Roulette Termination as motivated by \textcite{veach1997}, which probabilistically terminates the recursion based on the contribution of the current path segment:
 \begin{equation}
 \label{eq:rr}
     \estimator{I_\mathrm{RR}} =
@@ -45,7 +46,7 @@ To handle the infinite recursion without introducing bias, I use Russian roulett
         0 & \text{with probability } 1 - p_\mathrm{continue}
     \end{cases}
 \end{equation}
-The probability terms cancel out, hence this modification to the estimator does not introduce bias.
+The probability terms cancel out, thus this modification to the estimator does not introduce bias.
 I choose $p_\mathrm{continue}$ proportional to the relative luminance $Y$ \bcite{kirkpatrick2025} of the contribution of the current path segment, which measures the perceived linear brightness of that sample.
 
 % With this and by introducing a visibility term $V$, we can estimate the collected radiance along a complete path in an unbiased manner:
@@ -286,7 +287,8 @@ A general approach to combine multiple sampling strategies is given by the Multi
 where $N$ is the number of sampling strategies, $N_i$ is the number of samples drawn from the $i$-th sampling strategy, $p_i$ is the probability distribution of the $i$-th sampling strategy and $w_i(\hat{x})$ is the weight of the sample $\hat{x}$ drawn from the $i$-th sampling strategy with $\sum w_i(\hat{x}) = 1$.
 This estimator is again trivially unbiased.
 
-A naïve way to combine these two sampling strategies would be to simply weigh them equally, however this is suboptimal, as the resulting variance is then simply the average of the variances of both sampling strategies.
+A naïve way to combine these two sampling strategies would be to simply weigh them equally.
+However, this is suboptimal, as the resulting variance is then simply the average of the variances of both sampling strategies.
 Instead, \textcite{veach1997} also introduced a provably optimal way to combine multiple sampling strategies, called the balance heuristic:
 \begin{equation}
     w_i(\hat{x}) = \frac{N_i p_i(\hat{x})}{\sum_{j} N_j p_j(\hat{x})}
