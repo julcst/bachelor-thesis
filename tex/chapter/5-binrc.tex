@@ -30,6 +30,11 @@ This happens, whenever the support of the query sampling distribution $Q$ is not
 \textbf{Discussion:} It may be possible, to derive an unbiased radiance cache for diffuse queries by storing the radiance estimates $L_o(\hat{q})$ in a spatial data structure and reconnecting the queries $q$ to the query predictions $\hat{q}$ similarly to Vertex Connection and Merging (VCM). % TODO: Check and cite
 
 \section{The Path Space Integral Formulation}
+\begin{figure}[ht]
+    \centering
+    \includegraphics{asy/path_integral.pdf}
+\caption{A path of length $n=2$, $L_o(\vec{x}, \wo) = L_e(\pdir{0}{1}) \G{0}{1} \f{0}{1}{} \G{1}{} f(\pdir{1}{}, \vec{\omega_o})$}
+\end{figure}
 To be able to robustly derive the following radiance estimators, I will use an alternative but equivalent formulation of the rendering equation as an integral over the path space, which was first introduced by \textcite{veach1997}.
 
 A path $\bar{x}$ of length $n$ is defined as a sequence of vertices $\vec{x}_0 \vec{x}_1 \dots \vec{x}_n$.
@@ -38,10 +43,11 @@ Then, the path space integral formulation of the rendering equation is given by:
 \begin{equation}
 \label{eq:path_space_integral}
 \begin{aligned}
-    L_o(x, \wo) = \sum_{n=1}^{\infty} \int_{X_n} L_e(\pdir{0}{1}) \G{0}{1} \prod_{i=1}^{n - 1} \f{i-1}{i}{i+1} \G{i}{i+1}\\
-    f(\vec{x}_{n-1} \pto \vec{x}_n \pto \vec{x}) \G{n-1}{n} f(\vec{x}_n \pto \vec{x}, \wo) \ \diff A(\vec{x}_0) \dots \diff A(\vec{x}_n)
+    L_o(x, \wo) = \sum_{n=0}^{\infty} \int_{X_n} L_e(\pdir{0}{1}) \G{0}{1} \prod_{i=1}^{n - 1} \f{i-1}{i}{i+1} \G{i}{i+1}\\
+    \f{n-1}{n}{} \G{n}{} f(\vec{x}_n \pto \vec{x}, \wo) \ \diff A(\vec{x}_0) \dots \diff A(\vec{x}_n)
 \end{aligned}
 \end{equation}
+% TODO: check
 The arrow notation $\pto$ denotes a path segment, i.e. $L(\vec{x} \pto \vec{y})=L(\vec{x}, \vec{y} - \vec{x})$, and $f(\vec{x} \pto \vec{y} \pto \vec{z})=f(\vec{y} - \vec{x}, \vec{y}, \vec{z} - \vec{y})$ and $G(\vec{x} \leftrightarrow \vec{y})$ models the radiance transfer between the vertices $\vec{x}$ and $\vec{y}$:
 \begin{equation}
 \label{eq:transfer}
@@ -58,13 +64,14 @@ An essential tool for the derivation of path samplers is the conversion between 
 \diff A(\vec{y}) = \frac{\|\vec{y} - \vec{x}\|^2}{\cos \theta_{\vec{y}}} \diff \omega(\vec{x}\pto\vec{y}),
 \end{equation}
 
-
-
 \section{Inference}
-Using this framework a simple inference scheme trivially emerges from the Rendering Equation (\autoref{eq:rendering_equation}):
+Using this framework a simple inference scheme naturally emerges from the Rendering Equation (\autoref{eq:rendering_equation}):
 \begin{equation}
 \label{eq:inference}
-    I(\wo) = \left( \prod_{i=1}^{N} \frac{f(\wi, \wo) \cos(\theta_i)}{p(\wi \mid \wo)} \right) \cdot \hat{L}_o(q), \quad T_n = \prod_{i=1}^{N} \frac{f(\ptrip{i-1}{i}{i+1}) \cos \theta_{i \veryshortarrow i+1}}{p(\pdir{i}{i+1} \mid \pdir{i-1}{i})}
+    I
+    = \left(\sum_{i=1}^{n} T_i L_e(\pdir{i}{i-1})\right) + T_n \widehat{L}_o(\pdir{n}{n-1}), \quad
+    T_n
+    = \prod_{i=1}^{N} \frac{f(\ptrip{i-1}{i}{i+1}) \cos \theta_{i \veryshortarrow i+1}}{p(\pdir{i}{i+1} \mid \pdir{i-1}{i})}
 \end{equation}
 
 Note, that Russian Roulette Termination (\autoref{eq:rr}) is not to be applied here, as we terminate the path with a valid radiance estimate.
@@ -79,4 +86,4 @@ Note, that Russian Roulette Termination (\autoref{eq:rr}) is not to be applied h
 
 \section{Path Spaced Denoised Sparse Photon Mapping}
 
-\section{Hardware Accelerated Vertex Connection and Merging}
+%\section{Hardware Accelerated Vertex Connection and Merging}

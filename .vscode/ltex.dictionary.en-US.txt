@@ -35,3 +35,4 @@ quartic
 azimuthal
 denoising
 Denoised
+Cuda
