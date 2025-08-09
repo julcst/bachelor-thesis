@@ -1516,6 +1516,22 @@
   file = {/Users/julianstamm/Zotero/storage/XWYF4XPM/ggximportancesamplingpart2.html}
 }
 
+@incollection{shirley1995,
+  title = {Global {{Illumination}} via {{Density-Estimation}}},
+  booktitle = {Rendering {{Techniques}} ’95},
+  author = {Shirley, Peter and Wade, Bretton and Hubbard, Philip M. and Zareski, David and Walter, Bruce and Greenberg, Donald P.},
+  editor = {Hanrahan, Patrick M. and Purgathofer, Werner},
+  date = {1995},
+  pages = {219--230},
+  publisher = {Springer Vienna},
+  location = {Vienna},
+  doi = {10.1007/978-3-7091-9430-0_21},
+  url = {http://link.springer.com/10.1007/978-3-7091-9430-0_21},
+  urldate = {2025-08-09},
+  isbn = {978-3-211-82733-8 978-3-7091-9430-0},
+  langid = {english}
+}
+
 @incollection{smal2019,
   title = {Real-{{Time Global Illumination}} with {{Photon Mapping}}},
   booktitle = {Ray {{Tracing Gems}}: {{High-Quality}} and {{Real-Time Rendering}} with {{DXR}} and {{Other APIs}}},
@@ -1728,6 +1744,23 @@
   abstract = {This paper introduces a method for optimal combination of light paths generated from the camera and from the light sources in the photon mapping algorithm used for computing global illumination. Our method is based on Multiple Importance Sampling, a general approach, introduced by Veach, for adaptive path connection in bi-directional pathtracing. Our goal is to examine this method in connection with the biased algorithm of photon mapping and to improve the ineffective final gather heuristic used in the original version of this algorithm. This heuristic is usually problematic when applied to the scenes where highly glossy materials prevail.},
   langid = {english},
   file = {/Users/julianstamm/Zotero/storage/T4U58Q9V/Vorba - Bidirectional Photon Mapping.pdf}
+}
+
+@article{walter1997,
+  title = {Global Illumination Using Local Linear Density Estimation},
+  author = {Walter, Bruce and Hubbard, Philip M. and Shirley, Peter and Greenberg, Donald P.},
+  date = {1997-07},
+  journaltitle = {ACM Transactions on Graphics},
+  shortjournal = {ACM Trans. Graph.},
+  volume = {16},
+  number = {3},
+  pages = {217--259},
+  issn = {0730-0301, 1557-7368},
+  doi = {10.1145/256157.256158},
+  url = {https://dl.acm.org/doi/10.1145/256157.256158},
+  urldate = {2025-08-09},
+  abstract = {This article presents the density estimation framework for generating view-independent global illumination solutions. It works by probabilistically simulating the light flow in an environment with light particles that trace random walks origination at luminaires and then using statistical density estimation techniques to reconstruct the lighting on each surface. By splitting the computation into separate transport and reconstruction stages, we gain many advantages including reduced memory usage, the ability to simulate nondiffuse transport, and natural parallelism. Solutions to several theoretical and practical difficulties in implementing this framework are also described. Light sources that vary spectrally and directionally are integrated into a spectral particle tracer using  nonuniform rejection. A new local linear density estimation technique eliminates boundary bias and extends to arbitrary polygons. A mesh decimation algorithm with perceptual calibration is introduced to simplify the Gouraud-shaded representation of the solution for interactive display.},
+  langid = {english}
 }
 
 @article{walter2007,

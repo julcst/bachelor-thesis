@@ -1,5 +1,6 @@
 import geometry;
 import settings;
+import texcolors;
 outformat="pdf";
 usepackage("bm");
 size(6cm);
@@ -11,12 +12,12 @@ pair wm = dir(90)*5;
 pair wo = reflect((0,0),(wm))*wi;
 
 // draw wi
-draw((0,0)--wi, green, Arrow);
+draw((0,0)--wi, cmyk(green), Arrow);
 label("$\bm{\omega}_i$", wi, W);
 markangle("$\theta_i$", wm, (0,0), wi, radius=8);
 
 // draw wo
-draw((0,0)--wo, red, Arrow);
+draw((0,0)--wo, cmyk(red), Arrow);
 label("$\bm{\omega}_o$", wo, E);
 markangle("$\theta_o$", wo, (0,0), wm, radius=8);
 

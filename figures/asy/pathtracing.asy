@@ -9,7 +9,7 @@ pair refract(pair wi, pair n, real eta=1.5) {
   return -eta * wi + (eta * cos_theta_i - cos_theta_o) * n;
 }
 
-void drawEye(pair pos, pair dir, real r1 = 0.5, real r2 = 0.6, real angle = 20, real iris = 12) {
+void drawEye(pair pos, pair dir, real scale = 1, real r1 = 0.5 * scale, real r2 = 0.6 * scale, real angle = 20, real iris = 12) {
     pair c = pos - dir * r2;
     transform t = rotate(degrees(dir), c);
     draw(t*(c+r2*dir(-angle)--c--c+r2*dir(angle)));
@@ -20,7 +20,7 @@ void drawEye(pair pos, pair dir, real r1 = 0.5, real r2 = 0.6, real angle = 20, 
     fill(t*((p&arc(0.5*(a+b), b, a))--cycle));
 }
 
-void drawSun(pair pos, int rays = 8, real r1 = 0.2, real r2 = 0.3, real r3 = 0.5) {
+void drawSun(pair pos, int rays = 8, real scale = 1, real r1 = 0.2 * scale, real r2 = 0.3 * scale, real r3 = 0.5 * scale) {
     pair c = pos;
     draw(circle(c, r1));
     for (int i = 0; i < rays; ++i) {

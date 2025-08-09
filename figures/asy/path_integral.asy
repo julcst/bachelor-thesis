@@ -13,14 +13,14 @@ pair[] p = {
 };
 p.cyclic = true;
 
-p[0] += 0.4 * unit(p[1] - p[0]);
+p[0] += 0.3 * unit(p[1] - p[0]);
 pair wo = unit(p[-1] - eye);
 p.push(p[-1] - 0.5 * wo);
 
 draw(p, Arrow);
 draw(p[-1]--eye, dashed);
-drawSun(sun, rays=10, r3=0.35);
-drawEye(eye, wo);
+drawSun(sun, scale=0.5, rays=10, r3=0.2);
+drawEye(eye, wo, scale=0.5);
 label("$L_e(\pdir{0}{1})$", p[0], SW);
 label("$\G{0}{1}$", 0.5 * (p[0] + p[1]), NE);
 label("$\f{0}{1}{}$", p[1], N);
