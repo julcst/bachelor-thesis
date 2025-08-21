@@ -43,29 +43,64 @@ Then, the path space integral formulation of the rendering equation is given by:
 \begin{equation}
 \label{eq:path_space_integral}
 \begin{aligned}
-    L_o(x, \wo) = \sum_{n=0}^{\infty} \int_{X_n} L_e(\pdir{0}{1}) \G{0}{1} \prod_{i=1}^{n - 1} \f{i-1}{i}{i+1} \G{i}{i+1}\\
-    \f{n-1}{n}{} \G{n}{} f(\vec{x}_n \pto \vec{x}, \wo) \ \diff A(\vec{x}_0) \dots \diff A(\vec{x}_n)
+    % L_o(x, \wo) = \sum_{n=0}^{\infty} \int_{X_n} L_e(\pdir{0}{1}) \G{0}{1} \prod_{i=1}^{n - 1} \f{i-1}{i}{i+1} \G{i}{i+1}\\
+    % \f{n-1}{n}{} \G{n}{} f(\vec{x}_n \pto \vec{x}, \wo) \ \diff A(\vec{x}_0) \dots \diff A(\vec{x}_n)
+    L_o(\pdir{n-1}{n})
+    %= L_i(\pdir{n-1}{n})
+    = &\sum_{n=0}^{\infty} \int_{X_{n-2}} L_e(\pdir{0}{1}) \G{0}{1} \\
+    &\cdot \prod_{i=1}^{n - 1} \f{i-1}{i}{i+1} \G{i}{i+1}
+    \diff A(\vec{x}_0) \dots \diff A(\vec{x}_{n-2})
 \end{aligned}
 \end{equation}
 % TODO: check
-The arrow notation $\pto$ denotes a path segment, i.e. $L(\vec{x} \pto \vec{y})=L(\vec{x}, \vec{y} - \vec{x})$, and $f(\vec{x} \pto \vec{y} \pto \vec{z})=f(\vec{y} - \vec{x}, \vec{y}, \vec{z} - \vec{y})$ and $G(\vec{x} \leftrightarrow \vec{y})$ models the radiance transfer between the vertices $\vec{x}$ and $\vec{y}$:
+The arrow notation $\pto$ denotes a path segment with the direction indicating the direction of light flow, i.e. $L_o(\vec{x} \pto \vec{y})=L_o(\vec{x}, \vec{y} - \vec{x})$, and $f(\vec{x} \pto \vec{y} \pto \vec{z})=f(\vec{y} - \vec{x}, \vec{y}, \vec{z} - \vec{y})$ and $G(\vec{x} \leftrightarrow \vec{y})$ models the radiance transfer between the vertices $\vec{x}$ and $\vec{y}$:
 \begin{equation}
 \label{eq:transfer}
 G(\vec{x} \leftrightarrow \vec{y}) = V(\vec{x} \leftrightarrow \vec{y}) \frac{\cos \theta_{\vec{x} \to \vec{y}} \cos \theta_{\vec{y} \to \vec{x}}}{\|\vec{y} - \vec{x}\|^2},
 \end{equation}
 where $V(\vec{x} \leftrightarrow \vec{y}) \in \{0,1\}$ defines visibility and $\theta$ denotes the respective angles of incidence.
 The integral is measured over the surface of the scene $A(\vec{x})$.
-Note, that the original formulation has been slightly adapted to estimate \emph{radiance} instead of \emph{intensity}.
 
-The main advantage of this formulation is that the individual vertices are independent of each other, this for example allows for bidirectional sampling.
+Note, that the original formulation has been slightly adapted to estimate \emph{radiance} instead of \emph{intensity}.
+To collect incoming radiance at a sensor point $\vec{x}_n$, the path space integral formulation can be extended by a sensor weighting term $W(\pdir{n-1}{n})$, which in the case of an infinitesimal pin-hole camera is simply the Dirac-Delta-function $\delta(\pdir{n-1}{n})$:
+\begin{equation}
+\label{eq:path_space_integral_sensor}
+\begin{aligned}
+    I
+    = \sum_{n=0}^{\infty} \int_{X_n} L_e(\pdir{0}{1}) \G{0}{1} &\prod_{i=1}^{n - 1} \f{i-1}{i}{i+1} \G{i}{i+1}\\
+    &\cdot W(\pdir{n-1}{n}) \diff A(\vec{x}_0) \dots \diff A(\vec{x}_n)
+\end{aligned}
+\end{equation}
+
+The main advantage of this formulation is that the individual vertices are independent of each other.
+This for example allows for bidirectional sampling.
 An essential tool for the derivation of path samplers is the conversion between area and solid angle measure, given by:
 \begin{equation}
 \label{eq:area_solid_angle}
 \diff A(\vec{y}) = \frac{\|\vec{y} - \vec{x}\|^2}{\cos \theta_{\vec{y}}} \diff \omega(\vec{x}\pto\vec{y}),
 \end{equation}
+or equivalently for sampling:
+\begin{equation}
+\label{eq:area_solid_angle_p}
+p(\vec{y}) = \frac{\|\vec{y} - \vec{x}\|^2}{\cos \theta_{\vec{y}}} p(\vec{x}\pto\vec{y}).
+\end{equation}
 
 \section{Inference}
-Using this framework a simple inference scheme naturally emerges from the Rendering Equation (\autoref{eq:rendering_equation}):
+Using this framework a simple inference scheme naturally emerges from the Path Space Integral Formulation (\autoref{eq:path_space_integral}).
+The path length $n$ is limited by a path termination strategy, we only need to calculate the finite sum up to the termination length $l$, because we terminate with a valid radiance estimate which incorporates the sum over longer paths.
+We replace the integral over the path space $X_n$ by a primary Monte-Carlo Estimator.
+For readability, I will do an exemplary derivation for a path of length $n=2$ without intermediate emission:
+\begin{equation}
+\begin{aligned}
+    I
+    &= \int_{X_n} \widehat{L}_o(\pdir{0}{1}) \G{0}{1} \f{0}{1}{2} \G{1}{2} \f{1}{2}{3} \G{2}{3} \delta(\pdir{2}{3}) \diff A(\vec{x}_0) \dots \diff A(\vec{x}_3)\\
+    &= \int_{X_{n-1}} \widehat{L}_o(\pdir{0}{1}) \G{0}{1} \f{0}{1}{2} \G{1}{2} \f{1}{2}{3} \G{2}{3} \diff A(\vec{x}_0) \dots \diff A(\vec{x}_2)\\
+    &\approx \frac{\widehat{L}_o(\pdir{0}{1}) \G{0}{1}}{p(x_0)}  \frac{\f{0}{1}{2} \G{1}{2}}{p(x_1)} \frac{\f{1}{2}{3} \G{2}{3}}{p(x_2)}\\
+    &= \frac{\widehat{L}_o(\pdir{0}{1}) \cos\theta_{0\veryshortarrow1}}{p(\pdir{1}{0}\mid\pdir{2}{1})}  \frac{\f{0}{1}{2} \cos\theta_{1\veryshortarrow2}}{p(\pdir{2}{1}\mid\pdir{3}{2})} \frac{\f{1}{2}{3} \cos\theta_{2\veryshortarrow3}}{p(\pdir{3}{2})}\\
+\end{aligned}
+\end{equation}
+
+In the general case and over the whole path we thus get:
 \begin{equation}
 \label{eq:inference}
     I
