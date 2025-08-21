@@ -59,8 +59,8 @@ Square-integrability is not really a constraint, as it essentially assumes finit
 Neither is the limitation to $[0, 1]$, as we can always normalize the input to the bounding box of the scene.
 Such types of encodings were first used in language processing by \textcite{vaswani2017} and later adapted to computer graphics by \textcite{tancik2020} and to neural radiance fields by \textcite{mildenhall2022}.
 
-However, for practical applications, compromises are necessary.
-Firstly, \textcite{tancik2020} make the assumption that the output field is separable in the input dimensions, which is not generally true and leads to prominent stripe artifacts in the output if the network is to shallow.
+However, for practical applications, compromises are necessary:
+Firstly, \textcite{tancik2020} make the assumption that the output field is separable in the input dimensions, which is generally not the case, resulting in prominent stripe artifacts in the output if the network is too shallow to adequately mitigate this nonlinearity.
 Yet, this allows them to apply the Fourier transform individually per input dimension and brings the number of coefficients down from exponential to linear in the number of dimensions.
 The hope is, that the neural network can compensate for the missing information.
 This is generally possible, as every non-separable function can be approximated by a linear combination of separable functions, for example by writing the function as a tensor and applying tensor decomposition.

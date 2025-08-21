@@ -12,7 +12,7 @@ Radiance caching generally can be broken down into four steps:
     \begin{enumerate}
         \item \textbf{Query Prediction} First, we want to predict potential queries $\hat{q} = (\vec{x}, \vec{\omega}_o)$ according to a distribution $\hat{Q}(\hat{q})$.
         \item \textbf{Radiance Estimation} Given a predicted query $\hat{q}$, we want to estimate the outgoing radiance $L_o(\hat{q})$ at that query.
-        For this, we can use any possible combination of radiance estimation techniques, such as path tracing, light tracing, photon mapping or Vertex Connection and Merging (VCM).
+        For this, we can use any possible combination of radiance estimation techniques, such as path tracing, light tracing, photon mapping or bidirectional path tracing (BDPT).
     \end{enumerate}
     \item \textbf{Inference}
     \begin{enumerate}
@@ -27,7 +27,7 @@ Radiance caching generally can be broken down into four steps:
 Conversely, if we sample a query $q^*$ that can not be predicted by the query predictor (i.e. $\hat{Q}(q^*)=0$), we introduce fundamental bias into the radiance cache $\hat{L}_o(q^*)$, because the radiance cache will not contain an accurate radiance estimate for that query.
 This happens, whenever the support of the query sampling distribution $Q$ is not contained in the support of the query prediction distribution $\hat{Q}$, i.e. $\supp(Q) \not\subseteq \supp(\hat{Q})$.
 
-\textbf{Discussion:} It may be possible, to derive an unbiased radiance cache for diffuse queries by storing the radiance estimates $L_o(\hat{q})$ in a spatial data structure and reconnecting the queries $q$ to the query predictions $\hat{q}$ similarly to Vertex Connection and Merging (VCM). % TODO: Check and cite
+\textbf{Discussion:} It may be possible, to derive an unbiased radiance cache for diffuse queries by storing the radiance estimates $L_o(\hat{q})$ in a spatial data structure and reconnecting the queries $q$ to the query predictions $\hat{q}$ essentially performing Vertex Merging. % TODO: Check and cite
 
 \section{The Path Space Integral Formulation}
 \begin{figure}[ht]

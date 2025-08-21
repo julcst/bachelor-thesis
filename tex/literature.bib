@@ -19,6 +19,14 @@
   file = {/Users/julianstamm/Zotero/storage/KQ7ASC6B/watch.html}
 }
 
+@report{andersson2024,
+  title = {{{OpenPBR Surface Specification}}},
+  author = {Andersson, Zap and Edmondson, Paul and Guertault, Julien and Herubel, Adrien and King, Alan and Kutz, Peter and Machizaud, Andréa and Portsmouth, Jamie and Servant, Frédéric and Stone, Jonathan},
+  date = {2024},
+  institution = {Academy Software Foundation (ASWF)},
+  url = {https://academysoftwarefoundation.github.io/OpenPBR/}
+}
+
 @unpublished{apers2024,
   title = {Shipping {{Dynamic Global Illumination}} in {{Frostbite}}},
   author = {Apers, Diede},
@@ -153,9 +161,10 @@
   file = {/Users/julianstamm/Zotero/storage/B4U7KQ2G/Binder et al. - 2018 - Fast path space filtering by jittered spatial hashing.pdf}
 }
 
-@article{bitterli,
+@thesis{bitterli2013,
   title = {{{BSSRDF Explorer}}: {{A Rendering Framework}} for the {{BSSRDF}}},
   author = {Bitterli, Benedikt},
+  date = {2013-04},
   langid = {english},
   file = {/Users/julianstamm/Zotero/storage/MXJ8XKGQ/Bitterli - BSSRDF Explorer A Rendering Framework for the BSSRDF.pdf}
 }
@@ -212,6 +221,17 @@
   file = {/Users/julianstamm/Zotero/storage/NYYXXH4B/Advancing Real-Time Path Tracing with Neural Radiance Cache  GTC Digital Spring 2023  NVIDIA On-De.pdf;/Users/julianstamm/Zotero/storage/XYNTXBG9/gtcspring23-s51967.html}
 }
 
+@thesis{bruin2025,
+  type = {phdthesis},
+  title = {Global {{Illumination}} Using {{ReSTIR DI}} and {{Photon-Mapped Virtual Point Lights}}},
+  author = {Bruin, Samuel},
+  date = {2025},
+  institution = {Delft University of Technology},
+  url = {https://repository.tudelft.nl/record/uuid:ddb7ccdd-289b-48a4-bffa-541840f9cfbf},
+  urldate = {2025-08-21},
+  file = {/Users/julianstamm/Zotero/storage/3M83JNWN/Bruin - 2025 - Global Illumination using ReSTIR DI and Photon-Mapped Virtual Point Lights.pdf}
+}
+
 @inproceedings{burley2012,
   title = {Physically-{{Based Shading}} at {{Disney}}},
   booktitle = {Acm {{Siggraph}}},
@@ -243,7 +263,7 @@
   file = {/Users/julianstamm/Zotero/storage/KLRTTVCW/Burley - 2020 - Practical Hash-based Owen Scrambling.pdf}
 }
 
-@online{cao2016a,
+@online{cao2016,
   title = {Image {{Based Lighting}} in {{Offline}} and {{Real-time Rendering}}},
   author = {Cao, Jiayin},
   date = {2016-09-07T00:00:00+00:00},
@@ -503,6 +523,16 @@
   urldate = {2025-07-29}
 }
 
+@online{generalizedresampledimportancesamplingfoundationsrestiruniversitaetbonn,
+  title = {Generalized resampled importance sampling: foundations of ReSTIR - Universitaet Bonn},
+  shorttitle = {Generalized resampled importance sampling},
+  url = {https://hbz-ulb.userservices.exlibrisgroup.com},
+  urldate = {2025-08-21},
+  abstract = {Generalized resampled importance sampling: foundations of ReSTIR-book},
+  langid = {ngerman},
+  file = {/Users/julianstamm/Zotero/storage/HGDLKBHX/hbz-ulb.userservices.exlibrisgroup.com.html}
+}
+
 @online{generatingraytracedcausticeffectsunrealengine4part12020,
   title = {Generating {{Ray-Traced Caustic Effects}} in {{Unreal Engine}} 4, {{Part}} 1},
   date = {2020-12-08T19:38:03+00:00},
@@ -706,17 +736,6 @@
 }
 
 @article{heitz2014,
-  title = {Understanding the {{Masking-Shadowing Function}} in {{Microfacet-Based BRDFs}}},
-  author = {Heitz, Eric},
-  date = {2014},
-  volume = {3},
-  number = {2},
-  abstract = {We provide a new presentation of the masking-shadowing functions (or geometric attenuation factors) in microfacet-based BRDFs and answer some common questions about their applications. Our main motivation is to define a correct (geometrically indicated), physically based masking function for application in microfacet models, as well as the properties that function should exhibit. Indeed, several different masking functions are often presented in the literature and making the right choice is not always obvious. We start by showing that physically based masking functions are constrained by the projected area of the visible microsurface onto the outgoing direction. We use this property to derive the distribution of visible normals from the microsurface, whose normalization factor is the masking function. We then show how the common form of microfacet-based BRDFs emerges from this distribution. As a consequence, the masking function is related to the correct normalization of microfacetbased BRDFs. However, while the correct masking function satisfies these normalization constraints, its explicit form is can only be determined for a given microsurface profile.},
-  langid = {english},
-  file = {/Users/julianstamm/Zotero/storage/4XF7GXY4/Heitz - 2014 - Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs.pdf}
-}
-
-@article{heitz2014a,
   title = {Importance {{Sampling Microfacet}}‐{{Based BSDFs}} Using the {{Distribution}} of {{Visible Normals}}},
   author = {Heitz, E. and family=Eon, given=E., prefix=d', useprefix=true},
   date = {2014-07},
@@ -732,6 +751,17 @@
   abstract = {Abstract             We present a new approach to microfacet‐based BSDF importance sampling. Previously proposed sampling schemes for popular analytic BSDFs typically begin by choosing a microfacet normal at random in a way that is independent of direction of incident light. To sample the full BSDF using these normals requires arbitrarily large sample weights leading to possible fireflies. Additionally, at grazing angles nearly half of the sampled normals face away from the incident ray and must be rejected, making the sampling scheme inefficient. Instead, we show how to use the distribution of visible normals directly to generate samples, where normals are weighted by their projection factor toward the incident direction. In this way, no backfacing normals are sampled and the sample weights contain only the shadowing factor of outgoing rays (and additionally a Fresnel term for conductors). Arbitrarily large sample weights are avoided and variance is reduced. Since the BSDF depends on the microsurface model, we describe our sampling algorithm for two models: the V‐cavity and the Smith models. We demonstrate results for both isotropic and anisotropic rough conductors and dielectrics with Beckmann and GGX distributions.},
   langid = {english},
   file = {/Users/julianstamm/Zotero/storage/CIY8DU66/Heitz and d'Eon - 2014 - Importance Sampling Microfacet‐Based BSDFs using the Distribution of Visible Normals.pdf}
+}
+
+@article{heitz2014a,
+  title = {Understanding the {{Masking-Shadowing Function}} in {{Microfacet-Based BRDFs}}},
+  author = {Heitz, Eric},
+  date = {2014},
+  volume = {3},
+  number = {2},
+  abstract = {We provide a new presentation of the masking-shadowing functions (or geometric attenuation factors) in microfacet-based BRDFs and answer some common questions about their applications. Our main motivation is to define a correct (geometrically indicated), physically based masking function for application in microfacet models, as well as the properties that function should exhibit. Indeed, several different masking functions are often presented in the literature and making the right choice is not always obvious. We start by showing that physically based masking functions are constrained by the projected area of the visible microsurface onto the outgoing direction. We use this property to derive the distribution of visible normals from the microsurface, whose normalization factor is the masking function. We then show how the common form of microfacet-based BRDFs emerges from this distribution. As a consequence, the masking function is related to the correct normalization of microfacetbased BRDFs. However, while the correct masking function satisfies these normalization constraints, its explicit form is can only be determined for a given microsurface profile.},
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/4XF7GXY4/Heitz - 2014 - Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs.pdf}
 }
 
 @article{heitz2018,
@@ -774,6 +804,24 @@
   organization = {horizon-research}
 }
 
+@article{immel1986a,
+  title = {A Radiosity Method for Non-Diffuse Environments},
+  author = {Immel, David S. and Cohen, Michael F. and Greenberg, Donald P.},
+  date = {1986-08-31},
+  journaltitle = {ACM SIGGRAPH Computer Graphics},
+  shortjournal = {SIGGRAPH Comput. Graph.},
+  volume = {20},
+  number = {4},
+  pages = {133--142},
+  issn = {0097-8930},
+  doi = {10.1145/15886.15901},
+  url = {https://dl.acm.org/doi/10.1145/15886.15901},
+  urldate = {2025-08-21},
+  abstract = {A general radiosity method accounting for all interreflections of light between diffuse and nondiffuse surfaces in complex environments is introduced. As contrasted with previous radiosity methods, surfaces are no longer required to be perfectly diffuse reflectors and emitters. A complete, viewer independent description of the light leaving each surface in each direction is computed, allowing dynamic sequences of images to be rendered with little additional computation per image. Phenomena such as "reflection tracking", reflections following a moving observer across a specular surface are produced. Secondary light sources, such as the light from a spotlight reflecting off a mirror onto a wall are also accounted for.},
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/DKFHEDA6/Immel et al. - 1986 - A radiosity method for non-diffuse environments.pdf}
+}
+
 @online{improveshaderperformanceingameframeratesshaderexecutionreordering2022,
   title = {Improve {{Shader Performance}} and {{In-Game Frame Rates}} with {{Shader Execution Reordering}}},
   date = {2022-10-13T00:01:30+00:00},
@@ -782,6 +830,25 @@
   abstract = {Learn about Shader Execution Reordering (SER), a performance optimization that unlocks the potential for better ray and memory coherency in ray tracing shaders.},
   langid = {american},
   organization = {NVIDIA Technical Blog}
+}
+
+@article{jakob2012,
+  title = {Manifold Exploration: A {{Markov Chain Monte Carlo}} Technique for Rendering Scenes with Difficult Specular Transport},
+  shorttitle = {Manifold Exploration},
+  author = {Jakob, Wenzel and Marschner, Steve},
+  date = {2012-08-05},
+  journaltitle = {ACM Transactions on Graphics},
+  shortjournal = {ACM Trans. Graph.},
+  volume = {31},
+  number = {4},
+  pages = {1--13},
+  issn = {0730-0301, 1557-7368},
+  doi = {10.1145/2185520.2185554},
+  url = {https://dl.acm.org/doi/10.1145/2185520.2185554},
+  urldate = {2025-08-21},
+  abstract = {It is a long-standing problem in unbiased Monte Carlo methods for rendering that certain difficult types of light transport paths, particularly those involving viewing and illumination along paths containing specular or glossy surfaces, cause unusably slow convergence. In this paper we introduce Manifold Exploration, a new way of handling specular paths in rendering. It is based on the idea that sets of paths contributing to the image naturally form manifolds in path space, which can be explored locally by a simple equation-solving iteration. This paper shows how to formulate and solve the required equations using only geometric information that is already generally available in ray tracing systems, and how to use this method in in two different Markov Chain Monte Carlo frameworks to accurately compute illumination from general families of paths. The resulting rendering algorithms handle specular, near-specular, glossy, and diffuse surface interactions as well as isotropic or highly anisotropic volume scattering interactions, all using the same fundamental algorithm. An implementation is demonstrated on a range of challenging scenes and evaluated against previous methods.},
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/QWKR45P7/Jakob and Marschner - 2012 - Manifold exploration a Markov Chain Monte Carlo technique for rendering scenes with difficult specu.pdf}
 }
 
 @inproceedings{jarosz2008,
@@ -812,7 +879,8 @@
   url = {http://link.springer.com/10.1007/978-3-7091-9430-0_31},
   urldate = {2025-06-25},
   isbn = {978-3-211-82733-8 978-3-7091-9430-0},
-  langid = {english}
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/GK4DF68I/Jensen - 1995 - Importance Driven Path Tracing using the Photon Map.pdf}
 }
 
 @incollection{jensen1996,
@@ -927,7 +995,21 @@
   file = {/Users/julianstamm/Zotero/storage/ZFT5XLAD/Keller - 1995 - A Quasi-Monte Carlo Algorithm for the Global Illumination Problem in the Radiosity Setting.pdf}
 }
 
-@incollection{keller1996,
+@article{keller1996,
+  title = {Quasi-{{Monte Carlo}} Methods in Computer Graphics: The Global Illumination Problem},
+  shorttitle = {Quasi-{{Monte Carlo}} Methods in Computer Graphics},
+  author = {Keller, Alexander},
+  date = {1996},
+  journaltitle = {LECTURES IN APPLIED MATHEMATICS-AMERICAN MATHEMATICAL SOCIETY},
+  volume = {32},
+  pages = {455--470},
+  publisher = {Citeseer},
+  url = {https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=579bca8c938f1e0f25474a02a4ff93f5b6ea8886},
+  urldate = {2025-06-21},
+  file = {/Users/julianstamm/Zotero/storage/T3L6VFAD/Keller - 1996 - Quasi-Monte Carlo methods in computer graphics the global illumination problem.pdf}
+}
+
+@incollection{keller1996a,
   title = {Quasi-{{Monte Carlo Radiosity}}},
   booktitle = {Rendering {{Techniques}} ’96},
   author = {Keller, Alexander},
@@ -942,20 +1024,6 @@
   isbn = {978-3-211-82883-0 978-3-7091-7484-5},
   langid = {english},
   file = {/Users/julianstamm/Zotero/storage/4K86PPHB/Keller - 1996 - Quasi-Monte Carlo Radiosity.pdf}
-}
-
-@article{keller1996a,
-  title = {Quasi-{{Monte Carlo}} Methods in Computer Graphics: The Global Illumination Problem},
-  shorttitle = {Quasi-{{Monte Carlo}} Methods in Computer Graphics},
-  author = {Keller, Alexander},
-  date = {1996},
-  journaltitle = {LECTURES IN APPLIED MATHEMATICS-AMERICAN MATHEMATICAL SOCIETY},
-  volume = {32},
-  pages = {455--470},
-  publisher = {Citeseer},
-  url = {https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=579bca8c938f1e0f25474a02a4ff93f5b6ea8886},
-  urldate = {2025-06-21},
-  file = {/Users/julianstamm/Zotero/storage/T3L6VFAD/Keller - 1996 - Quasi-Monte Carlo methods in computer graphics the global illumination problem.pdf}
 }
 
 @article{kern2023,
@@ -1125,6 +1193,20 @@
   file = {/Users/julianstamm/Zotero/storage/3GP57JFU/Lin et al. - 2022 - Generalized resampled importance sampling foundations of ReSTIR.pdf}
 }
 
+@article{lin2023,
+  title = {Hypothesis {{Testing}} for {{Progressive Kernel Estimation}} and {{VCM Framework}}},
+  author = {Lin, Zehui and Hu, Chenxiao and Jia, Jinzhu and Li, Sheng},
+  date = {2023},
+  journaltitle = {IEEE Transactions on Visualization and Computer Graphics},
+  volume = {30},
+  number = {8},
+  pages = {4709--4723},
+  publisher = {IEEE},
+  url = {https://ieeexplore.ieee.org/abstract/document/10122174/},
+  urldate = {2025-08-21},
+  file = {/Users/julianstamm/Zotero/storage/2EBY5CVP/Lin et al. - 2023 - Hypothesis Testing for Progressive Kernel Estimation and VCM Framework.pdf}
+}
+
 @inproceedings{magdon-ismail1998,
   title = {Neural {{Networks}} for {{Density Estimation}}},
   booktitle = {Advances in {{Neural Information Processing Systems}}},
@@ -1223,7 +1305,7 @@
   file = {/Users/julianstamm/Zotero/storage/74F5A66G/NrcGuide.html}
 }
 
-@online{mikkelsena,
+@online{mikkelsen,
   title = {{{MikkTSpace}}.Com},
   author = {Mikkelsen, Morten S.},
   url = {http://www.mikktspace.com/},
@@ -1350,14 +1432,6 @@
   author = {Oat},
   date = {2005},
   file = {/Users/julianstamm/Zotero/storage/LSMXV8PD/Oat_GDC2005_IrradianceVolumesForGames.pdf}
-}
-
-@report{OpenPBR,
-  title = {{{OpenPBR Surface Specification}}},
-  author = {Andersson, Zap and Edmondson, Paul and Guertault, Julien and Herubel, Adrien and King, Alan and Kutz, Peter and Machizaud, Andréa and Portsmouth, Jamie and Servant, Frédéric and Stone, Jonathan},
-  date = {2024},
-  institution = {Academy Software Foundation (ASWF)},
-  url = {https://academysoftwarefoundation.github.io/OpenPBR/}
 }
 
 @inproceedings{oren1994,
@@ -1673,7 +1747,7 @@
   file = {/Users/julianstamm/Zotero/storage/4P8J5QL8/3675382.html}
 }
 
-@software{tensorflow,
+@software{tensorflowdevelopers2021,
   title = {{{TensorFlow}}},
   author = {{TensorFlow Developers}},
   date = {2021-05},
@@ -1759,14 +1833,6 @@
   file = {/Users/julianstamm/Zotero/storage/9MTXSP7E/Vaswani et al. - 2017 - Attention is all you need.pdf}
 }
 
-@article{veach,
-  title = {Metropolis {{Light Transport}}},
-  author = {Veach, Eric and Guibas, Leonidas J},
-  abstract = {We present a new Monte Carlo method for solving the light transport problem, inspired by the Metropolis sampling method in computational physics. To render an image, we generate a sequence of light transport paths by randomly mutating a single current path (e.g. adding a new vertex to the path). Each mutation is accepted or rejected with a carefully chosen probability, to ensure that paths are sampled according to the contribution they make to the ideal image. We then estimate this image by sampling many paths, and recording their locations on the image plane.},
-  langid = {english},
-  file = {/Users/julianstamm/Zotero/storage/ZKQBSNMG/Veach and Guibas - Metropolis Light Transport.pdf}
-}
-
 @incollection{veach1995,
   title = {Bidirectional {{Estimators}} for {{Light Transport}}},
   booktitle = {Photorealistic {{Rendering Techniques}}},
@@ -1794,6 +1860,23 @@
   file = {/Users/julianstamm/Zotero/storage/5PLIJRDX/veach1997.pdf;/Users/julianstamm/Zotero/storage/FHZR7F3K/veach-chapter9.pdf}
 }
 
+@inproceedings{veach1997a,
+  title = {Metropolis {{Light Transport}}},
+  booktitle = {Proceedings of the 24th Annual Conference on {{Computer}} Graphics and Interactive Techniques  - {{SIGGRAPH}} '97},
+  author = {Veach, Eric and Guibas, Leonidas J.},
+  date = {1997},
+  pages = {65--76},
+  publisher = {ACM Press},
+  location = {Not Known},
+  doi = {10.1145/258734.258775},
+  url = {http://portal.acm.org/citation.cfm?doid=258734.258775},
+  urldate = {2025-08-21},
+  eventtitle = {The 24th Annual Conference},
+  isbn = {978-0-89791-896-1},
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/N2US7DQX/Veach and Guibas - 1997 - Metropolis light transport.pdf}
+}
+
 @article{vorba2011,
   title = {Bidirectional {{Photon Mapping}}},
   author = {Vorba, Jiˇrı},
@@ -1801,6 +1884,33 @@
   abstract = {This paper introduces a method for optimal combination of light paths generated from the camera and from the light sources in the photon mapping algorithm used for computing global illumination. Our method is based on Multiple Importance Sampling, a general approach, introduced by Veach, for adaptive path connection in bi-directional pathtracing. Our goal is to examine this method in connection with the biased algorithm of photon mapping and to improve the ineffective final gather heuristic used in the original version of this algorithm. This heuristic is usually problematic when applied to the scenes where highly glossy materials prevail.},
   langid = {english},
   file = {/Users/julianstamm/Zotero/storage/T4U58Q9V/Vorba - Bidirectional Photon Mapping.pdf}
+}
+
+@article{vorba2014,
+  title = {On-Line Learning of Parametric Mixture Models for Light Transport Simulation},
+  author = {Vorba, Jiří and Karlík, Ondřej and Šik, Martin and Ritschel, Tobias and Křivánek, Jaroslav},
+  date = {2014-07-27},
+  journaltitle = {ACM Transactions on Graphics},
+  shortjournal = {ACM Trans. Graph.},
+  volume = {33},
+  number = {4},
+  pages = {101:1--101:11},
+  issn = {0730-0301, 1557-7368},
+  doi = {10.1145/2601097.2601203},
+  url = {https://dl.acm.org/doi/10.1145/2601097.2601203},
+  urldate = {2025-08-21},
+  abstract = {Monte Carlo techniques for light transport simulation rely on importance sampling when constructing light transport paths. Previous work has shown that suitable sampling distributions can be recovered from particles distributed in the scene prior to rendering. We propose to represent the distributions by a parametric mixture model trained in an on-line (i.e. progressive) manner from a potentially infinite stream of particles. This enables recovering good sampling distributions in scenes with complex lighting, where the necessary number of particles may exceed available memory. Using these distributions for sampling scattering directions and light emission significantly improves the performance of state-of-the-art light transport simulation algorithms when dealing with complex lighting.},
+  langid = {english},
+  file = {/Users/julianstamm/Zotero/storage/JFHPG88Y/Vorba et al. - 2014 - On-line learning of parametric mixture models for light transport simulation.pdf}
+}
+
+@article{vorba2014a,
+  title = {On-Line {{Learning}} of {{Parametric Mixture Models}} for {{Light Transport Simulation}}–{{Supplemental}} Material},
+  author = {Vorba, Jirı and Karlık, Ondrej and Šik, Martin and Ritschel, Tobias and Krivánek, Jaroslav},
+  date = {2014},
+  url = {https://cgg.mff.cuni.cz/~jaroslav/papers/2014-onlineis/2014-onlineis-supplemental_doc.pdf},
+  urldate = {2025-08-21},
+  file = {/Users/julianstamm/Zotero/storage/W7RXDZ5I/Vorba et al. - On-line Learning of Parametric Mixture Models for Light Transport Simulation–Supplemental material.pdf}
 }
 
 @article{walter1997,
