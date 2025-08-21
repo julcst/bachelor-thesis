@@ -2,12 +2,28 @@
 \chapter{Related Work}
 \label{chap:related}
 The research related to this thesis can be divided into three main categories:
-First, I will give a general overview over approaches to the global illumination problem.
+First, I will give a short overview over approaches to the global illumination problem.
 Secondly, I will specifically discuss approaches that reuse computed radiance estimates across frames or space.
 Finally, I will take a look into approaches that introduce neural networks into rendering.
+For a more complete overview over the field I refer to \textcite{ritschel2012,kang2016}.
 
 \section{Global Illumination}
+In the early days of rendering, lighting was limited to direct illumination and ray traced reflections \bcite{whitted1980} and indirect illumination was often hand-crafted \bcite{christensen2016}.
+\textcite{goral1984} later also introduced indirect illumination based on finite elements, but their approach was limited to diffuse surfaces.
+
+The first universal algorithm to solve the global illumination problem was given by \textcite{kajiya1986}, who formulated an unbiased estimator based on Monte Carlo integration.
+Simultaneously, \textcite{arvo1986} discovered the potential of light tracing to simulate indirect lighting effects.
+\textcite{lafortune1993} later combined light tracing and pathtracing, and \textcite{veach1997} introduced optimal weighting strategies to maximize convergence speed.
+\textcite{keller1995,owen1995} improved convergence for Monte-Carlo samplers by using low discrepancy samples.
+Furthermore, \textcite{veach1997} also proposed a new mutation based sampling strategy which exceeds in finding low-probability high-contribution paths which can cause significant noise.
+In addition, Manifold Exploration techniques were developed which excel at highly specular paths \bcite{manifold}.
+
+Simultaneously, a number of generally biased radiance estimators emerged that are based on storing outgoing flux \textit{(photons)} in spatial data structures \bcite{jensen1996,hachisuka2008,hachisuka2009a,knaus2011,kang2016,georgiev2012}.
+Alternatively, to obtain unbiased estimators, these spatial data structures can also be used to guide path sampling \bcite{jensen1995}.
+
+The most recent advancements in path tracing are based on spatio-temporal path reuse through reservoir sampling \bcite{bitterli2020,kern2024,hedstrom2025} and already achieve acceptable noise at close to real-time performance.
 
 \section{Radiance Caching}
+The groundstone of radiance cache was the seminal paper of \textcite{ward1988}.
 
 \section{Neural Rendering}
