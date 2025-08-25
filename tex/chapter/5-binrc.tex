@@ -27,7 +27,10 @@ Radiance caching generally can be broken down into four steps:
 Conversely, if we sample a query $q^*$ that can not be predicted by the query predictor (i.e. $\hat{Q}(q^*)=0$), we introduce fundamental bias into the radiance cache $\hat{L}_o(q^*)$, because the radiance cache will not contain an accurate radiance estimate for that query.
 This happens, whenever the support of the query sampling distribution $Q$ is not contained in the support of the query prediction distribution $\hat{Q}$, i.e. $\supp(Q) \not\subseteq \supp(\hat{Q})$.
 
-\textbf{Discussion:} It may be possible, to derive an unbiased radiance cache for diffuse queries by storing the radiance estimates $L_o(\hat{q})$ in a spatial data structure and reconnecting the queries $q$ to the query predictions $\hat{q}$ essentially performing Vertex Merging. % TODO: Check and cite
+\textbf{Discussion:} It may be possible, to derive a better radiance cache by storing the incoming radiance and BSDFs in a data structure and connecting to them stochastically through ReSTIR DI \bcite{bitterli2020} similar to Virtual Point Lights in Instant Radiosity techniques \bcite{keller1997}.
+% Or VCM
+
+The general idea of decoupling radiance estimation and visualization was already explored by others, notably \textcite{walter1999} and \textcite{tole2002}.
 
 \section{The Path Space Integral Formulation}
 \begin{figure}[ht]

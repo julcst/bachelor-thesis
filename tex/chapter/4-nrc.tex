@@ -22,7 +22,7 @@ To maximize the inference and training performance, \textcite{muller2021} introd
 For this, the whole network is implemented as a single CUDA kernel, with each block handling a batch of 128 64-dimensional input vectors and keeping the $64\times128$ activations in shared memory.
 Each block then consists of 4 warps, computing 16 neuron activations of the network each by applying a $16\times64$ matrix multiplication and the element-wise activation function.
 For this, the hardware accelerated $16\times16$ FP16 matrix multiplication instruction is used when available.
-With this hardware-optimized implementation, \textcite{muller2021} achieve a speedup of $5\times$ to $10\times$ compared to the widely used TensorFlow framework \bcite{tensorflow} on large batch sizes corresponding to HD resolution.
+With this hardware-optimized implementation, \textcite{muller2021} achieve a speedup of $5\times$ to $10\times$ compared to the widely used TensorFlow framework \bcite{tensorflowdevelopers2021} on large batch sizes corresponding to HD resolution.
 
 \section{Input Encodings}
 \begin{table}

@@ -36,3 +36,11 @@ azimuthal
 denoising
 Denoised
 Cuda
+BSDFs
+Arvo
+blitting
+precomputation
+BRDFs
+surfels
+NeRF-like
+Radiosity

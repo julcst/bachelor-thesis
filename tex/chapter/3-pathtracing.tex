@@ -47,7 +47,11 @@ To handle the infinite recursion without introducing bias, I use Russian Roulett
     \end{cases}
 \end{equation}
 The probability terms cancel out, thus this modification to the estimator does not introduce bias.
-I choose $p_\mathrm{continue}$ proportional to the relative luminance $Y$ \bcite{kirkpatrick2025} of the contribution of the current path segment, which measures the perceived linear brightness of that sample.
+I choose $p_\mathrm{continue}$ proportional to the relative luminance $Y$ \bcite{kirkpatrick2025} of the contribution of the current path segment, which measures the perceived linear brightness of that sample:
+\begin{equation}
+\label{eq:luminance}
+    Y(\vec{c}) = 0.2126 \cdot c_r + 0.7152 \cdot c_g + 0.0722 \cdot c_b
+\end{equation}
 
 % With this and by introducing a visibility term $V$, we can estimate the collected radiance along a complete path in an unbiased manner:
 % \begin{equation}
@@ -181,7 +185,7 @@ For the specular and transmissive components, I sample the distribution of visib
     p_\mathrm{VNDF}(\wm \mid \wo) = \frac{G_1(\wo, \wm) D(\NdotH) |\VdotH|}{|\NdotV|}
 \end{equation}
 Sampling this instead of the NDF reduces the variance at grazing angles, where many microfacets are shadowed.
-To sample the VNDF, I use the method proposed by \textcite{benyoub2024}, which improves upon the original method \bcite{heitz2014a} and its follow-up \bcite{heitz2018}.
+To sample the VNDF, I use the method proposed by \textcite{dupuy2023}, which improves upon the original method \bcite{heitz2014a} and its follow-up \bcite{heitz2018}.
 
 To weigh the BSDF, the VNDF has first to be transformed into a probability distribution over the domain of incoming directions $\wi$ using the Jacobian of the reflection operator \bcite{walter2007}:
 \begin{equation}
