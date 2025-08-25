@@ -57,7 +57,7 @@ This enables the neural network to approximate arbitrarily complex functions on 
 A very famous such basis set is the Fourier series, which forms a basis for the space of square-integrable functions on the interval $[0, 1]$.
 Square-integrability is not really a constraint, as it essentially assumes finite energy, which is a reasonable assumption to make for the radiance field.
 Neither is the limitation to $[0, 1]$, as we can always normalize the input to the bounding box of the scene.
-Such types of encodings were first used in language processing by \textcite{vaswani2017} and later adapted to computer graphics by \textcite{tancik2020} and to neural radiance fields by \textcite{mildenhall2022}.
+Such types of encodings were first used in language processing by \textcite{vaswani2017} and later adapted to computer graphics by \textcite{tancik2020} and to neural radiance fields by \textcite{mildenhall2020}.
 
 However, for practical applications, compromises are necessary:
 Firstly, \textcite{tancik2020} make the assumption that the output field is separable in the input dimensions, which is generally not the case, resulting in prominent stripe artifacts in the output if the network is too shallow to adequately mitigate this nonlinearity.
@@ -156,7 +156,7 @@ In addition, it does not affect performance, as the emission is directly given b
     \end{algorithmic}
 \end{algorithm}
 \textcite{muller2021} combine the training data collection with the inference step by extending a fraction of the inference paths with additional training bounces to avoid redundant path tracing.
-However, as I want to mix different training techniques and to keep flexibility with the implementation, I chose to separate the training data collection from the inference step, accepting potential performance penalties.
+However, as I want to mix different training techniques and to keep flexibility with the implementation, I chose to separate the training data collection from the inference step, accepting potential performance penalties, though \textcite{dereviannykh2024} even found performance benefits in this approach because it decreases incoherence.
 Nevertheless, the training sample acquisition is the same:
 I trace paths from the camera to the scene, using Russian Roulette termination (\autoref{eq:rr}) and Next Event Estimation (\autoref{sec:mis}).
 At each vertex of the path, I store the current contribution weight and the input vector.

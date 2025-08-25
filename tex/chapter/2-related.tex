@@ -39,6 +39,7 @@ However, with the recent advancements in GPU architectures, traversal of boundin
 \paragraph{Path Guiding}
 Alternatively, to obtain unbiased estimators, photon maps \bcite{jensen1996} can also be used only to \textit{guide} path sampling \bcite{jensen1995}.
 \textcite{vorba2014} later improved upon this idea by learning Gaussian Mixture Models.
+\textcite{muller2017} instead store an approximation of the light field in a tree structure which is more efficient to construct.
 
 \section{Path Reuse}
 
@@ -80,7 +81,15 @@ ReSTIR can also be combined with other techniques like radiance caching \bcite{m
 \section{Neural Rendering}
 With the recent advancements in Deep Learning, neural rendering techniques have gained great interest in the rendering community and have been applied to a vast array of rendering problems.
 
-\paragraph{Neural Importance Sampling}
+\paragraph{Neural GI}
+Several papers exist that add lighting effects as a screen-space post-processing effect to deferred shading buffers, notably \textcite{nalbach2017} use a convolutional U-net that was trained on a wide variety of scenes, while \textcite{thomas2018} use a generative adversarial network (GAN) trained on a per-scene basis.
+However, in contrast to world-space methods, screen-space methods have only a limited amount of information about the scene available.
+\textcite{hermosilla2019} thus trained a network to predict global illumination effects on point clouds.
+Other works use per-scene trained networks to approximate indirect illumination in world space \bcite{ren2013}.
+
+\paragraph{Neural Path Guiding}
+\textcite{muller2019} use a specialized variant of normalized flow networks to learn a distribution over the light field, which they use for importance sampling.
+Building on this, \textcite{muller2020} were able to further reduce variance by learning Neural Control Variates.
 
 \paragraph{Neural Interpolation}
 \textcite{iwanicki2017} use a neural network to efficiently weight irradiance probes in space to prevent light leaking.
@@ -89,10 +98,16 @@ Similarly, \textcite{zhu2020} use a neural network to predict kernels for photon
 \paragraph{Neural Radiance Caching}
 Neural Radiance Fields (NeRF) \bcite{mildenhall2020} have recently received a lot of attention in the field of Computer Vision to represent 3D scenes.
 \textcite{muller2021} used a NeRF-like neural network architecture as backing storage for radiance caching, which they call Neural Radiance Caching (NRC).
+An interesting idea which they implemented in their paper was given by \textcite{dahm2017}, who propose to understand learning of light fields as reinforcement learning and suggest self-learning for faster adaptation.
 \textcite{muller2022} improved on the original NRC-paper by introducing a versatile positional input encoding based on feature vectors distributed in multi-resolution hash grids.
 Recently, \textcite{dereviannykh2024} adapted the NRC to cache \textit{incident} radiance.
+Furthermore, they removed the bias of their method by integrating NRC together with traditional path tracing in a Two Level Monte Carlo estimator.
 
 \paragraph{Neural Denoising}
 Because Monte-Carlo rendering algorithms are unbiased but noisy, denoising can be highly effective to trade the remaining variance for a small bias.
-Although hand-crafted spatiotemporal filters can also achieve good results \bcite{schied2017}, recurrent autoencoders are well-suited for high quality screen-space denoising of Monte-Carlo rendered images \bcite{chaitanya2017} and are nowadays widely used in production \bcite{afra2019}.
-Neural Radiance Caching \bcite{muller2021} can also be interpreted as a form of Path Space Filtering \bcite{keller2016}. % TODO: check
+Although hand-crafted spatio-temporal filters can also achieve good results \bcite{schied2017}, recurrent autoencoders are well-suited for high quality screen-space denoising of Monte-Carlo rendered images \bcite{chaitanya2017} and are nowadays widely used in production \bcite{afra2019}.
+Similarly, \textcite{jiang2020} use a convolutional autoencoder to denoise low sample count light probes to predict indirect illumination.
+On a further note, Neural Radiance Caching \bcite{muller2021} can also be thought of as a form of Path Space Filtering \bcite{keller2016}. % TODO: check
+
+\section{Relevance for this thesis}
+In this thesis I will mainly build on the NRC by \textcite{muller2021} with the extension of \textcite{muller2022}, but I will introduce a decoupling of the radiance cache similar to \textcite{walter1999,tole2002} to apply it to bidirectional pathtracing \bcite{veach1997}, light tracing \bcite{arvo1986} and hardware accelerated progressive photon mapping \bcite{jensen1996,kern2023,hachisuka2008}.

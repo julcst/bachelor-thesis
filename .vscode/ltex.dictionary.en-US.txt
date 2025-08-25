@@ -44,3 +44,8 @@ BRDFs
 surfels
 NeRF-like
 Radiosity
+autoencoders
+Variates
+denoise
+autoencoder
+GAN
