@@ -188,11 +188,14 @@ This is analogous to Final Gathering in Photon Mapping \bcite{jensen1996}.
 In the following, I will thus discuss different strategies for path termination.
 
 \subsection{Path Termination Strategies}
-\textbf{1st Vertex} Terminating directly at the first path vertex is a simple strategy that is well suited to visualize the weaknesses of the radiance cache, but is a rather poor choice for glossy vertices that expose high frequency details in the radiance field.
+\label{sec:path-termination}
+\paragraph{1st Vertex} Terminating directly at the first path vertex is a simple strategy that is well suited to visualize the weaknesses of the radiance cache, but is a rather poor choice for glossy vertices that expose high frequency details in the radiance field.
 
-\textbf{Variance Heuristic} \textcite{muller2021} propose to terminate paths instead based on the estimated variance of the sampled path.
-Low variance paths should be path traced, because they exhibit high frequent detail and importance sampling these paths is likely to yield a good estimate.
-High variance paths on the other hand result in high Monte Carlo noise
+\paragraph{Spread Angle Heuristic (SAH)} \textcite{muller2021} propose to terminate paths instead based on the estimated spread of the sampled path.
+Low spread paths should be path traced, because they exhibit high frequent detail and importance sampling these paths is likely to yield a good estimate.
+High spread paths on the other hand result in high Monte Carlo noise.
+
+\paragraph{Balanced Termination Heuristic (BTH)}
 
 \subsection{Temporal Stability}
 Because the neural network is trained continuously with a relatively high learning rate on highly dynamic data, the output of the network can become temporally unstable.

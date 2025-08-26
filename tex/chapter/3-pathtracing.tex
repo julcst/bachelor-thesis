@@ -8,9 +8,9 @@ As always in rendering, we are interested in solving the rendering equation, whi
 The rendering equation is given by:
 \begin{equation}
 \label{eq:rendering_equation}
-    L_o(\vec{x}, \wo) = L_e(\vec{x}, \wo) + \int_{\Omega} f(\wi, \vec{x}, \wo) L_i(\vec{x}, \wi) \cos(\theta_i) \diff\wi
+    L_o(\vec{x}, \wo) = L_e(\vec{x}, \wo) + \int_{\Omega} f(\wi, \vec{x}, \wo) L_i(\vec{x}, \wi) \cos\theta_i \diff\wi
 \end{equation}
-where $L_o$ is the outgoing radiance, $L_e$ is the emitted radiance, $f$ is the bidirectional scattering distribution function (BSDF), and $L_i$ is the incoming radiance from direction $\omega_i$.
+where $L_o$ is the outgoing radiance, $L_e$ is the emitted radiance, $f$ is the bidirectional scattering distribution function (BSDF), $L_i$ is the incoming radiance from direction $\omega_i$, and $\theta_i$ is the incident angle, which is the angle between the incoming light direction $\omega_i$ and the surface normal at $\vec{x}$.
 
 \section{Monte Carlo Integration}
 
