@@ -295,6 +295,7 @@ A naïve way to combine these two sampling strategies would be to simply weigh t
 However, this is suboptimal, as the resulting variance is then simply the average of the variances of both sampling strategies.
 Instead, \textcite{veach1997} also introduced a provably optimal way to combine multiple sampling strategies, called the balance heuristic:
 \begin{equation}
+\label{eq:balance_heuristic}
     w_i(\hat{x}) = \frac{N_i p_i(\hat{x})}{\sum_{j} N_j p_j(\hat{x})}
 \end{equation}
 
@@ -303,5 +304,6 @@ Thus, a sample is weighted lower, if it is in an outlier of the generating distr
 
 As suggested by \textcite{veach1997}, I use the power heuristic generalization with a sharpening exponent of $\beta=2$ to combine BSDF and light sampling:
 \begin{equation}
+\label{eq:power_heuristic}
     w_i^{\beta}(\hat{x}) = \frac{(N_i p_i(\hat{x}))^\beta}{\sum_{j} (N_j p_j(\hat{x}))^{\beta}}
 \end{equation}

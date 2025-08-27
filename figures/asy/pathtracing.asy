@@ -20,7 +20,7 @@ void drawEye(pair pos, pair dir, real scale = 1, real r1 = 0.5 * scale, real r2 
     fill(t*((p&arc(0.5*(a+b), b, a))--cycle));
 }
 
-void drawSun(pair pos, int rays = 8, real scale = 1, real r1 = 0.2 * scale, real r2 = 0.3 * scale, real r3 = 0.5 * scale) {
+void drawSun(pair pos, int rays = 16, real scale = 1, real r1 = 0.2 * scale, real r2 = 0.3 * scale, real r3 = 0.5 * scale) {
     pair c = pos;
     draw(circle(c, r1));
     for (int i = 0; i < rays; ++i) {

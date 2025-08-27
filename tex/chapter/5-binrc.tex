@@ -33,6 +33,7 @@ This happens, whenever the support of the query sampling distribution $Q$ is not
 The general idea of decoupling radiance estimation and visualization was already explored by others, notably \textcite{walter1999} and \textcite{tole2002}.
 
 \section{The Path Space Integral Formulation}
+\label{sec:path_space_integral}
 To be able to robustly derive the following radiance estimators, I will use an alternative but equivalent formulation of the rendering equation as an integral over the path space, which was first introduced by \textcite{veach1997}.
 \begin{figure}[ht]
     \centering
@@ -98,6 +99,7 @@ p(\vec{y}) = \frac{\cos \theta_{\vec{y}\veryshortarrow\vec{x}}}{\|\vec{y} - \vec
 \end{equation}
 
 \section{Inference}
+\label{sec:inference}
 Using this framework a simple inference scheme naturally emerges from the Path Space Integral Formulation (\autoref{eq:path_space_integral}).
 The path length $n$ is limited by a path termination strategy (\autoref{sec:path-termination}), so we only need to calculate the finite sum up to the termination length $l$ because we terminate with a valid radiance estimate which incorporates the sum over longer paths.
 We replace the integral over the path space $X_n$ by a primary Monte-Carlo Estimator.
@@ -116,7 +118,7 @@ For readability, I will do an exemplary derivation for a path of length $n=2$ wi
     % &= \int_{X_{n-1}} \widehat{L}_o(\pdir{0}{1}) \G{0}{1} \f{0}{1}{2} \G{1}{2} \f{1}{2}{3} \G{2}{3} \diff A(\vec{x}_0) \dots \diff A(\vec{x}_2)\\
     % &\approx \frac{\widehat{L}_o(\pdir{0}{1}) \G{0}{1}}{p(x_0)}  \frac{\f{0}{1}{2} \G{1}{2}}{p(x_1)} \frac{\f{1}{2}{3} \G{2}{3}}{p(x_2)}\\
     % &= \frac{\widehat{L}_o(\pdir{0}{1}) \cos\theta_{0\veryshortarrow1}}{p(\pdir{1}{0}\mid\pdir{2}{1})}  \frac{\f{0}{1}{2} \cos\theta_{1\veryshortarrow2}}{p(\pdir{2}{1}\mid\pdir{3}{2})} \frac{\f{1}{2}{3} \cos\theta_{2\veryshortarrow3}}{p(\pdir{3}{2})}\\
-\end{align}
+\end{align} % TODO: generic
 \end{subequations}
 In the first step, the sensor weighting term $W$ cancels with the integration over the eye vertex (\ref{eq:cancelw}).
 We then replace the integral by a primary Monte Carlo estimator (\ref{eq:pmc}).
@@ -133,17 +135,51 @@ Applying these observations to all path lengths up to termination, we get:
 \begin{equation}
 \label{eq:inference}
     I
-    = \sum_{i=1}^{n-1} T_i L_e(\pdir{i}{i-1}) + T_n \widehat{L}_o(\pdir{n}{n-1}), \quad
+    \hateq \sum_{i=1}^{n-1} T_i L_e(\pdir{i}{i-1}) + T_n \widehat{L}_o(\pdir{n}{n-1}), \quad
     T_n
     = \prod_{i=1}^{n} \frac{f(\ptrip{i-1}{i}{i+1}) \cos \theta_{i \veryshortarrow i+1}}{p(\pdir{i}{i+1} \mid \pdir{i-1}{i})}
 \end{equation}
-where $T_n$ is the accumulated throughput along the path and $\widehat{L}_o(\pdir{n}{n-1})$ is the interpolated radiance estimate at the termination vertex.
+where $T_n$ is the accumulated throughput along the first $n$ segments of the path and $\widehat{L}_o(\pdir{n}{n-1})$ is the interpolated radiance estimate at the termination vertex.
 To simplify notation, the path now starts at the eye vertex $\vec{x}_0$.
 Note, that Russian Roulette Termination (\autoref{eq:rr}) is not to be applied here, as we terminate the path with a valid radiance estimate.
 
 \section{Path Tracing}
+\label{sec:re_eye}
+\begin{figure}[ht]
+    \centering
+    \includegraphics{asy/eye_tracing.pdf}
+\caption{The simplest way to estimate the outgoing radiance $L_o(\x_0, \wo_0)$ is eye tracing, which shoots a path from the surface into the scene and collects emissions at each intersection.}
+\label{fig:eye_tracing}
+\end{figure}
+We can apply the observations made in \autoref{sec:inference} to the path space formulation for radiance (\autoref{eq:path_space_integral_radiance}) to derive a path tracing based radiance estimator:
+\begin{equation}
+    L_o(\vec{x}_0, \wo_0)
+    \hateq \sum_{k=1}^{\infty} T_k L_e(\vec{x}_k, \wo_k), \quad
+    T_n
+    = \prod_{k=0}^{n-1} \frac{f(\wi_k, \x_k, \wo_k) \cos {\theta_i}_k}{p(\wi_k \mid \wo_k)}
+\end{equation}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics{asy/nee.pdf}
+\caption{Direct light sampling also known as Next Event Estimation (NEE) performs significantly better than BSDF sampling on small direct lighting.}
+\label{fig:nee}
+\end{figure}
+This estimator alone however is ineffective at finding small light sources, so we combine it with Next Event Estimation through Multiple Importance Sampling (\autoref{sec:mis}), as we already did in the reference pathtracer:
+\begin{equation}
+\begin{aligned}
+    L_o(\vec{x}_0, \wo_0)
+    \hateq \sum_{k=1}^{\infty} T_k \left( w_\text{BSDF} L_e(\x_k, \wo_k) + w_\text{L} \frac{f(\pdir{L}{k}, \wo_k) \G{k}{L} L_e(\pdir{L}{k})}{p(\x_L)} \right)
+\end{aligned}
+\end{equation}
+By combining the two techniques by weighting them with their respective MIS-weights $w_\text{BSDF}$ and $w_\text{L}$ (\autoref{eq:balance_heuristic} and \autoref{eq:power_heuristic}), we get the best of both worlds.
+This combined with ReSTIR DI \bcite{bitterli2020} and a LightBVH \bcite{moreau2019} for efficient many light sampling is the radiance estimator used by \textcite{muller2021}.
+However, I simply sample the light source from a precomputed CDF-table by inversion sampling, because my test scenes only contain a few light sources.
 
 \section{Bidirectional Training}
+\label{sec:re_bidir}
+A major weakness of the aforementioned radiance estimator (\autoref{sec:re_eye}) is indirect lighting where the light paths undergo glossy reflections/refractions before getting diffused.
+This effect is known as a caustic.
 
 \section{Light Tracing}
 

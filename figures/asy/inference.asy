@@ -31,7 +31,7 @@ label("$\f{2}{1}{0}$", p[1], S);
 label("$\f{3}{2}{1}$", p[2], N);
 label("$\widehat{L}_o(\pdir{3}{2})$", p[3], S);
 
-draw(p[3]--p[3]+0.1(p[2] - p[3]), linewidth(1.5), Arrow);
+draw(p[3]--p[3] + 0.2unit(p[2] - p[3]), linewidth(1.5), Arrow);
 
 dot(p);
 label("$\vec{x}_0$", p[0], 1.5E);
