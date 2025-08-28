@@ -51,3 +51,4 @@ autoencoder
 GAN
 LightBVH
 refractions
+BSDF-sampled

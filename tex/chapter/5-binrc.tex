@@ -17,17 +17,19 @@ Radiance caching generally can be broken down into four steps:
     \item \textbf{Inference}
     \begin{enumerate}
         \item \textbf{Query Sampling} We sample queries $q = (\vec{x}, \vec{\omega}_o)$ according to a distribution $Q(q)$.
-        \item \textbf{Interpolation} Given a query $q$, we want to approximate the outgoing radiance $\hat{L}_o(q)$ by interpolating the radiance estimates of spatiotemporally nearby query predictions $\hat{q}$.
+        \item \textbf{Interpolation} Given a query $q$, we want to approximate the outgoing radiance $\hat{L}_o(q)$ by interpolating the radiance estimates of spatio-temporally nearby query predictions $\hat{q}$.
         We can use any combination of storing and interpolation technique for this, such as nearest neighbor, linear interpolation or, in our case, the NRC.
         Note however, that this step generally introduces \textbf{bias}.
     \end{enumerate}
 \end{enumerate}
 
-\textbf{Note:} Using this framework we can observe that the \textbf{cache efficiency} is optimal if the query prediction distribution $\hat{Q}(\hat{q})$ is equal to the query sampling distribution $Q(q)$.
+\paragraph{Note:}
+\label{par:cache_efficiency}
+Using this framework we can observe that the \textbf{cache efficiency} is optimal if the query prediction distribution $\hat{Q}(\hat{q})$ is equal to the query sampling distribution $Q(q)$.
 Conversely, if we sample a query $q^*$ that can not be predicted by the query predictor (i.e. $\hat{Q}(q^*)=0$), we introduce fundamental bias into the radiance cache $\hat{L}_o(q^*)$, because the radiance cache will not contain an accurate radiance estimate for that query.
 This happens, whenever the support of the query sampling distribution $Q$ is not contained in the support of the query prediction distribution $\hat{Q}$, i.e. $\supp(Q) \not\subseteq \supp(\hat{Q})$.
 
-\textbf{Discussion:} It may be possible, to derive a better radiance cache by storing the incoming radiance and BSDFs in a data structure and connecting to them stochastically through ReSTIR DI \bcite{bitterli2020} similar to Virtual Point Lights in Instant Radiosity techniques \bcite{keller1997}.
+\paragraph{Discussion:} It may be possible, to derive a better radiance cache by storing the incoming radiance and BSDFs in a data structure and connecting to them stochastically through ReSTIR DI \bcite{bitterli2020} similar to Virtual Point Lights in Instant Radiosity techniques \bcite{keller1997}.
 % Or VCM
 
 The general idea of decoupling radiance estimation and visualization was already explored by others, notably \textcite{walter1999} and \textcite{tole2002}.
@@ -172,19 +174,86 @@ This estimator alone however is ineffective at finding small light sources, so w
     \hateq \sum_{k=1}^{\infty} T_k \left( w_\text{BSDF} L_e(\x_k, \wo_k) + w_\text{L} \frac{f(\pdir{L}{k}, \wo_k) \G{k}{L} L_e(\pdir{L}{k})}{p(\x_L)} \right)
 \end{aligned}
 \end{equation}
-By combining the two techniques by weighting them with their respective MIS-weights $w_\text{BSDF}$ and $w_\text{L}$ (\autoref{eq:balance_heuristic} and \autoref{eq:power_heuristic}), we get the best of both worlds.
+By combining the two techniques by weighting them with their respective MIS-weights $w_\text{BSDF}(\wo)$ and $w_\text{L}(\x_L)$ (\autoref{eq:balance_heuristic} and \autoref{eq:power_heuristic}), we get the best of both worlds.
 This combined with ReSTIR DI \bcite{bitterli2020} and a LightBVH \bcite{moreau2019} for efficient many light sampling is the radiance estimator used by \textcite{muller2021}.
 However, I simply sample the light source from a precomputed CDF-table by inversion sampling, because my test scenes only contain a few light sources.
+To limit the path length, I use Russian Roulette Termination (\autoref{eq:rr}) again, and in praxis the path length also has to be limited to a maximum length, which introduces potential bias.
 
 \section{Bidirectional Training}
 \label{sec:re_bidir}
 A major weakness of the aforementioned radiance estimator (\autoref{sec:re_eye}) is indirect lighting where the light paths undergo glossy reflections/refractions before getting diffused.
 This effect is known as a caustic.
+In the extreme case of an infinitesimal light source being ideally reflected/refracted and then diffused, path tracing and NEE even fail completely to capture this effect, because the probability to sample such a path by BSDF sampling is zero.
+However, we can do the exact opposite of NEE by tracing light paths and connecting them to query points sampled from the eye.
+This technique elegantly resolves even long glossy light paths.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics{asy/bidir.pdf}
+\caption{Flux is distributed along a BSDF-sampled path from a random point on a light source ($\x_0$). At the query point $\x_q$ radiance is collected by deterministically connecting to every vertex of the light path.}
+\label{fig:bidir}
+\end{figure}
+Specifically, I propose the following alternative radiance estimator based on this idea:
+First, sample a query point $q = (\vec{x}_q, \wo_q)$ from the query sampling distribution $Q(q)$.
+Then, trace a light path carrying flux from a randomly selected light source via BSDF sampling and connect each vertex $\vec{x}_k$ to the query point $\vec{x}_q$.
+
+Starting again with the Primary Monte Carlo Estimator for the Path Space Integral for Radiance (\autoref{eq:path_space_integral_radiance}) and applying the same observations as in \autoref{sec:inference}, we get:
+\begin{equation}
+\label{eq:bidir}
+\begin{aligned}
+    L_o(\vec{x}_q, \wo_q)
+    &\hateq \frac{L_e(\pdir{0}{q})}{p(\x_0)} \G{0}{q} f(\pdir{0}{q}, \wo_q) \\
+    &+ \sum_{k=1}^{\infty} \Phi_k \cdot \f{k-1}{k}{q} \G{k}{q} f(\pdir{k}{q}, \wo_q), \\
+    \Phi_n &= \frac{L_e(\pdir{0}{q}) \cos \theta_{0 \veryshortarrow 1}}{p(\x_0) p(\pdir{0}{1})} \prod_{i=2}^{n} \frac{f(\ptrip{i-1}{i}{i+1}) \cos \theta_{i \veryshortarrow i+1}}{p(\pdir{i}{i+1} \mid \pdir{i-1}{i})},
+\end{aligned}
+\end{equation}
+where $\Phi_n$ is the light flux transported along the path.
+The sum over the path length is split into two parts because the first vertex $\vec{x}_0$ is sampled directly on the light source and requires special handling.
+
+In practice, I only sample queries by shooting primary camera rays, because this is already a good approximation of the query sampling distribution $Q(q)$.
 
 \section{Light Tracing}
+\label{sec:light_tracing}
+However, despite already sampling light paths, the estimator from \autoref{sec:re_bidir} only finds indirect illumination by caustics efficiently, since given a specific query, the probability to connect to a glossy light path directly is still low.
+So, instead of predicting queries solely from the eye, we can also collect radiance at future vertices of the light path.
+At a light vertex, we are guaranteed to get strong contribution at least from the previous vertex, because we sampled it directly through BSDF sampling.
+It would also be possible to sample independent queries from the light vertices instead of reusing the next light vertex and this may in fact be an interesting algorithm to explore, though this is outside the scope of this thesis.
 
-\section{Balancing}
+\paragraph{Balancing} Although this estimator may look promising at first, it is important to note that it exhibits the problem already discussed in my motivation of bidirectional radiance caching (\autoref{par:cache_efficiency}):
+By sampling queries solely from the light, queries that are shadowed will never be predicted, which introduces bias into the cache.
+This can be clearly visible depending on the scene and will be further discussed in the results chapter (\autoref{chap:results}).
+
+To counteract this drawback, we can make a simple observation:
+If a query is not reachable from a light source, it does not receive energy, thus the radiance at such queries can be safely assumed to be zero.
+Because the Neural Radiance Cache performs averaging in local neighborhoods, we can carefully introduce samples with radiance zero according to the query sampling distribution $Q(q)$.
+By weighting the valid samples with the inverse of the ratio of zero samples, we can ensure that the mean over a local neighborhood is still correct:
+\begin{equation}
+\expectationvar{q}{{\widehat{L}_o}(\vec{x}_q, \wo_q)} = p_0 \cdot 0 + \frac{1}{n} \sum_{q \in Q} \frac{1}{p_0} L_o(\vec{x}_q, \wo_q) = \widehat{L}_o(\vec{x}_q, \wo_q)
+\end{equation}
+
+Essentially this algorithm models a sort of output decay on the NRC, dragging its prediction towards zero.
+This can work, but it degrades the quality of the cache, since it introduces additional noise with the zero radiance samples.
+Furthermore, it is a waste of bandwidth to spend resources on learning zero radiance, as it does not provide any information gain.
 
 \section{Path Spaced Denoised Sparse Photon Mapping}
+\label{sec:psdpm}
+The final radiance estimator I propose is an adaptation of Photon Mapping by \textcite{jensen1996}.
+We again shoot flux into the scene by light tracing.
+However, instead of collecting the flux by connecting to an infinitesimal query point, we collect the incoming flux over all sampled light paths in a \emph{query region} by kernel density estimation.
+\begin{subequations}
+\begin{align}
+    L_o(\x, \wo)
+    &= \int_{\Omega_i} f(\wi, \x, \wo) L_i(\wi, \x) \cos{\theta_i} \diff\wi \label{eq:pm:lo}\\
+    &= \int_{\Omega_i} f(\wi, \x, \wo) \frac{\diff^2 \Phi_i(\wi, \x)}{\diff A \; \cancel{\cos{\theta_i} \diff\wi}} \cancel{\cos{\theta_i} \diff\wi} \label{eq:pm:defrad}\\
+    &\hateq \frac{1}{n} \sum_{i=1}^n f(\hat{\vec{\omega}}_i, \x, \wo) \frac{\Delta \Phi_i(\hat{\vec\omega}_i, \x)}{\Delta A} \label{eq:pm:est}\\
+    &\approx \frac{1}{n \pi r^2} \sum_{i=1}^n f(\hat{\vec{\omega}}_i, \x, \wo) \Delta \Phi_i(\hat{\vec\omega}_i, \x) \label{eq:pm:sphere}
+\end{align}
+\end{subequations}
+We start with the rendering equation (\ref{eq:pm:lo}) and replace the incoming radiance $L_i$ by its definition as incoming flux per area and solid angle (\ref{eq:pm:defrad}).
+We then replace the integral by a Monte Carlo estimator over $n$ sampled flux packages \emph{(photons)} (\ref{eq:pm:est}).
+Finally, we use a box function inside a sphere of radius $r$ as our kernel.
+Assuming the surface is locally flat, this allows us to approximate the surface area $\Delta A$ over which we are integrating by a disk of area $A=\pi r^2$ (\ref{eq:pm:sphere}).
+
+\paragraph{Hardware Acceleration}
 
 %\section{Hardware Accelerated Vertex Connection and Merging}
