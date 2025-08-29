@@ -190,8 +190,8 @@ This technique elegantly resolves even long glossy light paths.
 \begin{figure}[ht]
     \centering
     \includegraphics{asy/bidir.pdf}
-\caption{Flux is distributed along a BSDF-sampled path from a random point on a light source ($\x_0$). At the query point $\x_q$ radiance is collected by deterministically connecting to every vertex of the light path.}
-\label{fig:bidir}
+    \caption{Flux is distributed along a BSDF-sampled path from a random point on a light source ($\x_0$). At the query point $\x_q$ radiance is collected by deterministically connecting to every vertex of the light path.}
+    \label{fig:bidir}
 \end{figure}
 Specifically, I propose the following alternative radiance estimator based on this idea:
 First, sample a query point $q = (\vec{x}_q, \wo_q)$ from the query sampling distribution $Q(q)$.
@@ -214,6 +214,14 @@ In practice, I only sample queries by shooting primary camera rays, because this
 
 \section{Light Tracing}
 \label{sec:light_tracing}
+\begin{figure}[ht]
+    \centering
+    \includegraphics{asy/light_bootstrapping_1.pdf}
+    \includegraphics{asy/light_bootstrapping_2.pdf}
+    \includegraphics{asy/light_bootstrapping_3.pdf}
+    \caption{Visualization of light tracing for query prediction: Every new light vertex is first handled as a query ($\vec{q}_i$) and collects radiance from all previous vertices according to \autoref{eq:bidir}.}
+    \label{fig:light_bootstrap}
+\end{figure}
 However, despite already sampling light paths, the estimator from \autoref{sec:re_bidir} only finds indirect illumination by caustics efficiently, since given a specific query, the probability to connect to a glossy light path directly is still low.
 So, instead of predicting queries solely from the eye, we can also collect radiance at future vertices of the light path.
 At a light vertex, we are guaranteed to get strong contribution at least from the previous vertex, because we sampled it directly through BSDF sampling.
@@ -239,21 +247,94 @@ Furthermore, it is a waste of bandwidth to spend resources on learning zero radi
 \label{sec:psdpm}
 The final radiance estimator I propose is an adaptation of Photon Mapping by \textcite{jensen1996}.
 We again shoot flux into the scene by light tracing.
-However, instead of collecting the flux by connecting to an infinitesimal query point, we collect the incoming flux over all sampled light paths in a \emph{query region} by kernel density estimation.
+However, instead of collecting the flux by connecting to an infinitesimal query point, we collect the incoming flux over all sampled light paths in a \emph{query region} by kernel density estimation (see \autoref{fig:pm_collection}).
+
+The radiance at a query point $\x$ in direction $\wo$ can be estimated by:
 \begin{subequations}
+\label{eq:pm}
 \begin{align}
     L_o(\x, \wo)
     &= \int_{\Omega_i} f(\wi, \x, \wo) L_i(\wi, \x) \cos{\theta_i} \diff\wi \label{eq:pm:lo}\\
     &= \int_{\Omega_i} f(\wi, \x, \wo) \frac{\diff^2 \Phi_i(\wi, \x)}{\diff A \; \cancel{\cos{\theta_i} \diff\wi}} \cancel{\cos{\theta_i} \diff\wi} \label{eq:pm:defrad}\\
-    &\hateq \frac{1}{n} \sum_{i=1}^n f(\hat{\vec{\omega}}_i, \x, \wo) \frac{\Delta \Phi_i(\hat{\vec\omega}_i, \x)}{\Delta A} \label{eq:pm:est}\\
-    &\approx \frac{1}{n \pi r^2} \sum_{i=1}^n f(\hat{\vec{\omega}}_i, \x, \wo) \Delta \Phi_i(\hat{\vec\omega}_i, \x) \label{eq:pm:sphere}
+    &\hateq \frac{1}{n} \sum_{k=1}^n f(\hat{\wi}_k, \x, \wo) \frac{\Delta \Phi_i(\hat{\wi}_k, \hat{\x}_k)}{\Delta A} w_{\vec{x}}(\hat{\x}_k)\label{eq:pm:est}\\
+    &\approx \frac{1}{n \pi r^2} \sum_{k=1}^n f(\hat{\wi}_k, \x, \wo) \Delta \Phi_i(\hat{\wi}_k, \hat{\x}_k) w_{\vec{x},r}(\hat{\x}_k), \label{eq:pm:sphere}
 \end{align}
 \end{subequations}
+where $w_{\vec{x},r}(\hat{\x}_k)$ is the kernel weight for the photon position $\hat{\x}_k$.
 We start with the rendering equation (\ref{eq:pm:lo}) and replace the incoming radiance $L_i$ by its definition as incoming flux per area and solid angle (\ref{eq:pm:defrad}).
 We then replace the integral by a Monte Carlo estimator over $n$ sampled flux packages \emph{(photons)} (\ref{eq:pm:est}).
-Finally, we use a box function inside a sphere of radius $r$ as our kernel.
+Finally, we assume that the kernel function $w_{\vec{x},r}(\hat{\x}_k)$ is limited to a sphere of radius $r$.
 Assuming the surface is locally flat, this allows us to approximate the surface area $\Delta A$ over which we are integrating by a disk of area $A=\pi r^2$ (\ref{eq:pm:sphere}).
+The simplest such kernel function is the box function, with $w_{\vec{x},r}(\hat{\x}_k)=1$ inside the sphere and $0$ outside.
+\begin{figure}[ht]
+    \centering
+    \includegraphics{asy/pm_collection.pdf}
+    \caption{Visualization of photon mapping. Photons (packages of flux, here small black arrows) are distributed in the scene and collected over query regions (dashed circle). In this example, three light paths were sampled ($n=3$). Note, that in practice photons and queries are not recorded at glossy surfaces, since they probably can not be connected with high contribution. This removes glossy features from the radiance estimate, however the path termination strategies from \autoref{sec:path-termination} avoid querying glossy surfaces in the first place.}
+    \label{fig:pm_collection}
+\end{figure}
+
+\paragraph{Query Lifetimes}
+Because we couple Photon Mapping with Radiance Caching, we can make some important modifications to the original algorithm:
+Firstly, we do not need to query the photon map at every pixel, since the Radiance Cache interpolates between sparse samples.
+So, we can reduce the amount of queries to a fixed number independent of render resolution.
+% TODO: Sample caustics more densely
+Secondly, I chose to store the \emph{queries} instead of the \emph{photons} in a spatial data structure.
+This enables the queries to persist across multiple frames and collect incoming flux over multiple light passes.
+The lifetimes of the queries can be made completely independent of each other by keeping track of the total amount of light samples already drawn at creation time of a query.
+The difference between the current count of light samples and the count at creation gives the number of total light samples $n$ that were used in the collection of flux for that query (\autoref{eq:pm}).
+Flux is simply accumulated to the query whenever a photon hits the query region.
+To maintain a constant number of queries I use a ring buffer with an atomic index counter and a constant query replacement factor $\kappa$.
+The lifetime of a query is thus approximately $1/\kappa$ frames, yet it can also be longer if query prediction fails to produce a valid result, for example if a camera ray does not hit any geometry.
+
+\begin{table}
+    \centering
+    \begin{subtable}{.33\textwidth}
+        %\centering
+        \caption{Photon}
+        \label{tab:photon_struct}
+        \begin{tabular}{l l l}
+            %\toprule
+            \textbf{Field} & \textbf{Description} \\
+            \midrule
+            $\x \in \mathbb{R}^3$ & Position \\
+            $\wi \in \mathbb{S}^2$ & Incident direction \\
+            $\Phi_i \in \mathbb{R}^3$ & Flux \\
+            %\bottomrule
+        \end{tabular}
+    \end{subtable}%
+    \begin{subtable}{.68\textwidth}
+        %\centering
+        \caption{Query}
+        \label{tab:query_struct}
+        \begin{tabular}{l l l}
+            %\toprule
+            \textbf{Field} & \textbf{Description} \\
+            \midrule
+            $\x \in \mathbb{R}^3$ & Position \\
+            $\wo \in \mathbb{S}^2$ & Outgoing direction \\
+            $\Phi_o \in \mathbb{R}^3$ & Accumulated outgoing flux \\
+            $r \in \mathbb{R}$ & Radius \\
+            $f \!:\! \mathbb{S}^4 \!\to\! \mathbb{R}^3$ & BSDF at $\x$ \\
+            $n_c \in \mathbb{N}$ & Number of total light samples at creation \\
+            $N \in \mathbb{R}$ & Amount of photons collected in previous passes \\
+            $M \in \mathbb{N}$ & Number of photons collected in current pass \\
+            %\bottomrule
+        \end{tabular}
+    \end{subtable}
+    \caption{The structs used to represent photons and queries.}
+\end{table}
+
+\paragraph{Radius Reduction}
+Choosing the radius $r$ is a trade-off between variance and bias.
+Larger radii collect flux over a larger area, increasing the number of photons used in the estimator and thus reducing variance.
+However, this also introduces bias, as these additional photons may not be an accurate representation of the incoming flux at the query point.
+Shrinking the radius $r$ towards zero would eliminate this bias in the limit, but the number of available estimates would also decrease, increasing variance.
+More precisely, \textcite{knaus2011} showed that $\mathrm{Bias}\left[\estimator{{L_o}_\mathrm{PM}}\right] \sim r^2 \sim 1/\mathrm{Var}\left[\estimator{{L_o}_\mathrm{PM}}\right]$.
+Radius Reduction was originally developed by \textcite{hachisuka2008} as a technique to make Photon Mapping consistent.
 
 \paragraph{Hardware Acceleration}
+\textcite{jensen1996} originally proposed to use k-d-trees to store photons, to enable fast neighbor searches.
+However, k-d-tree construction and querying are highly incoherent tasks and are commonly implemented using stacks.
+GPU hardware neither includes a stack, nor does it support extensive branching, making k-d-trees for real-time rendering impractical.
 
 %\section{Hardware Accelerated Vertex Connection and Merging}

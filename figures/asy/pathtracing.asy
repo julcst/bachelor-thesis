@@ -20,7 +20,7 @@ void drawEye(pair pos, pair dir, real scale = 1, real r1 = 0.5 * scale, real r2 
     fill(t*((p&arc(0.5*(a+b), b, a))--cycle));
 }
 
-void drawSun(pair pos, int rays = 16, real scale = 1, real r1 = 0.2 * scale, real r2 = 0.3 * scale, real r3 = 0.5 * scale) {
+void drawSun(pair pos, int rays = 16, real scale = 1, real r1 = 0.2 * scale, real r2 = 0.3 * scale, real r3 = 0.45 * scale) {
     pair c = pos;
     draw(circle(c, r1));
     for (int i = 0; i < rays; ++i) {
@@ -61,16 +61,42 @@ path operator cast(pair[] p) {
     return path(p);
 }
 
+pair refract(pair wi, pair n, real eta) {
+  real cos_theta_i = dot(wi, n);
+  real sin2_theta_i = max(0, 1 - cos_theta_i^2);
+  real sin2_theta_o = eta^2 * sin2_theta_i;
+
+  // Check for total internal reflection
+  if (sin2_theta_o > 1)
+    return (0,0); // indicate TIR (no refraction)
+
+  real cos_theta_o = sqrt(1 - sin2_theta_o);
+  return -eta * wi + (eta * cos_theta_i - cos_theta_o) * n;
+}
+
+struct object {
+    path shape;
+    bool refract;
+    //real eta = 1.5;
+}
+
 struct scene {
-    path[] objects;
-    
-    void add(path p) {
-        objects.push(p);
+    object[] objects;
+
+    void add(object o) {
+        objects.push(o);
+    }
+
+    void add(path p, bool refract = false) {
+        object o;
+        o.shape = p;
+        o.refract = refract;
+        add(o);
     }
 
     void draw() {
         for (int i = 0; i < objects.length; ++i) {
-            draw(objects[i], gray + linewidth(1));
+            draw(objects[i].shape, gray + linewidth(1));
         }
     }
 
@@ -83,9 +109,11 @@ struct scene {
             pair hit;
             real dist = 10000;
             pair tangent;
+            bool refracted = false;
 
             for (int j = 0; j < objects.length; ++j) {
-                path p = objects[j];
+                object o = objects[j];
+                path p = o.shape;
                 real[] ts = intersections(p, pos, pos + dir);
                 for (int k = 0; k < ts.length; ++k) {
                     pair candidate = point(p, ts[k]);
@@ -94,6 +122,7 @@ struct scene {
                         dist = currentDist;
                         hit = candidate;
                         tangent = dir(p, ts[k]);
+                        refracted = o.refract;
                     }
                 }
             }
@@ -104,9 +133,12 @@ struct scene {
             }
 
             pair normal = rotate(90)*tangent;
+            bool inside = dot(normal, dir) > 0;
+            if (inside) normal = -normal;
+            real eta = inside ? 1.0 / 1.5 : 1.5;
             lp.push(hit);
             pos = hit;
-            dir = reflect((0,0), normal)*(-dir);
+            dir = refracted ? refract(-dir, normal, eta) : reflect((0,0), normal)*(-dir);
         }
         if (end > 0) lp.push(pos + unit(dir) * end);
         return lp;

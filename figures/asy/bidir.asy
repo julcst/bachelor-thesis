@@ -9,8 +9,8 @@ size(10cm);
 pair sun = (5, -0.25);
 pair sunN = unit(NW);
 pair sunT = rotate(90)*sunN;
-pair query = (1, 0.3);
-pair wo = 0.2unit((-1, -1));
+pair query = (0, 0.25);
+pair wo = 0.2dir(-160);
 
 pair[] p = {
     sun,
@@ -30,7 +30,7 @@ markangle("$\theta_{1 \veryshortarrow 2}$", p[2], p[1], p[1]+S);
 
 label("$L_o(\vec{x}_q, \wo_q)$", query, N);
 dot(query);
-label("$\x_q$", query, SE);
+label("$\x_q$", query, 1.5S);
 draw(query--query+wo, linewidth(1.5), Arrow);
 
 for (pair x : p) {
