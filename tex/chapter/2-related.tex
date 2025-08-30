@@ -5,7 +5,7 @@ The research related to this thesis can be divided into three main categories:
 First, I will give a short overview over several relevant approaches to the global illumination problem.
 After that, I will specifically discuss methods that reuse computed radiance estimates across time or space.
 Finally, I will take a closer look into papers that apply neural networks to rendering.
-For a more in-depth overview over the whole field I refer to \textcite{ritschel2012} and for photon mapping in particular to \textcite{kang2016}.
+For a more in-depth overview over the whole field, I refer to \textcite{ritschel2012} and for photon mapping in particular to \textcite{kang2016}.
 
 \section{Global Illumination (GI)}
 In the early days of rendering, lighting was limited to direct illumination and ray traced reflections \bcite{whitted1980} and indirect illumination was often hand-crafted \bcite{christensen2016}.
@@ -18,9 +18,9 @@ However, the separation of the scene into finite elements generally results in v
 \paragraph{Monte Carlo Methods}
 The first universal unbiased algorithm to solve the global illumination problem was given by \textcite{kajiya1986}, who formulated a radiance estimator based on Monte Carlo integration.
 Simultaneously, \textcite{arvo1986} discovered the potential of light tracing to simulate indirect lighting effects.
-\textcite{lafortune1993} later combined light tracing and pathtracing into Bidirectional Pathtracing (BDPT), and \textcite{veach1997} introduced provably optimal weighting strategies to maximize convergence speed.
+\textcite{lafortune1993} later combined light tracing and path tracing into Bidirectional Path Tracing (BDPT), and \textcite{veach1997} introduced provably optimal weighting strategies to maximize convergence speed.
 \textcite{keller1995,owen1995} improved convergence of Monte-Carlo samplers in general by using low discrepancy samples.
-Furthermore, \textcite{veach1997a} also proposed a new mutation based sampling strategy which exceeds in finding low-probability high-contribution paths which can cause significant noise in classic Monte Carlo methods.
+Furthermore, \textcite{veach1997a} also proposed a new mutation-based sampling strategy which exceeds in finding low-probability high-contribution paths which can cause significant noise in classic Monte Carlo methods.
 In addition, Manifold Exploration techniques were developed which excel at discovering highly specular paths \bcite{jakob2012}.
 
 \paragraph{Photon Mapping}
@@ -110,4 +110,4 @@ Similarly, \textcite{jiang2020} use a convolutional autoencoder to denoise low s
 On a further note, Neural Radiance Caching \bcite{muller2021} can also be thought of as a form of Path Space Filtering \bcite{keller2016}. % TODO: check
 
 \section{Relevance for this thesis}
-In this thesis I will mainly build on the NRC by \textcite{muller2021} with the extension of \textcite{muller2022}, but I will introduce a decoupling of the radiance cache similar to what \textcite{walter1999,tole2002} did to combine it with bidirectional pathtracing \bcite{veach1997}, light tracing \bcite{arvo1986} and hardware accelerated progressive photon mapping \bcite{jensen1996,kern2023,hachisuka2008}.
+In this thesis I will mainly build on the NRC by \textcite{muller2021} with the extension of \textcite{muller2022}, but I will introduce a decoupling of the radiance cache similar to what \textcite{walter1999,tole2002} did to combine it with Bidirectional Path Tracing \bcite{veach1997}, light tracing \bcite{arvo1986} and hardware accelerated progressive photon mapping \bcite{jensen1996,kern2023,hachisuka2008}.

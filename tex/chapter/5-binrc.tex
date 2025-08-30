@@ -249,7 +249,7 @@ Furthermore, it is a waste of bandwidth to spend resources on learning zero radi
 
 \section{Path Spaced Denoised Sparse Photon Mapping}
 \label{sec:psdpm}
-The final radiance estimator I propose is an adaptation of Photon Mapping by \textcite{jensen1996}.
+The final radiance estimator I propose is an adaptation of Progressive Photon Mapping by \textcite{jensen1996,hachisuka2008}.
 We again shoot flux into the scene by light tracing.
 However, instead of collecting the flux by connecting to an infinitesimal query point, we collect the incoming flux over all sampled light paths in a \emph{query region} by kernel density estimation (see \autoref{fig:pm_collection}).
 
@@ -286,7 +286,7 @@ This enables the queries to persist across multiple frames and collect incoming 
 The lifetimes of the queries can be made completely independent of each other by keeping track of the total amount of light samples already drawn at creation time of a query.
 The difference between the current count of light samples and the count at creation gives the number of total light samples $n$ that are used in the collection of flux for that query (\autoref{eq:pm}).
 Flux is simply accumulated to the query whenever a photon hits the query region.
-To maintain a constant number of queries I use a ring buffer with an atomic index counter and a constant query replacement factor $\kappa$.
+To maintain a constant number of queries I use a ring buffer with an atomic index counter and a constant query replacement fraction $\kappa$.
 The lifetime of a query is thus approximately $1/\kappa$ frames, yet it can also be longer if query prediction fails to produce a valid result, for example if a camera ray does not hit any geometry.
 
 \begin{table}
@@ -318,9 +318,10 @@ The lifetime of a query is thus approximately $1/\kappa$ frames, yet it can also
             $\wo \in \mathbb{S}^2$ & Outgoing direction \\
             $\Phi_o \in \mathbb{R}^3$ & Accumulated outgoing flux \\
             $r \in \mathbb{R}$ & Radius \\
+            $\vec{n} \in \mathbb{S}^2$ & Surface normal at $\x$ \\
             $f : \mathbb{S}^4 \to \mathbb{R}^3$ & BSDF at $\x$ \\
             $n_c \in \mathbb{N}$ & Number of total light samples at creation \\
-            $N \in \mathbb{R}$ & Amount of photons collected in previous passes \\
+            $N \in \mathbb{R}$ & Amount of photons collected in all passes \\
             $M \in \mathbb{N}$ & Number of photons collected in current pass \\
             %\bottomrule
         \end{tabular}
@@ -332,9 +333,22 @@ The lifetime of a query is thus approximately $1/\kappa$ frames, yet it can also
 Choosing the radius $r$ is a trade-off between variance and bias.
 Larger radii collect flux over a larger area, increasing the number of photons used in the estimator and thus reducing variance.
 However, this also introduces bias, as these additional photons may not be an accurate representation of the incoming flux at the query point.
-Shrinking the radius $r$ towards zero would eliminate this bias in the limit, but the number of available estimates would also decrease, increasing variance.
+Shrinking the radius $r$ towards zero eliminates this bias in the limit, but the number of available estimates also decreases, increasing the variance.
 More precisely, \textcite{knaus2011} showed that $\mathrm{Bias}\left[\estimator{{L_o}_\mathrm{PM}}\right] \sim r^2 \sim 1/\mathrm{Var}\left[\estimator{{L_o}_\mathrm{PM}}\right]$.
-Radius Reduction was originally developed by \textcite{hachisuka2008} as a technique to make Photon Mapping consistent.
+
+Leveraging this observation, \textcite{hachisuka2008} developed Progressive Photon Mapping (PPM), originally as a technique to make classic Photon Mapping consistent and to overcome the memory constraint of storing a single photon map.
+Their idea was to perform multiple light passes, shrinking the radius after every iteration, yet never too much, as there has to be a gain in the total amount of photons, otherwise the estimator diverges.
+Therefore, they introduce a factor $\alpha$ to control the fraction of photons to keep after each light pass (\ref{eq:ppm_n}).
+By fixing the photon density inside the area of the query (\ref{eq:ppm_r}), they derive following update rules:
+\begin{subequations}
+\begin{align}
+    \text{Let } N' = N + \alpha M \label{eq:ppm_n}\\
+    \frac{N + M}{A} = \frac{N + M}{\pi r^2} \stackrel{!}{=} \frac{N'}{\pi (r^2)'} = \frac{N'}{A'} \implies (r^2)' = r^2 \frac{N'}{N + M} \label{eq:ppm_r}\\
+    \Phi_o' = \Phi_o \frac{A'}{A} = \Phi_o \frac{\pi (r^2)'}{\pi r^2} = \Phi_o \frac{N'}{N + M}, \label{eq:ppm_f}
+\end{align}
+\end{subequations}
+where $N$ is the total amount of collected photons, $M$ is the number of new photons found during the light pass, and $r$ and $A$ are the respective radius and area of the query.
+The total outgoing flux has also to be scaled down to the reduced area $A'$ (\ref{eq:ppm_f}).
 
 \paragraph{Hardware Acceleration}
 \textcite{jensen1996} originally proposed to use k-d-trees to store photons, to enable fast near neighbor searches.
@@ -357,11 +371,11 @@ After the light pass we apply Radius Reduction and use the radiance estimates to
 \paragraph{Notes on Performance}
 If the queries are dense or the radius is large, many queries will overlap, causing the atomic accumulation to be serialized and stalling the GPU threads.
 This is the reason why \textcite{kern2023} store the \emph{photons} instead of the queries in the BVH, which forces them however to use a global radius reduction scheme \bcite{knaus2011}.
-A limitation of this strategy is that queries can no longer accumulate flux over multiple light passes, making their approach less suitable for our scenario.
-Fortunately, we partially avoid serialization since our queries are only distributed sparsely.
-An interesting idea would be to check for overlap during query prediction and reject queries that overlap too much with existing queries.
-This would also automatically sample caustics more densely, as caustics receive more light samples, making the radius reduction faster for caustic queries, reducing overlap.
-\textcite{kern2023} also stochastically reject $70\%$ of all non-caustic photons, this could also benefit performance in our case.
+Yet, because we allow the queries to have independent lifetimes, a global radius is not applicable in our case, rendering their approach incompatible.
+Fortunately though, we partially avoid serialization since our queries are only distributed sparsely.
+An interesting idea to resolve this problem would be to check for overlap during query prediction and reject queries that overlap too much with existing queries.
+This would also automatically sample caustics more densely, as caustics receive more light samples, making the radius shrink faster, thus reducing overlap and creating space for new queries.
+\textcite{kern2023} stochastically reject $70\%$ of all non-caustic photons, this could also benefit performance in our case.
 Furthermore, to improve quality at corners, they reject photons with strongly deviating normals.
 
 % Global Radius

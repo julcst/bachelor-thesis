@@ -7,7 +7,6 @@ cuRAND
 conformant
 glTF
 decorrelated
-pathtracing
 microfacet
 Trowbridge-Reitz
 Stamm
