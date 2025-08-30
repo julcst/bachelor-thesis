@@ -52,3 +52,7 @@ GAN
 LightBVH
 refractions
 BSDF-sampled
+rasterization
+AABBs
+BSDF-weighted
+BVHs

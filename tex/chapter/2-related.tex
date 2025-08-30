@@ -32,7 +32,7 @@ The original estimator of \textcite{jensen1996} was made consistent by \textcite
 \paragraph{Real-time Photon Mapping}
 As the original method for photon mapping \bcite{jensen1996} used highly incoherent k-d-tree traversal to perform Fixed-Radius-Near-Neighbor (FRNN) searches, it was not well suited for GPU execution.
 To solve this, \textcite{hachisuka2010} proposed to stochastically store photons in a fixed-size hash grid, which improves parallelization and reduces memory access, yet increases noise.
-\textcite{mara2013} later published four further GPU-optimized photon mapping algorithms.
+\textcite{mara2013} later published four further GPU-optimized photon mapping algorithms, two rasterizing photons and two using grids.
 However, with the recent advancements in GPU architectures, traversal of bounding volume hierarchies can be hardware accelerated.
 \textcite{evangelou2021} successfully leveraged these modern hardware features to perform fast FRNN queries, leading \textcite{kern2023} to apply this to photon mapping and together with culling and stochastic rejection they achieve real-time performance.
 
