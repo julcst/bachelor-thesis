@@ -47,7 +47,7 @@ To handle the infinite recursion without introducing bias, I use Russian Roulett
     \end{cases}
 \end{equation}
 The probability terms cancel out, thus this modification to the estimator does not introduce bias.
-I choose $p_\mathrm{continue}$ proportional to the relative luminance $Y$ \bcite{kirkpatrick2025} of the contribution of the current path segment, which measures the perceived linear brightness of that sample:
+I choose $p_\mathrm{continue}$ proportional to the relative luminance $Y$ \parencite{kirkpatrick2025} of the contribution of the current path segment, which measures the perceived linear brightness of that sample:
 \begin{equation}
 \label{eq:luminance}
     Y(\vec{c}) = 0.2126 \cdot c_r + 0.7152 \cdot c_g + 0.0722 \cdot c_b
@@ -69,13 +69,13 @@ Carefully introducing randomness to the low-discrepancy sequence can help to imp
 This is known as Randomized Quasi-Monte Carlo integration and was first introduced by \textcite{owen1995}.
 For a practical application to pathtracing see for example \textcite{burley2020}.
 
-I use the scrambled Sobol' sequence from cuRAND \bcite{nvidiacorporation2024} which is based on the work of \textcite{owen2008}.
-Furthermore, I employ the same technique as the \textcite{blenderfoundation} and only precompute a single Sobol' sequence for the entire scene, which is then decorrelated between pixels using constant random per-pixel shifts modulo 1, also known as Cranley-Patterson rotations \bcite{cranley1976}.
+I use the scrambled Sobol' sequence from cuRAND \parencite{nvidiacorporation2024} which is based on the work of \textcite{owen2008}.
+Furthermore, I employ the same technique as the \textcite{blenderfoundation} and only precompute a single Sobol' sequence for the entire scene, which is then decorrelated between pixels using constant random per-pixel shifts modulo 1, also known as Cranley-Patterson rotations \parencite{cranley1976}.
 The Sobol' sequence is regularly recomputed in batches on the GPU to allow for unlimited progressive rendering, the per pixel shifts are only recomputed on frame buffer resize, which makes the technique relatively lightweight.
 
 \section{Principled BSDF}
 
-As a material model I use a simplified physically based model, which is inspired by the Disney principled BSDF \bcite{burley2012} and conformant with the glTF PBR specification \bcite{thekhronosr3dformatsworkinggroup2021}.
+As a material model I use a simplified physically based model, which is inspired by the Disney principled BSDF \parencite{burley2012} and conformant with the glTF PBR specification \parencite{thekhronosr3dformatsworkinggroup2021}.
 I restrict myself to the diffuse, specular and transmission components, as they can already cover a wide range of interesting materials and suffice to showcase the strengths and weaknesses of the subsequent techniques.
 
 The BSDF is split into two parts: If the light direction $\wi$ and the view direction $\wo$ lie in the same hemisphere, the BRDF is composed of a diffuse and a specular lobe, otherwise it consists only of a transmission lobe:
@@ -106,7 +106,7 @@ The BSDF is split into two parts: If the light direction $\wi$ and the view dire
 }
 \end{figure}
 
-For the specular component, I use the Torrance-Sparrow/Cook-Torrance microfacet model \bcite{torrance1967, cook1982} with the corrected normalization factor from \textcite{walter2007}:
+For the specular component, I use the Torrance-Sparrow/Cook-Torrance microfacet model \parencite{torrance1967, cook1982} with the corrected normalization factor from \textcite{walter2007}:
 \begin{equation}
     f_s(\wi, \vec{x}, \wo) = \frac{D(\NdotH) G(\n, \wi, \wo) F(\LdotH)}{4 \NdotL \NdotV}
 \end{equation}
@@ -120,7 +120,7 @@ $\wm$ is the normal of an ideally reflecting microfacet (see \autoref{fig:wm_ref
     \wm = \frac{\wi + \wo}{\|\wi + \wo\|}
 \end{equation}
 
-$G$ is the corresponding geometric attenuation term, for which I use the Smith shadowing-masking function \bcite{smith1967}, derived for the Trowbridge-Reitz NDF by \textcite{walter2007}:
+$G$ is the corresponding geometric attenuation term, for which I use the Smith shadowing-masking function \parencite{smith1967}, derived for the Trowbridge-Reitz NDF by \textcite{walter2007}:
 \begin{equation}
     \begin{aligned}
     G(\n, \wi, \wo) &= \frac{1}{1 + \Lambda(\NdotL) + \Lambda(\NdotV)}\\
@@ -129,7 +129,7 @@ $G$ is the corresponding geometric attenuation term, for which I use the Smith s
     \end{aligned}
 \end{equation}
 
-For the Fresnel term $F$, I use the Schlick approximation \bcite{schlick1994}:
+For the Fresnel term $F$, I use the Schlick approximation \parencite{schlick1994}:
 \begin{equation}
     F(\LdotH) = F_0 + (1 - F_0) (1 - \LdotH)^5
 \end{equation}
@@ -150,9 +150,9 @@ For the diffuse component, I simply use the Lambertian reflectance model:
 \begin{equation}
     f_d(\wi, \vec{x}, \wo) = \frac{\rho_d}{\pi}
 \end{equation}
-Several other, more physically accurate, models have been proposed for the diffuse component, such as the microfacet-based Oren-Nayar reflectance model \bcite{oren1994} or the heuristic model from \textcite{burley2012}.
+Several other, more physically accurate, models have been proposed for the diffuse component, such as the microfacet-based Oren-Nayar reflectance model \parencite{oren1994} or the heuristic model from \textcite{burley2012}.
 The Oren-Nayar model is rather computational expensive and not fully energy conserving, although these deficiencies can be mostly overcome by the improvements made by \textcite{fujii}.
-Burley's model suffers also from energy conservation issues, but renormalized versions exist \bcite{lagarde2014}.
+Burley's model suffers also from energy conservation issues, but renormalized versions exist \parencite{lagarde2014}.
 However, the Lambertian model has the nice property of being constant over the hemisphere, which can be advantageous for caching.
 
 To parameterize the BSDF, I use a base color $\vec{c} \in [0, 1]^3$, a metallic factor $m \in [0, 1]$, a roughness factor $r \in [0, 1]$ and a transmission factor $t \in [0, 1]$, as follows:
@@ -172,7 +172,7 @@ For metals, the base color $\vec{c}$ is used directly as the $F_0$ to simulate w
 As aforementioned, the variance of a Monte Carlo estimator can be reduced by sampling the integral using a probability distribution that is as proportional to the integrand as possible.
 Revisiting the rendering equation (\ref{eq:rendering_equation}), we first concentrate on sampling the term $f(\wi, \vec{x}, \wo) \cos(\theta_i)$ of the integrand.
 Also sampling $L_i(\vec{x}, \wi)$ is not that easy, because to obtain $L_i$ we would need to solve the rendering equation again.
-Yet, several approaches have been made to also take $L_i$ into account, notably direct light sampling \bcite{veach1997}, path guiding \bcite{muller2017,muller2019,lafortune1995,jensen1995} and ReSTIR \bcite{bitterli2020}.
+Yet, several approaches have been made to also take $L_i$ into account, notably direct light sampling \parencite{veach1997}, path guiding \parencite{muller2017,muller2019,lafortune1995,jensen1995} and ReSTIR \parencite{bitterli2020}.
 For my reference pathtracer, I will only employ BSDF sampling and direct light sampling (\ref{sec:mis}).
 
 For the diffuse component, as it is constant I only sample the cosine weighted hemisphere:
@@ -180,14 +180,14 @@ For the diffuse component, as it is constant I only sample the cosine weighted h
     p_d(\wi) = \frac{\cos(\theta_i)}{\pi} \quad \text{for } \wi \in \Omega
 \end{equation}
 
-For the specular and transmissive components, I sample the distribution of visible microfacet normals (VNDF) \bcite{heitz2014a} of the Trowbridge-Reitz NDF, which is given by:
+For the specular and transmissive components, I sample the distribution of visible microfacet normals (VNDF) \parencite{heitz2014a} of the Trowbridge-Reitz NDF, which is given by:
 \begin{equation}
     p_\mathrm{VNDF}(\wm \mid \wo) = \frac{G_1(\wo, \wm) D(\NdotH) |\VdotH|}{|\NdotV|}
 \end{equation}
 Sampling this instead of the NDF reduces the variance at grazing angles, where many microfacets are shadowed.
-To sample the VNDF, I use the method proposed by \textcite{dupuy2023}, which improves upon the original method \bcite{heitz2014a} and its follow-up \bcite{heitz2018}.
+To sample the VNDF, I use the method proposed by \textcite{dupuy2023}, which improves upon the original method \parencite{heitz2014a} and its follow-up \parencite{heitz2018}.
 
-To weigh the BSDF, the VNDF has first to be transformed into a probability distribution over the domain of incoming directions $\wi$ using the Jacobian of the reflection operator \bcite{walter2007}:
+To weigh the BSDF, the VNDF has first to be transformed into a probability distribution over the domain of incoming directions $\wi$ using the Jacobian of the reflection operator \parencite{walter2007}:
 \begin{equation}
     \begin{aligned}
         \wi &= \reflect(\wo, \wm), \quad \wm \sim p_\mathrm{VNDF}(\wm \mid \wo)\\
@@ -199,7 +199,7 @@ To weigh the BSDF, the VNDF has first to be transformed into a probability distr
 \end{equation}
 $\left\|\frac{\partial \wm}{\partial \wi}\right\|$ denotes the absolute value of the determinant of the Jacobian for the transform from $\wm$ to $\wi$ and was derived by \textcite{walter2007}.
 
-For the transmission component, I use the same approach, but with the Jacobian of the refraction operator \bcite{walter2007}:
+For the transmission component, I use the same approach, but with the Jacobian of the refraction operator \parencite{walter2007}:
 % TODO: TIR
 \begin{equation}
     \begin{aligned}

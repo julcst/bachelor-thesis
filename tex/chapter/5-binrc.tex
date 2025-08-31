@@ -29,7 +29,7 @@ Using this framework we can observe that the \emph{cache efficiency} is optimal 
 Conversely, if we sample a query $q^*$ that can not be predicted by the query predictor (i.e. $\hat{Q}(q^*)=0$), we introduce fundamental bias into the radiance cache $\hat{L}_o(q^*)$, because the radiance cache will not contain an accurate radiance estimate for that query.
 This happens, whenever the support of the query sampling distribution $Q$ is not contained in the support of the query prediction distribution $\hat{Q}$, i.e. $\supp(Q) \not\subseteq \supp(\hat{Q})$.
 
-\paragraph{Discussion:} It may be possible, to derive a better radiance cache by storing the incoming radiance and BSDFs in a data structure and connecting to them stochastically through ReSTIR DI \bcite{bitterli2020} similar to Virtual Point Lights in Instant Radiosity techniques \bcite{keller1997}.
+\paragraph{Discussion:} It may be possible, to derive a better radiance cache by storing the incoming radiance and BSDFs in a data structure and connecting to them stochastically through ReSTIR DI \parencite{bitterli2020} similar to Virtual Point Lights in Instant Radiosity techniques \parencite{keller1997}.
 % Or VCM
 
 The general idea of decoupling radiance estimation and visualization was already explored by others, notably \textcite{walter1999} and \textcite{tole2002}.
@@ -175,7 +175,7 @@ This estimator alone however is ineffective at finding small light sources, so w
 \end{aligned}
 \end{equation}
 By combining the two techniques by weighting them with their respective MIS-weights $w_\text{BSDF}(\wo)$ and $w_\text{L}(\x_L)$ (\autoref{eq:balance_heuristic} and \autoref{eq:power_heuristic}), we get the best of both worlds.
-This combined with ReSTIR DI \bcite{bitterli2020} and a LightBVH \bcite{moreau2019} for efficient many light sampling is the radiance estimator used by \textcite{muller2021}.
+This combined with ReSTIR DI \parencite{bitterli2020} and a LightBVH \parencite{moreau2019} for efficient many light sampling is the radiance estimator used by \textcite{muller2021}.
 Nevertheless, I simply sample the light source from a precomputed CDF-table by inversion sampling, because my test scenes only contain a few light sources.
 To limit the path length, I use Russian Roulette Termination (\autoref{eq:rr}) again, and in praxis the path length also has to be limited to a maximum length, which introduces potential bias.
 
@@ -183,13 +183,13 @@ To limit the path length, I use Russian Roulette Termination (\autoref{eq:rr}) a
 In practice, I only predict queries by shooting primary camera rays, because this is already a good approximation of the query sampling distribution $Q(q)$ for the path termination strategies given in \autoref{sec:path_termination}.
 A more accurate and efficient method however would be to randomly draw queries from the queries already generated in the inference stage.
 Unfortunately, I did not have the time to implement this.
-% TODO
+% TODO Implement
 
 \section{Bidirectional Training}
 \label{sec:re_bidir}
 A major weakness of the aforementioned radiance estimator (\autoref{sec:re_eye}) is indirect lighting where the light paths undergo glossy reflections/refractions before getting diffused.
 This effect is known as a caustic.
-In the extreme case of an infinitesimal light source being ideally reflected/refracted and then diffused, path tracing and NEE even fail completely to capture this effect, because the probability to sample such a path by BSDF sampling is zero.
+In the extreme case of an infinitesimal light source being ideally reflected/refracted and then diffused, path tracing and NEE even fail completely to capture this effect, because the probability to sample such a path by BSDF sampling is zero. % TODO: Visualize
 However, we can do the exact opposite of NEE by tracing light paths and connecting them to query points sampled from the eye.
 This technique elegantly resolves even long glossy light paths.
 
@@ -226,14 +226,14 @@ The sum over the path length is split into two parts because the first vertex $\
     \caption{Visualization of light tracing for query prediction: Every new light vertex is first handled as a query ($\vec{q}_i$) and collects radiance from all previous vertices according to \autoref{eq:bidir}.}
     \label{fig:light_bootstrap}
 \end{figure}
-However, despite already sampling light paths, the estimator from \autoref{sec:re_bidir} only finds indirect illumination by caustics efficiently, since given a specific query, the probability to connect to a glossy light path directly is still low.
+However, despite already sampling light paths, the estimator from \autoref{sec:re_bidir} only finds indirect illumination by caustics efficiently, since given a specific query, the probability to connect to a glossy light path directly is still low. % TODO: Visualize
 So, instead of predicting queries solely from the eye, we can also collect radiance at future vertices of the light path.
 At a light vertex, we are guaranteed to get strong contribution at least from the previous vertex, because we sampled it directly through BSDF sampling.
 It would also be possible to sample independent queries from the light vertices instead of reusing the next light vertex and this may in fact be an interesting algorithm to explore, though this is outside the scope of this thesis.
 
 \paragraph{Balancing} Although this estimator may look promising at first, it is important to note that it exhibits the problem already discussed in my motivation of bidirectional radiance caching (\autoref{par:cache_efficiency}):
 By sampling queries solely from the light, queries that are shadowed will never be predicted, which introduces bias into the cache.
-This can be clearly visible depending on the scene and will be further discussed in the results chapter (\autoref{chap:results}).
+This can be clearly visible depending on the scene and will be further discussed in the results chapter (\autoref{chap:results}). % TODO: Visualize
 
 To counteract this drawback, we can make a simple observation:
 If a query is not reachable from a light source, it does not receive energy, thus the radiance at such queries can be safely assumed to be zero.
@@ -326,7 +326,7 @@ The lifetime of a query is thus approximately $1/\kappa$ frames, yet it can also
             %\bottomrule
         \end{tabular}
     \end{subtable}
-    \caption{The structs used to represent photons and queries. Unit vector compression strategies \bcite{cigolle2014} could be applied to reduce the memory footprint, to keep the code simple I refrained from doing so in my implementation.}
+    \caption{The structs used to represent photons and queries. Unit vector compression strategies \parencite{cigolle2014} could be applied to reduce the memory footprint, to keep the code simple I refrained from doing so in my implementation.}
 \end{table}
 
 \paragraph{Radius Reduction}
@@ -370,7 +370,7 @@ After the light pass we apply Radius Reduction and use the radiance estimates to
 
 \paragraph{Notes on Performance}
 If the queries are dense or the radius is large, many queries will overlap, causing the atomic accumulation to be serialized and stalling the GPU threads.
-This is the reason why \textcite{kern2023} store the \emph{photons} instead of the queries in the BVH, which forces them however to use a global radius reduction scheme \bcite{knaus2011}.
+This is the reason why \textcite{kern2023} store the \emph{photons} instead of the queries in the BVH, which forces them however to use a global radius reduction scheme \parencite{knaus2011}.
 Yet, because we allow the queries to have independent lifetimes, a global radius is not applicable in our case, rendering their approach incompatible.
 Fortunately though, we partially avoid serialization since our queries are only distributed sparsely.
 An interesting idea to resolve this problem would be to check for overlap during query prediction and reject queries that overlap too much with existing queries.
