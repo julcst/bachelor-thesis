@@ -185,7 +185,7 @@ A more accurate and efficient method however would be to randomly draw queries f
 Unfortunately, I did not have the time to implement this.
 % TODO: Implement
 
-\section{Bidirectional Training}
+\section{Bidirectional Training (BT)}
 \label{sec:re_bidir}
 A major weakness of the aforementioned radiance estimator (\autoref{sec:re_eye}) is indirect lighting where the light paths undergo glossy reflections/refractions before getting diffused.
 This effect is known as a caustic.
@@ -216,8 +216,8 @@ Starting again with the Primary Monte Carlo Estimator for the Path Space Integra
 where $\Phi_n$ is the light flux transported along the path.
 The sum over the path length is split into two parts because the first vertex $\vec{x}_0$ is sampled directly on the light source and requires special handling.
 
-\section{Light Tracing}
-\label{sec:light_tracing}
+\section{Light Tracing (LT)}
+\label{sec:lt}
 \begin{figure}[ht]
     \centering
     \includegraphics{asy/light_bootstrapping_1.pdf}
@@ -247,8 +247,8 @@ Essentially this algorithm models a sort of output decay on the NRC, dragging it
 This can work, but it degrades the quality of the cache, since it introduces additional noise with the zero radiance samples.
 Furthermore, it is a waste of bandwidth to spend resources on learning zero radiance, as it does not provide any information gain.
 
-\section{Path Spaced Denoised Sparse Photon Mapping}
-\label{sec:psdpm}
+\section{Sparse Progressive Photon Collection (SPPC)}
+\label{sec:sppc}
 The final radiance estimator I propose is an adaptation of Progressive Photon Mapping by \textcite{jensen1996,hachisuka2008}.
 We again shoot flux into the scene by light tracing.
 However, instead of collecting the flux by connecting to an infinitesimal query point, we collect the incoming flux over all sampled light paths in a \emph{query region} by kernel density estimation (see \autoref{fig:pm_collection}).

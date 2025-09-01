@@ -5,8 +5,9 @@ import numpy as np
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
+#plt.rcParams['legend.framealpha'] = 0.4
 
-def plot_breakdown(label_file_pairs, size=(6, 4), bar_width=0.1):
+def plot_breakdown(label_file_pairs, size=(6, 4), bar_width=0.5, headroom=1.1):
     """
     Plot stacked bar breakdowns for one or more JSON files.
 
@@ -81,7 +82,7 @@ def plot_breakdown(label_file_pairs, size=(6, 4), bar_width=0.1):
                 if k not in breakdown:
                     continue
                 val = breakdown[k]
-                color = cmap(0.3 + 0.5*(i/n)) if hasattr(cmap, "__call__") else cmap
+                color = cmap(0.2 + 0.6*(i/n)) if hasattr(cmap, "__call__") else cmap
                 bar = ax.bar(idx, val, color=color, bottom=bottom, width=bar_width,
                              label=k)
                 ax.bar_label(bar, labels=[f"{val:.2f} ms"], label_type='center',
@@ -89,8 +90,8 @@ def plot_breakdown(label_file_pairs, size=(6, 4), bar_width=0.1):
                 bottom += val
 
         # Total label above bar
-        ax.text(idx, bottom + 0.4, f"{breakdown['total']:.2f} ms",
-                ha='center', va='bottom', fontsize="small", fontweight='bold')
+        #ax.text(idx, bottom + 0.5, f"{breakdown['total']:.2f} ms", ha='center', va='bottom', fontsize="small", fontweight='bold')
+        ax.annotate(f"{breakdown['total']:.2f} ms", xy=(idx, bottom), xytext=(0, 1), textcoords='offset fontsize', ha='center', va='bottom', fontsize="small", fontweight='bold', annotation_clip=False)
 
     # Deduplicate legend entries and sort them according to ordered_keys
     handles, labels = ax.get_legend_handles_labels()
@@ -104,16 +105,54 @@ def plot_breakdown(label_file_pairs, size=(6, 4), bar_width=0.1):
 
     # Use provided labels for x-axis
     ax.set_ylabel("Time (ms)")
+    _, ymax = ax.get_ylim()
+    ax.set_ylim(ymax=ymax*headroom)
     #ax.set_title("Performance Breakdown")
     ax.set_xticks(x_positions)
-    ax.set_xticklabels([lbl for lbl, _ in label_file_pairs])
-    plt.tight_layout()
-    #plt.show()
+    ax.set_xticklabels([lbl for lbl, _ in label_file_pairs], fontsize="x-small")
 
     return fig, ax
 
 fig, ax = plot_breakdown([
-    ("PT", "tests/caustic_small_reference_30min.hdr.json"),
-    ("PM", "tests/caustic_small_photon_1spp.hdr.json")
+    ("PT", "tests/performance_comparison/pt_1spp.hdr.json"),
+    ("NRC+PT", "tests/performance_comparison/nrc+pt_1spp.hdr.json"),
+    ("NRC+PT+SL", "tests/performance_comparison/nrc+pt+sl_1spp.hdr.json"),
+    ("NRC+BT", "tests/performance_comparison/nrc+bt_1spp.hdr.json"),
+    ("NRC+LT", "tests/performance_comparison/nrc+lt_1spp.hdr.json"),
+    ("NRC+SPPC", "tests/performance_comparison/nrc+sppc_1spp.hdr.json"),
+    ("PM ($1/4$)", "tests/performance_comparison/sppm_1spp.hdr.json")
 ])
 fig.savefig("breakdown.pgf", bbox_inches='tight')
+
+import glob, re, os
+
+def get_perf_files(folder, prefix):
+    """Return sorted list of (label, path) for a given prefix."""
+    pattern = re.compile(rf"{re.escape(prefix)}_(\d+)px\.hdr\.json")
+    files = sorted(
+        [(f"${m.group(1)}^2$px", path) 
+         for path in glob.glob(os.path.join(folder, f"{prefix}_*px.hdr.json"))
+         if (m := pattern.search(os.path.basename(path)))],
+        key=lambda x: int(x[0][1:-5])
+    )
+    return files
+
+def overlay_totals(ax, files, label, style, color=None):
+    """Overlay total times as a line plot on the given axes."""
+    xs, ys = [], []
+    for lbl, path in files:
+        with open(path) as f:
+            data = json.load(f)
+        xs.append(lbl)
+        ys.append(data["breakdown"]["total"])
+    ax.plot(xs, ys, style, label=label, color=color)
+
+pt = get_perf_files("tests/performance_resolution", "pt_1spp")
+nrc_pt = get_perf_files("tests/performance_resolution", "nrc+pt_1spp")
+nrc_sppc = get_perf_files("tests/performance_resolution", "nrc+sppc_1spp")
+fig, ax = plot_breakdown(nrc_sppc)
+overlay_totals(ax, pt, "PT", '.--', 'black')
+overlay_totals(ax, nrc_pt, "NRC+PT", '.--', 'purple')
+fig.savefig("perfres.pgf", bbox_inches='tight')
+
+plt.show()

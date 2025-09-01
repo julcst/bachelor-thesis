@@ -2,11 +2,19 @@
 \chapter{Results}
 \label{chap:results}
 For the purpose of reproducible evaluation, I have implemented a JSON-configurable CLI tool that was used to generate all results presented in this thesis and the exact parametrization is distributed along the source code on my repository \parencite{stamm2025}.
-For the performance evaluation I use Cuda Events, tone mapping and blitting to the screen were not included into the measurements.
+For the performance evaluation I use Cuda Events.
+Tone mapping and blitting to the screen were not included into the measurements.
 
 \begin{figure}
     \centering
     \input{figures/py/breakdown.pgf}
-    \caption{Performance breakdown of the different rendering techniques.}
+    \caption{Performance breakdown of the different rendering techniques. Measured in HD-equivalent $960^2$px resolution on an NVIDIA RTX 3060 TI.}
     \label{fig:breakdown}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \input{figures/py/perfres.pgf}
+    \caption{Performance vs resolution of SPPC. For reference, the performance of PT (black line) and NRC+PT (purple line) is also shown. The resolution sequence is linear in total pixel count, going up to FullHD-equivalent $1440^2$px. Note, that PT has a near zero constant overhead, but a significantly higher per-pixel cost, whereas both Radiance Caching techniques have a much lower per-pixel cost but higher overhead.}
+    \label{fig:perres}
 \end{figure}

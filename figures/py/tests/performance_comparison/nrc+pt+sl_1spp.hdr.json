@@ -1,0 +1,22 @@
+{
+    "breakdown": {
+        "backwardSampleGeneration": 0.001402375171892345,
+        "balanceSampleGeneration": 0.0,
+        "forwardSampleGeneration": 0.843646228313446,
+        "inference": 3.8851168155670166,
+        "pathtracing": 2.183015823364258,
+        "photonGeneration": 0.0,
+        "photonPostprocessing": 0.0,
+        "photonQueryGeneration": 0.0,
+        "photonQueryMapBuildTime": 0.0,
+        "selfLearningInference": 0.4932050406932831,
+        "selfLearningPostprocessing": 0.034727320075035095,
+        "total": 11.801743507385254,
+        "training": 4.076526165008545,
+        "visualization": 0.23645752668380737
+    },
+    "condition": "1spp",
+    "duration": 0.011859145,
+    "samples": 1,
+    "total_samples": 847
+}
