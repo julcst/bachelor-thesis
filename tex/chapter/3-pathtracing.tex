@@ -135,7 +135,6 @@ For the Fresnel term $F$, I use the Schlick approximation \parencite{schlick1994
 \end{equation}
 
 In the case of transmission, the normal of an ideally refracting microfacet is given by (see \autoref{fig:wm_refract}):
-% TODO: Figure
 \begin{equation}
     \wm = \pm\frac{\eta_i \wi + \eta_o \wo}{\|\eta_i \wi + \eta_o \wo\|} = \pm\frac{\eta \wi + \wo}{\|\eta \wi + \wo\|}
 \end{equation}
@@ -220,7 +219,7 @@ However, for performance reasons, I only approximate these weights by using the 
         Y_d &= Y(\rho_d) &\quad
         Y_s &= Y(F(\NdotV)) &\quad
         Y_t &= Y(\rho_t) \\
-% TODO
+% TODO: Better weight
         % Y_t &= Y((1 - F(\NdotV)) \cdot \rho_t) \\
         P_d &= \frac{Y_d}{Y_d + Y_s + Y_t} &\quad
         P_s &= \frac{Y_s}{Y_d + Y_s + Y_t} &\quad

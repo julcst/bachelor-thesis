@@ -107,7 +107,7 @@ Furthermore, they removed the bias of their method by integrating NRC together w
 Because Monte-Carlo rendering algorithms are unbiased but noisy, denoising can be highly effective to trade the remaining variance for a small bias.
 Although hand-crafted spatio-temporal filters can also achieve good results \parencite{schied2017}, recurrent autoencoders are well-suited for high quality screen-space denoising of Monte-Carlo rendered images \parencite{chaitanya2017} and are nowadays widely used in production \parencite{afra2019}.
 Similarly, \textcite{jiang2020} use a convolutional autoencoder to denoise low sample count light probes to predict indirect illumination.
-On a further note, Neural Radiance Caching \parencite{muller2021} can also be thought of as a form of Path Space Filtering \parencite{keller2016}. % TODO: check
+On a further note, Neural Radiance Caching \parencite{muller2021} can also be thought of as a form of Path Space Filtering \parencite{keller2016}. % TODO: Check
 
 \section{Relevance for this thesis}
 In this thesis I will mainly build on the NRC by \textcite{muller2021} with the extension of \textcite{muller2022}, but I will introduce a decoupling of the radiance cache similar to what \textcite{walter1999,tole2002} did to combine it with Bidirectional Path Tracing \parencite{veach1997}, light tracing \parencite{arvo1986} and hardware accelerated progressive photon mapping \parencite{jensen1996,kern2023,hachisuka2008}.
