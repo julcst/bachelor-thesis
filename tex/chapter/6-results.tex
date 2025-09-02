@@ -7,14 +7,38 @@ Tone mapping and blitting to the screen were not included into the measurements.
 
 \begin{figure}
     \centering
+    \begin{tabularx}{\textwidth}{*{7}{>{\centering\arraybackslash}X}}
+        PT (1min) & PT & 1st Vert & 1st Diff & SAH & BTH $1/2$ & BTH $1/10$ \\
+        \input{figures/py/tests/path_termination/table.tex}
+        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/ref_1min.png} &
+        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/ref_1spp.png} &
+        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/1stvert_1spp.png} &
+        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/1stdiff_1spp.png} &
+        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/sah_1spp.png} &
+        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/bth_1spp.png} &
+        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/bthk9_1spp.png}
+        % \\ &
+        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/ref_1spp_flip.png} &
+        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/1stvert_1spp_flip.png} &
+        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/1stdiff_1spp_flip.png} &
+        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/sah_1spp_flip.png} &
+        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/bth_1spp_flip.png} &
+        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/bthk9_1spp_flip.png}
+    \end{tabularx}
+    \caption{Comparison of the Path Termination strategies from \autoref{sec:path_termination}.}
+    \label{fig:pathterm_comparison}
+\end{figure}
+
+\begin{figure}
+    \centering
     \input{figures/py/breakdown.pgf}
-    \caption{Performance breakdown of the different rendering techniques. Measured in HD-equivalent $960^2$px resolution on an NVIDIA RTX 3060 TI.}
+    \caption{Performance breakdown of the different rendering techniques. Measured in HD-equivalent $960^2$px resolution on an NVIDIA RTX 3060 TI and averaged over 10s.}
     \label{fig:breakdown}
 \end{figure}
 
 \begin{figure}
     \centering
     \input{figures/py/perfres.pgf}
-    \caption{Performance vs resolution of SPPC. For reference, the performance of PT (black line) and NRC+PT (purple line) is also shown. The resolution sequence is linear in total pixel count, going up to FullHD-equivalent $1440^2$px. Note, that PT has a near zero constant overhead, but a significantly higher per-pixel cost, whereas both Radiance Caching techniques have a much lower per-pixel cost but higher overhead.}
+    \caption{Performance vs resolution of SPPC. For reference, the performance of PT (black line) and NRC+PT (purple line) is also shown. The resolution sequence is linear in total pixel count, going up to FullHD-equivalent $1440^2$px. Measurements are averaged over 10s. Note, that PT has a near zero constant overhead, but a significantly higher per-pixel cost, whereas both Radiance Caching techniques have a much lower per-pixel cost but higher overhead.}
     \label{fig:perres}
 \end{figure}

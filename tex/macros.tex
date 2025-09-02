@@ -128,7 +128,9 @@
 %%%%%% My Macros %%%%%%
 
 % Flip metric
-\newcommand{\FLIP}{ꟻLIP}
+\usepackage{mathtools}
+\usepackage{xspace}
+\newcommand{\FLIP}{\protect\reflectbox{F}LIP\xspace}
 
 % Estimator with angle brackets
 \newcommand{\estimator}[1]{\ensuremath{\left\langle #1 \right\rangle_N}}
