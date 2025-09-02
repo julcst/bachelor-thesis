@@ -1,32 +1,32 @@
 
 \chapter{Results}
 \label{chap:results}
+
+\section{Methodology}
 For the purpose of reproducible evaluation, I have implemented a JSON-configurable CLI tool that was used to generate all results presented in this thesis and the exact parametrization is distributed along the source code on my repository \parencite{stamm2025}.
 For the performance evaluation I use Cuda Events.
 Tone mapping and blitting to the screen were not included into the measurements.
 
 \begin{figure}
     \centering
+    \tiny
     \begin{tabularx}{\textwidth}{*{7}{>{\centering\arraybackslash}X}}
-        PT (1min) & PT & 1st Vert & 1st Diff & SAH & BTH $1/2$ & BTH $1/10$ \\
+        Reference (PT) & PT & 1st Vert & 1st Diff & SAH & BTH $1/2$ & BTH $1/10$ \\
         \input{figures/py/tests/path_termination/table.tex}
-        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/ref_1min.png} &
-        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/ref_1spp.png} &
-        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/1stvert_1spp.png} &
-        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/1stdiff_1spp.png} &
-        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/sah_1spp.png} &
-        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/bth_1spp.png} &
-        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/bthk9_1spp.png}
-        % \\ &
-        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/ref_1spp_flip.png} &
-        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/1stvert_1spp_flip.png} &
-        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/1stdiff_1spp_flip.png} &
-        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/sah_1spp_flip.png} &
-        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/bth_1spp_flip.png} &
-        % \includegraphics[width=\linewidth]{figures/py/tests/path_termination/bthk9_1spp_flip.png}
     \end{tabularx}
     \caption{Comparison of the Path Termination strategies from \autoref{sec:path_termination}.}
     \label{fig:pathterm_comparison}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \tiny
+    \begin{tabularx}{\textwidth}{*{8}{>{\centering\arraybackslash}X}}
+        Reference (PT) & PT & NRC+PT & NRC+PT+SL & NRC+BT & NRC+LT & NRC+SPPC & PM \\
+        \input{figures/py/tests/quality_comparison/table.tex}
+    \end{tabularx}
+    \caption{Comparison of the radiance estimators from \autoref{chap:bidirectional_caching}.}
+    \label{fig:quality_comparison}
 \end{figure}
 
 \begin{figure}
