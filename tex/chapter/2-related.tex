@@ -30,10 +30,13 @@ The original estimator of \textcite{jensen1996} was made consistent by \textcite
 \textcite{georgiev2012} further improved the quality by integrating bidirectional path tracing and shadow tests into photon mapping.
 
 \paragraph{Real-time Photon Mapping}
-As the original method for photon mapping \parencite{jensen1996} used highly incoherent k-d-tree traversal to perform Fixed-Radius-Near-Neighbor (FRNN) searches, it was not well suited for GPU execution.
+\textcite{jensen1996} originally proposed to use k-d-trees to perform fast Fixed-Radius-Near-Neighbor (FRNN) queries.
+Yet, k-d-tree construction and querying are highly incoherent tasks that are commonly implemented using stacks.
+GPU hardware neither natively supports stacks nor extensive branching, making k-d-trees impractical for real-time rendering.
 To solve this, \textcite{hachisuka2010} proposed to stochastically store photons in a fixed-size hash grid, which improves parallelization and reduces memory access, yet increases noise.
 \textcite{mara2013} later published four further GPU-optimized photon mapping algorithms, two rasterizing photons and two using grids.
-However, with the recent advancements in GPU architectures, traversal of bounding volume hierarchies can be hardware accelerated.
+The problem with such linear data structures nonetheless is that they either require stochastic sampling, increasing variance, or linear counting, increasing runtime.
+With the recent advancements in GPU architectures however, traversal of bounding volume hierarchies is hardware accelerated.
 \textcite{evangelou2021} successfully leveraged these modern hardware features to perform fast FRNN queries, leading \textcite{kern2023} to apply this to photon mapping and together with culling and stochastic rejection they achieve real-time performance.
 
 \paragraph{Path Guiding}
@@ -107,7 +110,8 @@ Furthermore, they removed the bias of their method by integrating NRC together w
 Because Monte-Carlo rendering algorithms are unbiased but noisy, denoising can be highly effective to trade the remaining variance for a small bias.
 Although hand-crafted spatio-temporal filters can also achieve good results \parencite{schied2017}, recurrent autoencoders are well-suited for high quality screen-space denoising of Monte-Carlo rendered images \parencite{chaitanya2017} and are nowadays widely used in production \parencite{afra2019}.
 Similarly, \textcite{jiang2020} use a convolutional autoencoder to denoise low sample count light probes to predict indirect illumination.
-On a further note, Neural Radiance Caching \parencite{muller2021} can also be thought of as a form of Path Space Filtering \parencite{keller2016}. % TODO: Check
+For interactive applications, \textcite{hasselgren2020} combine temporally stable denoising with adaptive sampling.
+On a further note, Neural Radiance Caching \parencite{muller2021} can also be thought of as a form of Path Space Filtering \parencite{keller2016}.
 
-\section{Relevance for this thesis}
+\section{Prerequisites}
 In this thesis I will mainly build on the NRC by \textcite{muller2021} with the extension of \textcite{muller2022}, but I will introduce a decoupling of the radiance cache similar to what \textcite{walter1999,tole2002} did to combine it with Bidirectional Path Tracing \parencite{veach1997}, light tracing \parencite{arvo1986} and hardware accelerated progressive photon mapping \parencite{jensen1996,kern2023,hachisuka2008}.

@@ -54,7 +54,7 @@ The diffuse and specular reflectance on the other hand can be used directly, as 
 
 \subsection{Positional Encodings}
 
-\subsubsection{Triangle Wave Encoding}
+\paragraph{Triangle Wave Encoding}
 A natural idea to linearize the input space is to find a set of orthonormal basis functions.
 This enables the neural network to approximate arbitrarily complex functions on the input space as a linear combination of these basis functions.
 A very famous such basis set is the Fourier series, which forms a basis for the space of square-integrable functions on the interval $[0, 1]$.
@@ -69,7 +69,7 @@ The hope is, that the neural network can compensate for the missing information.
 This is generally possible, as every non-separable function can be approximated by a linear combination of separable functions, for example by writing the function as a tensor and applying tensor decomposition.
 Additionally, \textcite{muller2021} omit the cosine terms and approximate the sine terms with triangle waves, which they found to reduce the number of coefficients and the computational cost without visibly affecting the output quality.
 
-\subsubsection{Instant Neural Graphic Primitives}
+\paragraph{Instant Neural Graphic Primitives}
 In a follow-up work, \textcite{muller2022} propose a new positional encoding scheme, which they call Multiresolution Hash Encoding (MHE).
 The idea is, to distribute feature vectors in a hierarchical grid in space.
 For a given input position $\vec{x}$ and for each grid level a feature vector is then obtained by linearly interpolating the feature vectors at the corners of the current grid cell.
@@ -80,14 +80,14 @@ For the hyperparametrization of the grid, \textcite{muller2022} empirically foun
 
 \subsection{Directional Encodings}
 
-\subsubsection{Spherical Harmonics}
+\paragraph{Spherical Harmonics}
 A popular choice for the encoding of direction vectors is the use of spherical harmonics.
 This is a natural choice, as the spherical harmonics form an orthonormal basis for the space of square-integrable functions defined on the unit sphere, so every function on directions can be represented as a linear combination of spherical harmonics, whose coefficients can be learned by the neural network.
 However, the number of basis functions is quadratic in the degree $m$, which limits us to a maximum degree of $m=3$ for the 64-dimensional input vector, and they are relatively expensive to compute.
 The limited degree also hinders the representation of high-frequency details in the radiance field.
 Thus, I also explore alternative encodings for $\wo$ and $\vec{n}$.
 
-\subsubsection{One Blob and One Blob Diffuse Encoding}
+\paragraph{One Blob and One Blob Diffuse Encoding}
 For bounded domains, \textcite{muller2019} propose a simple encoding scheme, which is a continuous generalization of the popular one-hot encoding, they call One Blob Encoding.
 The idea is, to divide the input space into a fixed number of bins along each dimension.
 Each input vector is then assumed to be distributed over the bins by a Gaussian distribution and the activation of the bin is the probability of the input vector to fall into that bin.
@@ -121,9 +121,9 @@ To avoid these discontinuities, I implemented a variant of the One Blob Encoding
 For such surfaces, the direction vector $\wo$ is irrelevant, as we use the constant Lambertian reflectance model.
 Thus, to omit $\wo$ without breaking the encoding, I assume that the distribution of the input values converges to a uniform distribution over all bins, which is equivalent to a constant activation value of $1 / n$ for each bin.
 
-\subsubsection{Positional Encoding on an Octahedron}
+\paragraph{Positional Encoding on an Octahedron}
 
-\subsubsection{Positional Encoding of the Unit Sphere}
+\paragraph{Positional Encoding of the Unit Sphere}
 
 \subsection{Reflectance Factorization}
 To help the neural network learn the radiance field, \textcite{muller2021} propose to multiply the network output with the sum of the mean diffuse and specular reflectance terms:

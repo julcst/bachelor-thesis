@@ -169,10 +169,10 @@ For metals, the base color $\vec{c}$ is used directly as the $F_0$ to simulate w
 \section{Importance Sampling}
 
 As aforementioned, the variance of a Monte Carlo estimator can be reduced by sampling the integral using a probability distribution that is as proportional to the integrand as possible.
-Revisiting the rendering equation (\ref{eq:rendering_equation}), we first concentrate on sampling the term $f(\wi, \vec{x}, \wo) \cos(\theta_i)$ of the integrand.
+Revisiting the rendering equation (\autoref{eq:rendering_equation}), we first concentrate on sampling the term $f(\wi, \vec{x}, \wo) \cos(\theta_i)$ of the integrand.
 Also sampling $L_i(\vec{x}, \wi)$ is not that easy, because to obtain $L_i$ we would need to solve the rendering equation again.
 Yet, several approaches have been made to also take $L_i$ into account, notably direct light sampling \parencite{veach1997}, path guiding \parencite{muller2017,muller2019,lafortune1995,jensen1995} and ReSTIR \parencite{bitterli2020}.
-For my reference pathtracer, I will only employ BSDF sampling and direct light sampling (\ref{sec:mis}).
+For my reference pathtracer, I will only employ BSDF sampling and direct light sampling (\autoref{sec:mis}).
 
 For the diffuse component, as it is constant I only sample the cosine weighted hemisphere:
 \begin{equation}
