@@ -4,23 +4,24 @@
         "balanceSampleGeneration": 0.0,
         "forwardSampleGeneration": 0.0,
         "inference": 0.0,
-        "pathtracing": 13.036971092224121,
+        "pathtracing": 13.13912296295166,
         "photonGeneration": 0.0,
         "photonPostprocessing": 0.0,
         "photonQueryGeneration": 0.0,
         "photonQueryMapBuildTime": 0.0,
         "selfLearningInference": 0.0,
         "selfLearningPostprocessing": 0.0,
-        "total": 13.049616813659668,
+        "total": 13.15178394317627,
         "training": 0.0,
         "visualization": 0.0
     },
     "condition": "1min",
-    "duration": 60.005242849,
+    "duration": 60.009119242,
+    "loss_history": [],
     "resolution": [
         960,
         960
     ],
-    "samples": 4585,
-    "total_samples": 5353
+    "samples": 4551,
+    "total_samples": 5312
 }

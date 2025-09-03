@@ -145,6 +145,8 @@ where $T_n$ is the accumulated throughput along the first $n$ segments of the pa
 To simplify notation, the path now starts at the eye vertex $\vec{x}_0$.
 Note, that Russian Roulette Termination (\autoref{eq:rr}) is not to be applied here, as we terminate the path with a valid radiance estimate.
 
+To improve the quality of the inference pass, we can additionally apply Next Event Estimation with Multiple Importance Sampling like in the following section and the reference pathtracer.
+
 \section{Path Tracing}
 \label{sec:re_eye}
 \begin{figure}[ht]

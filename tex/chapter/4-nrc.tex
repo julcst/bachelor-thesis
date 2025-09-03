@@ -88,7 +88,17 @@ The limited degree also hinders the representation of high-frequency details in 
 Thus, I also explore alternative encodings for $\wo$ and $\vec{n}$.
 
 \subsubsection{One Blob and One Blob Diffuse Encoding}
-\begin{figure}
+For bounded domains, \textcite{muller2019} propose a simple encoding scheme, which is a continuous generalization of the popular one-hot encoding, they call One Blob Encoding.
+The idea is, to divide the input space into a fixed number of bins along each dimension.
+Each input vector is then assumed to be distributed over the bins by a Gaussian distribution and the activation of the bin is the probability of the input vector to fall into that bin.
+This probability is simply the integral of the PDF over the bin, which can be computed using the cumulative distribution function (CDF):
+\begin{equation}
+    \mathrm{ob}(x)_i = \probability{b_i \leq x < b_{i+1}} = \probability{x < b_{i+1}} - \probability{x < b_i},
+\end{equation}
+where $b_i$ and $b_{i+1}$ are the boundaries of the $i$-th bin.
+To improve performance, \textcite{muller2021} approximate the Gaussian distribution with a fourth order polynomial.
+
+\begin{figure}[ht]
     \centering
     \begin{subfigure}{0.5\textwidth}
         \centering
@@ -101,15 +111,6 @@ Thus, I also explore alternative encodings for $\wo$ and $\vec{n}$.
     \caption{Visualization of the activations of the One Blob Encoding for a 1D input space with 4 bins using the quartic approximation of the Gaussian distribution. Left without wrapping at the edges right with.}
     \label{fig:oneblob}
 \end{figure}
-For bounded domains, \textcite{muller2019} propose a simple encoding scheme, which is a continuous generalization of the popular one-hot encoding, they call One Blob Encoding.
-The idea is, to divide the input space into a fixed number of bins along each dimension.
-Each input vector is then assumed to be distributed over the bins by a Gaussian distribution and the activation of the bin is the probability of the input vector to fall into that bin.
-This probability is simply the integral of the PDF over the bin, which can be computed using the cumulative distribution function (CDF):
-\begin{equation}
-    \mathrm{ob}(x)_i = \probability{b_i \leq x < b_{i+1}} = \probability{x < b_{i+1}} - \probability{x < b_i},
-\end{equation}
-where $b_i$ and $b_{i+1}$ are the boundaries of the $i$-th bin.
-To improve performance, \textcite{muller2021} approximate the Gaussian distribution with a fourth order polynomial.
 
 This encoding is used by \textcite{muller2021} on the roughness but also on the direction vectors $\wo$ and $\vec{n}$, by first converting these to spherical coordinates and then using the azimuthal angle $\phi$ and the polar angle $\theta$ as input.
 However, the azimuthal angle is periodic, so the encoding has also to be periodic to avoid discontinuities at the boundaries.

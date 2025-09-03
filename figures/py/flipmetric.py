@@ -25,7 +25,7 @@ def write_png(path, img, srgb=True): # img is float32 RGB
     if srgb:
         img = to_srgb(img)
     img = cv2.cvtColor(to_uint8(img), cv2.COLOR_RGB2BGR)  # Convert back to BGR
-    cv2.imwrite(path, img)
+    cv2.imwrite(path, img, [cv2.IMWRITE_PNG_COMPRESSION, 9])
 
 def save_flip_png(ref_img, test_path: str):
     # Load HDRs as numpy arrays (HxWxC)

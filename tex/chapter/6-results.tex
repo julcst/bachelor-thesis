@@ -31,6 +31,13 @@ Tone mapping and blitting to the screen were not included into the measurements.
 
 \begin{figure}
     \centering
+    \input{figures/py/loss_history.pgf}
+    \caption{Comparison of training convergence.}
+    \label{fig:convergence}
+\end{figure}
+
+\begin{figure}
+    \centering
     \input{figures/py/breakdown.pgf}
     \caption{Performance breakdown of the different rendering techniques. Measured in HD-equivalent $960^2$px resolution on an NVIDIA RTX 3060 TI and averaged over 10s.}
     \label{fig:breakdown}

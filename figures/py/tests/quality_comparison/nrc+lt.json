@@ -9,6 +9,6 @@
         "backward_trainer": "train_light"
     },
     "rendering": {
-        "inference_mode": "sah"
+        "inference_mode": "bth"
     }
 }
