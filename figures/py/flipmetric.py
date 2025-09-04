@@ -99,3 +99,12 @@ save_flip_pngs("tests/quality_comparison/", "pt_1min", [
     "nrc+sppc_1spp",
     "sppm_1spp"
 ])
+
+save_flip_pngs("tests/quality_comparison/", "pt_1min", [
+    "pt_1min",
+    "nrc+pt_1min",
+    "nrc+pt+sl_1min",
+    "nrc+bt_1min",
+    "nrc+lt_1min",
+    "nrc+sppc_1min",
+], table_name="table_1min")

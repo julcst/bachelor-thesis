@@ -14,3 +14,6 @@
 thesis.pdf
 
 build/
+
+figures/py/tests/**/*.hdr
+figures/py/tests/**/*.hdr.json

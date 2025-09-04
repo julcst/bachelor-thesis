@@ -31,6 +31,16 @@ Tone mapping and blitting to the screen were not included into the measurements.
 
 \begin{figure}
     \centering
+    \tiny
+    \begin{tabularx}{\textwidth}{*{7}{>{\centering\arraybackslash}X}}
+        Reference (PT) & PT & NRC+PT & NRC+PT+SL & NRC+BT & NRC+LT & NRC+SPPC \\
+        \input{figures/py/tests/quality_comparison/table_1min.tex}
+    \end{tabularx}
+    \caption{Bias.}
+\end{figure}
+
+\begin{figure}
+    \centering
     \input{figures/py/loss_history.pgf}
     \caption{Comparison of training convergence.}
     \label{fig:convergence}
