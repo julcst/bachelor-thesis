@@ -2,11 +2,12 @@ import cv2
 import flip_evaluator as flip
 import numpy as np
 import json
+import os.path
 
 def load_hdr(path):
     img = cv2.imread(path, cv2.IMREAD_UNCHANGED)  # float32 BGR
     if img is None:
-        raise FileNotFoundError(f"Could not read HDR image: {path}")
+        raise FileNotFoundError(f"Could not load image: {path}")
     return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)   # HxWxC RGB float32
 
 def to_srgb(img):
@@ -33,7 +34,7 @@ def save_flip_png(ref_img, test_path: str):
     mse = np.mean((ref_img - test_img) ** 2)
 
     # Run FLIP on numpy arrays
-    flip_map, mean_error, params = flip.evaluate(
+    flip_map, flip_mean, params = flip.evaluate(
         reference=ref_img,
         test=test_img,
         dynamicRangeString="HDR",
@@ -42,7 +43,7 @@ def save_flip_png(ref_img, test_path: str):
     # Save PNGs
     write_png(f"{test_path}.png", test_img)
     write_png(f"{test_path}_flip.png", flip_map, srgb=False)
-    return mean_error, mse
+    return flip_mean, mse
 
 def format_seconds(seconds: float) -> str:
     if seconds < 1:
@@ -58,53 +59,60 @@ def get_perf(path: str) -> str:
         data = json.load(f)
         return f"{data['samples']}spp ({format_seconds(data['duration'])})\n"
 
-def save_flip_pngs(prefix: str, ref: str, tests: list[str], latex_prefix="figures/py/", table_name="table"):
+def convert_to_png(path: str):
+    img = load_hdr(f"{path}.hdr")
+    write_png(f"{path}.png", img)
+
+def calc_biasvar(ref_img, mean_img, var_img):
+    bias = np.mean(mean_img - ref_img)
+    variance = np.mean(var_img)
+    return bias, variance
+
+def save_flip_pngs(prefix: str, ref: str, tests: list[str], suffix="", msuffix="", latex_prefix="figures/py/", table_name="table"):
     print(f"Creating {prefix}{table_name}...")
     ref_img = load_hdr(f"{prefix}{ref}.hdr")
     write_png(f"{prefix}{ref}.png", ref_img)
     perf_row = get_perf(f"{prefix}{ref}")
     img_row = f"\\includegraphics[width=\\linewidth]{{{latex_prefix}{prefix}{ref}.png}}\n"
     flip_row = ""
-    flip_means = ""
-    rmse_row = ""
+    error_row = ""
+    bias_var_row = ""
     for test in tests:
         print(f"{ref} vs {test}")
-        mean_error, mse = save_flip_png(ref_img, f"{prefix}{test}")
-        img_row += f"& \\includegraphics[width=\\linewidth]{{{latex_prefix}{prefix}{test}.png}}\n"
-        flip_row += f"& \\includegraphics[width=\\linewidth]{{{latex_prefix}{prefix}{test}_flip.png}}\n"
-        flip_means += f"& {mean_error:.3f}"
-        rmse_row += f"& {np.sqrt(mse):.3f}"
-        perf_row += f"& {get_perf(f"{prefix}{test}")}"
-            
+        flip_mean, mse = save_flip_png(ref_img, f"{prefix}{test}{suffix}")
+        img_row += f"& \\includegraphics[width=\\linewidth]{{{latex_prefix}{prefix}{test}{suffix}.png}}\n"
+        flip_row += f"& \\includegraphics[width=\\linewidth]{{{latex_prefix}{prefix}{test}{suffix}_flip.png}}\n"
+        error_row += f" & ${flip_mean:.3f}/{mse:.3f}$"
+        perf_row += f" & {get_perf(f"{prefix}{test}{suffix}")}"
+        try:
+            mean = load_hdr(f"{prefix}{test}{msuffix}_mean.hdr")
+            var = load_hdr(f"{prefix}{test}{msuffix}_var.hdr")
+            b, v = calc_biasvar(ref_img, mean, var)
+            b2 = b * b
+            bias_var_row += f" & ${b2:.2e}/{v:.2e}$"
+        except FileNotFoundError:
+            bias_var_row += " & "
+
     with open(f"{prefix}{table_name}.tex", "w") as f:
-        f.write(f"{perf_row}\\\\\n{img_row}\\\\\n{flip_row}\\\\\n\\FLIP:{flip_means}\\\\\nRMSE:{rmse_row}\\\\\n")
+        f.write(f"{perf_row}\\\\\n{img_row}\\\\\n{flip_row}\\\\\n\\FLIP/MSE:{error_row}\\\\\n$\\mathrm{{Bias}}^2/\\mathrm{{Variance}}${bias_var_row}\\\\\n")
 
 # TODO: Variance + Bias decomp
 
-save_flip_pngs("tests/path_termination/", "ref_1min", [
-    "ref_1spp",
-    "1stvert_1spp",
-    "1stdiff_1spp",
-    "sah_1spp",
-    "bth_1spp",
-    "bthk9_1spp",
-])
+save_flip_pngs("tests/path_termination/", "ref_1min_thinker", [
+    "ref",
+    "1stvert",
+    "1stdiff",
+    "sah",
+    "bth",
+    "bthk9",
+], suffix="_1spp_thinker", msuffix="_thinker")
 
 save_flip_pngs("tests/quality_comparison/", "pt_1min", [
-    "pt_1spp",
-    "nrc+pt_1spp",
-    "nrc+pt+sl_1spp",
-    "nrc+bt_1spp",
-    "nrc+lt_1spp",
-    "nrc+sppc_1spp",
-    "sppm_1spp"
-])
-
-save_flip_pngs("tests/quality_comparison/", "pt_1min", [
-    "pt_1min",
-    "nrc+pt_1min",
-    "nrc+pt+sl_1min",
-    "nrc+bt_1min",
-    "nrc+lt_1min",
-    "nrc+sppc_1min",
-], table_name="table_1min")
+    "pt",
+    "nrc+pt",
+    "nrc+pt+sl",
+    "nrc+bt",
+    "nrc+lt",
+    "nrc+sppc",
+    "sppm"
+], suffix="_1spp")
