@@ -3,11 +3,35 @@
 \label{chap:results}
 
 \section{Methodology}
-For the purpose of reproducible evaluation, I have implemented a JSON-configurable CLI tool that was used to generate all results presented in this thesis and the exact parametrization is distributed along the source code on my repository \parencite{stamm2025}.
-For the performance evaluation I use Cuda Events.
-Tone mapping and blitting to the screen were not included into the measurements.
+For the purpose of reproducible evaluation, a JSON-configurable CLI tool was used to generate all results presented in this thesis and the exact parametrization is distributed along the source code on my repository \parencite{stamm2025}.
 
-\begin{figure}
+\paragraph{Performance Measurement}
+Cuda Events are used to evaluate performance.
+Tone mapping and screen blitting are not included into the measurements, so only the pure rendering time is reported.
+If not otherwise stated, all measurements are taken on an NVIDIA RTX 3060 Ti GPU and averaged over at least 10 seconds.
+
+\paragraph{Error Metric}
+Reference images are generated using Path Tracing (PT) or Stochastic Progressive Photon Mapping (SPPM) \parencite{hachisuka2009a} in caustic scenes where PT does not converge.
+To compare the quality of different techniques, the Mean Squared Error (MSE) in linear RGB space is reported for numerical error and the HDR variant of the \FLIP metric \parencite{andersson2021} for humanly perceived error.
+Furthermore, bias and variance are measured separately by computing the first and second moment over 1000 independent 1spp renders.
+Between the bias and variance samples the configuration and cache are kept constant, but for the inference pass different samples are drawn from a Quasi-Random Low Discrepancy Sequence.
+
+\paragraph{Scenes}
+Tests are performed on a set of scenes that are also included in the source code repository \parencite{stamm2025}:
+\begin{itemize}
+\item The \emph{Diffuse} scene is an adaptation of the Cornell Box and highlights diffuse indirect illumination.
+\item The \emph{Thinker} scene incorporates glossy and transmissive materials with complex specular highlights.
+It contains decimated and remeshed version of the Thinker statue by Auguste Rodin scanned by \textcite{scantheworld2014} and the Stanford Bunny scanned by \textcite{stanforduniversitycomputergraphicslaboratory1994}.
+\item The \emph{Chess} scene is a complex textured scene composed of public domain assets from \textcite{polyhaven}.
+\item The \emph{Ajar} scene is mostly lit by long indirect light paths, which are difficult to find with eye tracing.
+\item The \emph{Caustics} scene contains complex sharp caustic patterns that are challenging for traditional path tracing.
+\end{itemize}
+
+\section{Inference}
+
+\paragraph{Path Termination Strategies}
+
+\begin{figure}[ht]
     \centering
     \tiny
     \begin{tabularx}{\textwidth}{*{7}{>{\centering\arraybackslash}X}}
@@ -18,38 +42,65 @@ Tone mapping and blitting to the screen were not included into the measurements.
     \label{fig:pathterm_comparison}
 \end{figure}
 
-\begin{figure}
-    \centering
-    \tiny
-    \begin{tabularx}{\textwidth}{*{8}{>{\centering\arraybackslash}X}}
-        Reference (PT) & PT & NRC+PT & NRC+PT+SL & NRC+BT & NRC+LT & NRC+SPPC & PM \\
-        \input{figures/py/tests/quality_comparison/table.tex}
-    \end{tabularx}
-    \caption{Comparison of the radiance estimators from \autoref{chap:bidirectional_caching}.}
-    \label{fig:quality_comparison}
-\end{figure}
+\paragraph{Next Event Estimation}
 
-\begin{figure}
-    \centering
-    \tiny
-    \begin{tabularx}{\textwidth}{*{7}{>{\centering\arraybackslash}X}}
-        Reference (PT) & PT & NRC+PT & NRC+PT+SL & NRC+BT & NRC+LT & NRC+SPPC \\
-        \input{figures/py/tests/quality_comparison/table_1min.tex}
-    \end{tabularx}
-    \caption{Bias.}
-\end{figure}
+\section{Training}
 
-\begin{figure}
+\begin{figure}[ht]
     \centering
     \input{figures/py/loss_history.pgf}
     \caption{Comparison of training convergence.}
     \label{fig:convergence}
 \end{figure}
 
+\subsection{Radiance Estimators}
+
+\begin{figure}[ht]
+    \centering
+    \tiny
+    \begin{tabularx}{\textwidth}{*{9}{>{\centering\arraybackslash}X}}
+        Reference (PT) & PT & NRC+PT & NRC+PT+SL & NRC+BT & NRC+LT & NRC+LT+Bal & NRC+SPPC & PM \\
+        \input{figures/py/tests/quality_comparison/diffuse.tex}\\
+        \input{figures/py/tests/quality_comparison/thinker.tex}\\
+        \input{figures/py/tests/quality_comparison/chess.tex}\\
+        \input{figures/py/tests/quality_comparison/ajar.tex}\\
+        \input{figures/py/tests/quality_comparison/caustics.tex}
+    \end{tabularx}
+    \caption{Comparison of the different radiance estimators from \autoref{chap:bidirectional_caching}. To isolate training quality, inference is terminated after the first diffuse vertex and is not combined with NEE.}
+    \label{fig:quality_comparison}
+\end{figure}
+
+\section{Performance and Optimization}
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \tiny
+        \begin{tabularx}{\linewidth}{*{4}{>{\centering\arraybackslash}X}}
+            Reference (SPPM) & SER & SER, 70\% & SER, 70\%, 30° \\
+            \input{figures/py/tests/photon_optimization/table.tex}
+        \end{tabularx}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \small
+        \begin{tabular}{lll}
+            \textbf{Technique} & \textbf{Frametime} & \textbf{Change} \\
+            \midrule
+            \textbf{Baseline} & \textbf{159.50ms} & \\
+            IS only & 178.19ms & $+11.7\%$\\
+            SER & 158.54ms & $-0.6\%$\\
+            SER, 70\% & 124.46ms & $-22\%$\\
+            SER, 70\%, 30$^{\circ}$ & 123.58ms & $-22.5\%$
+        \end{tabular}
+    \end{subfigure}
+    \caption{Optimizations to Photon Mapping. \emph{IS only} directly accumulates in the Intersection Shader (IS) and skips the Any Hit Shader (AH). \emph{SER} uses Shader Execution Reordering between the Intersection and Any Hit shader to improve coherence. \emph{SER, 70\%} additionally rejects 70\% of the non-caustic photons in the Any Hit shader \parencite{kern2023}. \emph{SER, 70\%, 30$^{\circ}$} rejects photon hits whose surface normals deviate more than 30° from the surface normals at the query point \parencite{kern2023}. The most notable performance improvement comes from rejecting non-caustic photons, however, this notably increases error in non-caustic areas. Rejecting photons based on normal deviation has a small positive performance impact and decreases bias.}
+\end{figure}
+
 \begin{figure}
     \centering
     \input{figures/py/breakdown.pgf}
-    \caption{Performance breakdown of the different rendering techniques. Measured in HD-equivalent $960^2$px resolution on an NVIDIA RTX 3060 TI and averaged over 10s.}
+    \caption{Performance breakdown of the different rendering techniques. Measured in HD-equivalent $960^2$px resolution on an NVIDIA RTX 3060 Ti and averaged over 10s.}
     \label{fig:breakdown}
 \end{figure}
 

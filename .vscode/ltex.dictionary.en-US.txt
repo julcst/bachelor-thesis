@@ -63,3 +63,5 @@ FullHD
 FullHD-equivalent
 Kneiphof
 surfel
+Auguste
+remeshed

@@ -1,2 +1,5 @@
 {"rule":"COMMA_COMPOUND_SENTENCE","sentence":"^\\QAdditionally, they omit biases because they did not observe a benefit and it simplifies the implementation.\\E$"}
 {"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QWith this hardware-optimized implementation, \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q achieve a speedup of \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q to \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q compared to the widely used TensorFlow framework tensorflow on large batch sizes corresponding to HD resolution.\\E$"}
+{"rule":"ADVERB_OR_HYPHENATED_ADJECTIVE","sentence":"^\\QThe Chess scene is a complex textured scene composed of public domain assets from\\E$"}
+{"rule":"ADVERB_OR_HYPHENATED_ADJECTIVE","sentence":"^\\QThe Chess scene is a complex textured scene composed of public domain assets from \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q.\\E$"}
+{"rule":"POSSESSIVE_APOSTROPHE","sentence":"^\\QThe Caustics scene contains complex sharp caustic patterns challenging for traditional path tracing.\\E$"}

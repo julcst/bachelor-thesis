@@ -68,35 +68,97 @@ def calc_biasvar(ref_img, mean_img, var_img):
     variance = np.mean(var_img)
     return bias, variance
 
+from dataclasses import dataclass
+
+@dataclass
+class TestResult:
+    name: str
+    duration: float
+    samples: int
+    flip: float
+    mse: float
+    bias2: float | None
+    var: float | None
+
+# Helpers
+def bold_if_min(val, min_val, fmt, none_allowed=False):
+    if val is None and none_allowed:
+        return ""
+    s = fmt(val)
+    if min_val is not None and val == min_val:
+        return f"\\textbf{{{s}}}"
+    return s
+
 def save_flip_pngs(prefix: str, ref: str, tests: list[str], suffix="", msuffix="", latex_prefix="figures/py/", table_name="table"):
     print(f"Creating {prefix}{table_name}...")
     ref_img = load_hdr(f"{prefix}{ref}.hdr")
     write_png(f"{prefix}{ref}.png", ref_img)
-    perf_row = get_perf(f"{prefix}{ref}")
-    img_row = f"\\includegraphics[width=\\linewidth]{{{latex_prefix}{prefix}{ref}.png}}\n"
-    flip_row = ""
-    error_row = ""
-    bias_var_row = ""
+
+    # Collect results
+    results: list[TestResult] = []
     for test in tests:
         print(f"{ref} vs {test}")
         flip_mean, mse = save_flip_png(ref_img, f"{prefix}{test}{suffix}")
-        img_row += f"& \\includegraphics[width=\\linewidth]{{{latex_prefix}{prefix}{test}{suffix}.png}}\n"
-        flip_row += f"& \\includegraphics[width=\\linewidth]{{{latex_prefix}{prefix}{test}{suffix}_flip.png}}\n"
-        error_row += f" & ${flip_mean:.3f}/{mse:.3f}$"
-        perf_row += f" & {get_perf(f"{prefix}{test}{suffix}")}"
+
+        with open(f"{prefix}{test}{suffix}.hdr.json", "r") as f:
+            data = json.load(f)
+
         try:
             mean = load_hdr(f"{prefix}{test}{msuffix}_mean.hdr")
             var = load_hdr(f"{prefix}{test}{msuffix}_var.hdr")
             b, v = calc_biasvar(ref_img, mean, var)
             b2 = b * b
-            bias_var_row += f" & ${b2:.2e}/{v:.2e}$"
         except FileNotFoundError:
-            bias_var_row += " & "
+            b2, v = None, None
+
+        results.append(TestResult(
+            name=test,
+            duration=data["duration"],
+            samples=data["samples"],
+            flip=flip_mean,
+            mse=mse,
+            bias2=b2,
+            var=v,
+        ))
+
+    # Find minima
+    min_duration = min(r.duration for r in results)
+    min_flip     = min(r.flip for r in results)
+    min_mse      = min(r.mse for r in results)
+    min_bias     = min((r.bias2 for r in results if r.bias2 is not None), default=None)
+    min_var      = min((r.var   for r in results if r.var   is not None), default=None)
+
+    # Build LaTeX rows
+    perf_row = get_perf(f"{prefix}{ref}")
+    img_row  = f"\\includegraphics[width=\\linewidth]{{{latex_prefix}{prefix}{ref}.png}}\n"
+    flip_row, error_row, bias_var_row = "", "", ""
+
+    for r in results:
+        # perf
+        dur_str = bold_if_min(r.duration, min_duration, format_seconds)
+        perf_row += f" & {r.samples}spp ({dur_str})"
+
+        # error row
+        flip_str = bold_if_min(r.flip, min_flip, lambda x: f"\\num{{{x:.3f}}}")
+        mse_str  = bold_if_min(r.mse,  min_mse,  lambda x: f"\\num{{{x:.3f}}}")
+        error_row += f" & {flip_str}/{mse_str}"
+
+        # bias/var
+        if r.bias2 is not None and r.var is not None:
+            bias_str = bold_if_min(r.bias2, min_bias, lambda x: f"\\num{{{x:.2e}}}")
+            var_str  = bold_if_min(r.var,   min_var,  lambda x: f"\\num{{{x:.2e}}}")
+            bias_var_row += f" & {bias_str}/{var_str}\n"
+        else:
+            bias_var_row += " &\n"
+
+        # images
+        img_row  += f"& \\includegraphics[width=\\linewidth]{{{latex_prefix}{prefix}{r.name}{suffix}.png}}\n"
+        flip_row += f"& \\includegraphics[width=\\linewidth]{{{latex_prefix}{prefix}{r.name}{suffix}_flip.png}}\n"
 
     with open(f"{prefix}{table_name}.tex", "w") as f:
-        f.write(f"{perf_row}\\\\\n{img_row}\\\\\n{flip_row}\\\\\n\\FLIP/MSE:{error_row}\\\\\n$\\mathrm{{Bias}}^2/\\mathrm{{Variance}}${bias_var_row}\\\\\n")
-
-# TODO: Variance + Bias decomp
+        f.write(f"{perf_row}\\\\\n{img_row}\\\\\n{flip_row}\\\\\n"
+                f"\\FLIP/MSE:{error_row}\\\\\n"
+                f"$\\mathrm{{Bias}}^2/\\mathrm{{Variance}}${bias_var_row}\\\\\n")
 
 save_flip_pngs("tests/path_termination/", "ref_1min_thinker", [
     "ref",
@@ -107,12 +169,63 @@ save_flip_pngs("tests/path_termination/", "ref_1min_thinker", [
     "bthk9",
 ], suffix="_1spp_thinker", msuffix="_thinker")
 
-save_flip_pngs("tests/quality_comparison/", "pt_1min", [
+save_flip_pngs("tests/quality_comparison/", "refpt_3min_diffuse", [
     "pt",
     "nrc+pt",
     "nrc+pt+sl",
     "nrc+bt",
     "nrc+lt",
+    "nrc+lt+bal",
     "nrc+sppc",
     "sppm"
+], suffix="_1spp_diffuse", msuffix="_diffuse", table_name="diffuse")
+
+save_flip_pngs("tests/quality_comparison/", "refpt_3min_thinker", [
+    "pt",
+    "nrc+pt",
+    "nrc+pt+sl",
+    "nrc+bt",
+    "nrc+lt",
+    "nrc+lt+bal",
+    "nrc+sppc",
+    "sppm"
+], suffix="_1spp_thinker", msuffix="_thinker", table_name="thinker")
+
+save_flip_pngs("tests/quality_comparison/", "refpt_3min_chess", [
+    "pt",
+    "nrc+pt",
+    "nrc+pt+sl",
+    "nrc+bt",
+    "nrc+lt",
+    "nrc+lt+bal",
+    "nrc+sppc",
+    "sppm"
+], suffix="_1spp_chess", msuffix="_chess", table_name="chess")
+
+save_flip_pngs("tests/quality_comparison/", "refpt_3min_ajar_caustic", [
+    "pt",
+    "nrc+pt",
+    "nrc+pt+sl",
+    "nrc+bt",
+    "nrc+lt",
+    "nrc+lt+bal",
+    "nrc+sppc",
+    "sppm"
+], suffix="_1spp_ajar_caustic", msuffix="_ajar_caustic", table_name="ajar")
+
+save_flip_pngs("tests/quality_comparison/", "refsppm_2min", [
+    "pt",
+    "nrc+pt",
+    "nrc+pt+sl",
+    "nrc+bt",
+    "nrc+lt",
+    "nrc+lt+bal",
+    "nrc+sppc",
+    "sppm"
+], suffix="_1spp_caustics_small", msuffix="_caustics_small", table_name="caustics")
+
+save_flip_pngs("tests/photon_optimization/", "ref_2min", [
+    "SER",
+    "SER+Reject70",
+    "SER+Reject70+RejectN"
 ], suffix="_1spp")

@@ -90,6 +90,9 @@
 \usepackage{cancel}
 \usepackage{scalerel,stackengine}
 \usepackage{tabularx}
+\usepackage{siunitx} % for \num
+\sisetup{output-exponent-marker=\ensuremath{\mathrm{e}}, propagate-math-font=true, detect-weight=true,
+  detect-family=true}
 
 % PGF support (matplotlib)
 \def\mathdefault#1{#1} % Required for matplotlib
