@@ -34,9 +34,9 @@ It contains decimated and remeshed version of the Thinker statue by Auguste Rodi
 \begin{figure}[ht]
     \centering
     \tiny
-    \begin{tabularx}{\textwidth}{*{7}{>{\centering\arraybackslash}X}}
-        Reference (PT) & PT & 1st Vert & 1st Diff & SAH & BTH $1/2$ & BTH $1/10$ \\
-        \input{figures/py/tests/path_termination/table.tex}
+    \begin{tabularx}{\textwidth}{r*{7}{>{\centering\arraybackslash}X}}
+        & Reference (PT) & PT & 1st Vert & 1st Diff & SAH & BTH $1/2$ & BTH $1/10$ \\
+        \input{figures/py/tests/path_termination/Thinker}
     \end{tabularx}
     \caption{Comparison of the Path Termination strategies from \autoref{sec:path_termination}.}
     \label{fig:pathterm_comparison}
@@ -58,13 +58,13 @@ It contains decimated and remeshed version of the Thinker statue by Auguste Rodi
 \begin{figure}[ht]
     \centering
     \tiny
-    \begin{tabularx}{\textwidth}{*{9}{>{\centering\arraybackslash}X}}
-        Reference (PT) & PT & NRC+PT & NRC+PT+SL & NRC+BT & NRC+LT & NRC+LT+Bal & NRC+SPPC & PM \\
-        \input{figures/py/tests/quality_comparison/diffuse.tex}\\
-        \input{figures/py/tests/quality_comparison/thinker.tex}\\
-        \input{figures/py/tests/quality_comparison/chess.tex}\\
-        \input{figures/py/tests/quality_comparison/ajar.tex}\\
-        \input{figures/py/tests/quality_comparison/caustics.tex}
+    \begin{tabularx}{\textwidth}{r*{9}{>{\centering\arraybackslash}X}}
+        &Reference (PT) & PT & NRC+PT & NRC+PT+SL & NRC+BT & NRC+LT & NRC+LT+Bal & NRC+SPPC & PM \\
+        \input{figures/py/tests/quality_comparison/Diffuse}\\
+        \input{figures/py/tests/quality_comparison/Thinker}\\
+        \input{figures/py/tests/quality_comparison/Chess}\\
+        \input{figures/py/tests/quality_comparison/Ajar}\\
+        \input{figures/py/tests/quality_comparison/Caustics}
     \end{tabularx}
     \caption{Comparison of the different radiance estimators from \autoref{chap:bidirectional_caching}. To isolate training quality, inference is terminated after the first diffuse vertex and is not combined with NEE.}
     \label{fig:quality_comparison}
@@ -76,9 +76,9 @@ It contains decimated and remeshed version of the Thinker statue by Auguste Rodi
     \begin{subfigure}{0.5\textwidth}
         \centering
         \tiny
-        \begin{tabularx}{\linewidth}{*{4}{>{\centering\arraybackslash}X}}
-            Reference (SPPM) & SER & SER, 70\% & SER, 70\%, 30° \\
-            \input{figures/py/tests/photon_optimization/table.tex}
+        \begin{tabularx}{\linewidth}{r*{4}{>{\centering\arraybackslash}X}}
+            &Reference (SPPM) & SER & SER, 70\% & SER, 70\%, 30° \\
+            \input{figures/py/tests/photon_optimization/Caustics}
         \end{tabularx}
     \end{subfigure}%
     \begin{subfigure}{0.5\textwidth}

@@ -2,6 +2,7 @@
 \chapter{Neural Radiance Caching}
 \label{chap:nrc}
 % TODO: Figure
+% TODO: Rewrite
 A weak point of the reference Monte Carlo pathtracer motivated in \autoref{chap:pathtracing} is, that we have to start from zero, every time the scene or camera changes.
 It would make sense to keep samples around that can be reused when temporally and spatially similar paths occur in the evaluation of the global illumination integral.
 \textcite{muller2021} introduced Neural Radiance Caching (NRC) to address this problem.
@@ -9,7 +10,7 @@ The idea is to train a neural network on collected radiance samples and use it t
 
 Effectively, the idea is to replace the recursive path tracing integral with a neural estimate of the radiance when the variance along the path becomes too high.
 The Neural Radiance Cache can be interpreted as a classical cache that uses gradient descent for a temporally smooth cache update and the generalization capabilities of neural networks to interpolate between cached samples.
-However, this approach could also be viewed as a form of denoising of the radiance field, which is why it is a good mean to reduce variance in the final image.
+However, this approach could also be viewed as a form of path space denoising of the radiance field, which is why it is a good mean to reduce variance in the final image.
 
 \textcite{dereviannykh2024} recently adapted the NRC to predict \emph{incident} radiance, yet this is probably not well suited for caustics which exhibit high-frequency sparse incident radiance but low-frequency dense outgoing radiance.
 Thus, this thesis only explores classic Neural Radiance Caching, although applying the radiance estimators from \autoref{chap:bidirectional_caching} to the Neural Incident Radiance Cache (NIRC) may be an interesting topic for future research.

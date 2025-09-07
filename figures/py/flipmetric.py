@@ -157,7 +157,7 @@ def save_flip_pngs(prefix: str, ref: str, tests: list[str], suffix="", msuffix="
 
     with open(f"{prefix}{table_name}.tex", "w") as f:
         f.write(f"&{perf_row}\\\\\n"
-                f"\\rotatebox{{90}}{{\\textsc{{{table_name}}}}}\\hspace{{-1em}}\n"
+                f"\\rotatebox{{90}}{{\\textsc{{{table_name}}}}}\\hspace{{-1.5em}}\n"
                 f"&{img_row}\\\\\n"
                 f"&{flip_row}\\\\\n"
                 f"&\\FLIP/MSE:{error_row}\\\\\n"

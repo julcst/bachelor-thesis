@@ -9,6 +9,10 @@ pair refract(pair wi, pair n, real eta=1.5) {
   return -eta * wi + (eta * cos_theta_i - cos_theta_o) * n;
 }
 
+pen toggle(bool var, pen p = defaultpen) {
+    return var ? p : invisible;
+}
+
 void drawEye(pair pos, pair dir, real scale = 1, real r1 = 0.5 * scale, real r2 = 0.6 * scale, real angle = 20, real iris = 12) {
     pair c = pos - dir * r2;
     transform t = rotate(degrees(dir), c);
@@ -82,6 +86,7 @@ struct object {
 
 struct scene {
     object[] objects;
+    real eta = 1.5; // refractive index of the medium
 
     void add(object o) {
         objects.push(o);
@@ -135,10 +140,10 @@ struct scene {
             pair normal = rotate(90)*tangent;
             bool inside = dot(normal, dir) > 0;
             if (inside) normal = -normal;
-            real eta = inside ? 1.0 / 1.5 : 1.5;
+            real etar = inside ? 1.0 / eta : eta;
             lp.push(hit);
             pos = hit;
-            dir = refracted ? refract(-dir, normal, eta) : reflect((0,0), normal)*(-dir);
+            dir = refracted ? refract(-dir, normal, etar) : reflect((0,0), normal)*(-dir);
         }
         if (end > 0) lp.push(pos + unit(dir) * end);
         return lp;
