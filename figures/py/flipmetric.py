@@ -136,12 +136,12 @@ def save_flip_pngs(prefix: str, ref: str, tests: list[str], suffix="", msuffix="
     for r in results:
         # perf
         dur_str = bold_if_min(r.duration, min_duration, format_seconds)
-        perf_row += f" & {r.samples}spp ({dur_str})"
+        perf_row += f" & {r.samples}spp ({dur_str})\n"
 
         # error row
         flip_str = bold_if_min(r.flip, min_flip, lambda x: f"\\num{{{x:.3f}}}")
         mse_str  = bold_if_min(r.mse,  min_mse,  lambda x: f"\\num{{{x:.3f}}}")
-        error_row += f" & {flip_str}/{mse_str}"
+        error_row += f" & {flip_str}/{mse_str}\n"
 
         # bias/var
         if r.bias2 is not None and r.var is not None:
@@ -156,9 +156,12 @@ def save_flip_pngs(prefix: str, ref: str, tests: list[str], suffix="", msuffix="
         flip_row += f"& \\includegraphics[width=\\linewidth]{{{latex_prefix}{prefix}{r.name}{suffix}_flip.png}}\n"
 
     with open(f"{prefix}{table_name}.tex", "w") as f:
-        f.write(f"{perf_row}\\\\\n{img_row}\\\\\n{flip_row}\\\\\n"
-                f"\\FLIP/MSE:{error_row}\\\\\n"
-                f"$\\mathrm{{Bias}}^2/\\mathrm{{Variance}}${bias_var_row}\\\\\n")
+        f.write(f"&{perf_row}\\\\\n"
+                f"\\rotatebox{{90}}{{\\textsc{{{table_name}}}}}\\hspace{{-1em}}\n"
+                f"&{img_row}\\\\\n"
+                f"&{flip_row}\\\\\n"
+                f"&\\FLIP/MSE:{error_row}\\\\\n"
+                f"&$\\mathrm{{Bias}}^2/\\mathrm{{Variance}}${bias_var_row}\\\\\n")
 
 save_flip_pngs("tests/path_termination/", "ref_1min_thinker", [
     "ref",
@@ -167,7 +170,7 @@ save_flip_pngs("tests/path_termination/", "ref_1min_thinker", [
     "sah",
     "bth",
     "bthk9",
-], suffix="_1spp_thinker", msuffix="_thinker")
+], suffix="_1spp_thinker", msuffix="_thinker", table_name="Thinker")
 
 save_flip_pngs("tests/quality_comparison/", "refpt_3min_diffuse", [
     "pt",
@@ -178,7 +181,7 @@ save_flip_pngs("tests/quality_comparison/", "refpt_3min_diffuse", [
     "nrc+lt+bal",
     "nrc+sppc",
     "sppm"
-], suffix="_1spp_diffuse", msuffix="_diffuse", table_name="diffuse")
+], suffix="_1spp_diffuse", msuffix="_diffuse", table_name="Diffuse")
 
 save_flip_pngs("tests/quality_comparison/", "refpt_3min_thinker", [
     "pt",
@@ -189,7 +192,7 @@ save_flip_pngs("tests/quality_comparison/", "refpt_3min_thinker", [
     "nrc+lt+bal",
     "nrc+sppc",
     "sppm"
-], suffix="_1spp_thinker", msuffix="_thinker", table_name="thinker")
+], suffix="_1spp_thinker", msuffix="_thinker", table_name="Thinker")
 
 save_flip_pngs("tests/quality_comparison/", "refpt_3min_chess", [
     "pt",
@@ -200,7 +203,7 @@ save_flip_pngs("tests/quality_comparison/", "refpt_3min_chess", [
     "nrc+lt+bal",
     "nrc+sppc",
     "sppm"
-], suffix="_1spp_chess", msuffix="_chess", table_name="chess")
+], suffix="_1spp_chess", msuffix="_chess", table_name="Chess")
 
 save_flip_pngs("tests/quality_comparison/", "refpt_3min_ajar_caustic", [
     "pt",
@@ -211,7 +214,7 @@ save_flip_pngs("tests/quality_comparison/", "refpt_3min_ajar_caustic", [
     "nrc+lt+bal",
     "nrc+sppc",
     "sppm"
-], suffix="_1spp_ajar_caustic", msuffix="_ajar_caustic", table_name="ajar")
+], suffix="_1spp_ajar_caustic", msuffix="_ajar_caustic", table_name="Ajar")
 
 save_flip_pngs("tests/quality_comparison/", "refsppm_2min", [
     "pt",
@@ -222,10 +225,10 @@ save_flip_pngs("tests/quality_comparison/", "refsppm_2min", [
     "nrc+lt+bal",
     "nrc+sppc",
     "sppm"
-], suffix="_1spp_caustics_small", msuffix="_caustics_small", table_name="caustics")
+], suffix="_1spp_caustics_small", msuffix="_caustics_small", table_name="Caustics")
 
 save_flip_pngs("tests/photon_optimization/", "ref_2min", [
     "SER",
     "SER+Reject70",
     "SER+Reject70+RejectN"
-], suffix="_1spp")
+], suffix="_1spp", table_name="Caustics")
