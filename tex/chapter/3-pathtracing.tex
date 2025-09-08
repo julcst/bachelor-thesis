@@ -115,7 +115,7 @@ where $D$ is the isotropic Trowbridge-Reitz normal distribution function (NDF) o
     D(\NdotH) = \frac{\alpha^2}{\pi (\alpha^2 \cos^2 \theta_m + \sin^2 \theta_m)^2}
 \end{equation}
 Here, $\alpha$ is the width of the microfacet distribution, which is related to the roughness of the surface.
-$\wm$ is the normal of an ideally reflecting microfacet (see \autoref{fig:wm_reflect}):
+$\wm$ is the normal of an ideally reflecting microfacet (see \cref{fig:wm_reflect}):
 \begin{equation}
     \wm = \frac{\wi + \wo}{\|\wi + \wo\|}
 \end{equation}
@@ -134,7 +134,7 @@ For the Fresnel term $F$, I use the Schlick approximation \parencite{schlick1994
     F(\LdotH) = F_0 + (1 - F_0) (1 - \LdotH)^5
 \end{equation}
 
-In the case of transmission, the normal of an ideally refracting microfacet is given by (see \autoref{fig:wm_refract}):
+In the case of transmission, the normal of an ideally refracting microfacet is given by (see \cref{fig:wm_refract}):
 \begin{equation}
     \wm = \pm\frac{\eta_i \wi + \eta_o \wo}{\|\eta_i \wi + \eta_o \wo\|} = \pm\frac{\eta \wi + \wo}{\|\eta \wi + \wo\|}
 \end{equation}
@@ -169,10 +169,10 @@ For metals, the base color $\vec{c}$ is used directly as the $F_0$ to simulate w
 \section{Importance Sampling}
 
 As aforementioned, the variance of a Monte Carlo estimator can be reduced by sampling the integral using a probability distribution that is as proportional to the integrand as possible.
-Revisiting the rendering equation (\autoref{eq:rendering_equation}), we first concentrate on sampling the term $f(\wi, \vec{x}, \wo) \cos(\theta_i)$ of the integrand.
+Revisiting the rendering equation (\cref{eq:rendering_equation}), we first concentrate on sampling the term $f(\wi, \vec{x}, \wo) \cos(\theta_i)$ of the integrand.
 Also sampling $L_i(\vec{x}, \wi)$ is not that easy, because to obtain $L_i$ we would need to solve the rendering equation again.
 Yet, several approaches have been made to also take $L_i$ into account, notably direct light sampling \parencite{veach1997}, path guiding \parencite{muller2017,muller2019,lafortune1995,jensen1995} and ReSTIR \parencite{bitterli2020}.
-For my reference pathtracer, I will only employ BSDF sampling and direct light sampling (\autoref{sec:mis}).
+For my reference pathtracer, I will only employ BSDF sampling and direct light sampling (\cref{sec:mis}).
 
 For the diffuse component, as it is constant I only sample the cosine weighted hemisphere:
 \begin{equation}

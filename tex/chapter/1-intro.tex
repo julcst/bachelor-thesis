@@ -2,8 +2,24 @@
 \chapter{Introduction}
 \label{chap:intro}
 
-\paragraph{Contributions}
-To summarize, my contributions are the following:
+A longstanding and essential problem in computer graphics is Global illumination (GI), which is the simulation of both direct and indirect lighting.
+Many algorithms were developed to approach this problem, the most prominent and widely used of which is path tracing \parencite{kajiya1986} for its simplicity and generality.
+In recent years, huge advancements in GPU architecture made interactive path tracing feasible.
+However, path tracing is still slow compared to traditional rasterization and suffers from high temporally instable noise.
+Radiance Caching \parencite{ward1988} tackles both of these shortcomings.
+By only estimating radiance sparsely and interpolating in between, reusing radiance estimates from previous frames, Radiance Caching can significantly reduce the number of samples per pixel while also averaging temporally and spatially near estimates to reduce noise.
+
+\textcite{muller2021} recently proposed a particularly elegant approach to Radiance Caching that utilizes neural networks to do the interpolation, leveraging the generalization capabilities of neural networks and the online adaptation capabilities of modern optimizers.
+Their approach, called Neural Radiance Caching (NRC) estimates the outgoing radiance field with a multilayer perceptron (MLP) that is trained online during rendering.
+Particularly important for a high quality result is the choice of input encoding, as the MLP is kept shallow for performance reasons, so the input should correlate roughly linearly with the output.
+\textcite{muller2021} originally used a simplified version of the Fourier transform to linearize space \parencite{tancik2020}.
+\textcite{muller2022} later proposed the Multiresolution Hash Encoding, which uses feature vectors distributed in hash-grids and significantly improves quality of high frequency details.
+
+However, because the training of NRC is based on unidirectional path tracing, it struggles to capture low-probability high-contribution light paths like caustics and indirect illumination.
+In this thesis I aim to generalize NRC to enable the use of radiance estimators better suited to these phenomena.
+I integrate three radiance estimators into the training, one based on Bidirectional Pathtracing \parencite{lafortune1993}, one based on Light Tracing \parencite{arvo1986} and one based on Progressive Photon Mapping \parencite{hachisuka2008}.
+
+\paragraph{Contributions} To summarize, my contributions are the following:
 \begin{itemize}
     \item I propose a generalized theoretical framework for Neural Radiance Caching by \textcite{muller2021}, allowing for arbitrary and independent modifications to the inference, training and interpolation steps.
     \item For the inference step, I introduce a modification to the directional input encoding that can prevent artifacts caused by the pole singularities of spherical coordinates.
@@ -11,6 +27,13 @@ To summarize, my contributions are the following:
     \begin{itemize}
         \item A bidirectional training approach that excels at capturing complex indirect lighting effects.
         \item A light tracing technique that is able to learn sharp caustic features.
-        \item An adaptation of Progressive Photon Mapping \parencite{jensen1996,hachisuka2008} that robustly learns both indirect lighting and caustics, essentially performing path space denoising for Progressive Photon Mapping.
+        \item An adaptation of Progressive Photon Mapping \parencite{jensen1996,hachisuka2008} which extends the original technique with sparse online caching and path space denoising and robustly learns both indirect lighting and caustics.
     \end{itemize}
 \end{itemize}
+
+\paragraph{Structure} \Cref{chap:related} gives an overview over solutions to the Global Illumination problem with a particular focus on approaches that cache radiance or leverage neural networks.
+After that, \cref{chap:pathtracing} provides a theoretical background on path tracing and derives a physically plausible BSDF.
+\Cref{chap:nrc} then introduces Neural Radiance Caching and gives details about the network architecture, input encodings and the training and inference procedure.
+\Cref{chap:bidirectional_caching} contains the main contribution by providing a generalization of radiance caching and derivations of the three proposed radiance estimators.
+In \cref{chap:results} detailed comparisons of all described techniques are provided.
+Finally, \cref{chap:conclusion} summarizes the findings and motivates interesting areas for future research.

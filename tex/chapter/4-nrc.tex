@@ -3,7 +3,7 @@
 \label{chap:nrc}
 % TODO: Figure
 % TODO: Rewrite
-A weak point of the reference Monte Carlo pathtracer motivated in \autoref{chap:pathtracing} is, that we have to start from zero, every time the scene or camera changes.
+A weak point of the reference Monte Carlo pathtracer motivated in \cref{chap:pathtracing} is, that we have to start from zero, every time the scene or camera changes.
 It would make sense to keep samples around that can be reused when temporally and spatially similar paths occur in the evaluation of the global illumination integral.
 \textcite{muller2021} introduced Neural Radiance Caching (NRC) to address this problem.
 The idea is to train a neural network on collected radiance samples and use it to accumulate and interpolate these samples online.
@@ -13,9 +13,10 @@ The Neural Radiance Cache can be interpreted as a classical cache that uses grad
 However, this approach could also be viewed as a form of path space denoising of the radiance field, which is why it is a good mean to reduce variance in the final image.
 
 \textcite{dereviannykh2024} recently adapted the NRC to predict \emph{incident} radiance, yet this is probably not well suited for caustics which exhibit high-frequency sparse incident radiance but low-frequency dense outgoing radiance.
-Thus, this thesis only explores classic Neural Radiance Caching, although applying the radiance estimators from \autoref{chap:bidirectional_caching} to the Neural Incident Radiance Cache (NIRC) may be an interesting topic for future research.
+Thus, this thesis only explores classic Neural Radiance Caching, although applying the radiance estimators from \cref{chap:bidirectional_caching} to the Neural Incident Radiance Cache (NIRC) may pose an interesting topic for future research.
 
 \section{Network Architecture}
+\label{sec:fully_fused}
 Because the network has to be trained and evaluated in real-time, \textcite{muller2021} propose to use a rather small hardware-accelerated network architecture.
 They use a fully connected network with 5 hidden layers, with 64 neurons and ReLU activation each.
 The output layer has 3 neurons, one for each color channel.
@@ -36,12 +37,12 @@ With this hardware-optimized implementation, \textcite{muller2021} achieve a spe
         \textbf{Parameter} & \textbf{Encoding} & \textbf{Dimensions} \\
         \midrule
         Position $\vec{x} \in \mathbb{R}^3$ & $\mathrm{mhe}(\vec{x}) \in \mathbb{R}^{16 \times 2}$ & 0--31 \\
-        Direction $\wo \in \mathbb{S}^2$ & $\mathrm{ob}(\wo) \in \mathbb{R}^{8}$ & 32--39 \\
-        Normal $\vec{n}(\vec{x}) \in \mathbb{S}^2$ & $\mathrm{ob}(\vec{n}(\vec{x})) \in \mathbb{R}^{8}$ & 40--47 \\
-        Roughness $r(\vec{x}) \in [0,1]$ & $\mathrm{ob}(r(\vec{x})) \in \mathbb{R}^{8}$ & 48--55 \\
-        Diffuse reflectance $\vec{F}_d(\vec{x}, \wo) \in [0,1]^3$ & $\vec{F}_d(\vec{x}, \wo) \in \mathbb{R}^{3}$ & 56--58 \\
-        Specular reflectance $\vec{F}_s(\vec{x}, \wo) \in [0,1]^3$ & $\vec{F}_s(\vec{x}, \wo) \in \mathbb{R}^{3}$ & 59--61 \\
-        Padding $\vec{1} \in \mathbb{R}^2$ & $\vec{1} \in \mathbb{R}^2$ & 62--63 \\ % TODO: Check implementation
+        Direction $\wo \in \mathbb{S}^2$ & $\mathrm{ob}(\wo) \in \mathbb{R}^{2 \times 4}$ & 32--39 \\
+        Normal $\vec{n}(\vec{x}) \in \mathbb{S}^2$ & $\mathrm{ob}(\vec{n}(\vec{x})) \in \mathbb{R}^{2 \times 4}$ & 40--47 \\
+        Roughness $r(\vec{x}) \in [0,1]$ & $\mathrm{ob}(r(\vec{x})) \in \mathbb{R}^{4}$ & 48--51 \\
+        Diffuse reflectance $\vec{F}_d(\vec{x}, \wo) \in [0,1]^3$ & $\vec{F}_d(\vec{x}, \wo) \in \mathbb{R}^{3}$ & 51--53 \\
+        Specular reflectance $\vec{F}_s(\vec{x}, \wo) \in [0,1]^3$ & $\vec{F}_s(\vec{x}, \wo) \in \mathbb{R}^{3}$ & 54--57 \\
+        Padding $\vec{1} \in \mathbb{R}^7$ & $\vec{1} \in \mathbb{R}^7$ & 57--63 \\ % TODO: Check implementation
         %\bottomrule
     \end{tabular}
     \caption{The components of the 64-dimensional input vector to the neural network.}
@@ -115,7 +116,7 @@ To improve performance, \textcite{muller2021} approximate the Gaussian distribut
 
 This encoding is used by \textcite{muller2021} on the roughness but also on the direction vectors $\wo$ and $\vec{n}$, by first converting these to spherical coordinates and then using the azimuthal angle $\phi$ and the polar angle $\theta$ as input.
 However, the azimuthal angle is periodic, so the encoding has also to be periodic to avoid discontinuities at the boundaries.
-To achieve this, \textcite{muller2021} use a wrapped CDF (see \autoref{fig:oneblob}), which comes with the added benefit of being able to compute just one boundary per thread and obtaining the other through warp shuffling.
+To achieve this, \textcite{muller2021} use a wrapped CDF (see \cref{fig:oneblob}), which comes with the added benefit of being able to compute just one boundary per thread and obtaining the other through warp shuffling.
 However, this encoding is not perfect as it establishes visible discontinuities at the poles.
 
 To avoid these discontinuities, I implemented a variant of the One Blob Encoding which can be selectively disabled for diffuse surfaces by passing IEEE 754 NaNs as input.
@@ -163,9 +164,9 @@ In addition, it does not affect performance, as the emission is directly given b
 \textcite{muller2021} combine the training data collection with the inference step by extending a fraction of the inference paths with additional training bounces to avoid redundant path tracing.
 However, as I want to mix different training techniques and to keep flexibility with the implementation, I chose to separate the training data collection from the inference step, accepting potential performance penalties, though \textcite{dereviannykh2024} even found performance benefits in this approach because it decreases incoherence.
 Nevertheless, the training sample acquisition is the same:
-I trace paths from the camera to the scene, using Russian Roulette termination (\autoref{eq:rr}) and Next Event Estimation (\autoref{sec:mis}).
+I trace paths from the camera to the scene, using Russian Roulette termination (\cref{eq:rr}) and Next Event Estimation (\cref{sec:mis}).
 At each vertex of the path, I store the current contribution weight and the input vector.
-When I sample an emitter, I can then use these weights to transport the radiance back to the previous vertices (see \autoref{alg:backtransport}).
+When I sample an emitter, I can then use these weights to transport the radiance back to the previous vertices (see \cref{alg:backtransport}).
 
 To store the training data, I use a fixed-size ring buffer with an atomic counter to ensure thread safety.
 This is not ideal, as it may lead to serialization of the GPU threads and thus potentially introduces a performance bottleneck, but it allows me to write dynamic amounts of data per thread.
@@ -219,7 +220,7 @@ High spread paths on the other hand result in high Monte Carlo noise but low-fre
 \end{equation}
 % TODO: fix in implementation
 where $p(\wi_{k-1} \mid \wo_{k-1})$ is the importance sampling PDF of the current vertex in solid angle measure and ${\theta_o}_k$ is the incident angle at the current vertex.
-Interestingly, as we will later see, the part under the square root is simply the inverse of the sampling PDF in surface area measure (\autoref{eq:area_solid_angle_p}), so this term is an estimate for the covered area.
+Interestingly, as we will later see, the part under the square root is simply the inverse of the sampling PDF in surface area measure (\cref{eq:area_solid_angle_p}), so this term is an estimate for the covered area.
 By taking the sum over the roots of areas, we are essentially summing the radii.
 Squaring this sum thus gives us the area spread over the whole path.
 
@@ -232,7 +233,7 @@ Because the spread is only defined for subpaths with $n \geq 2$, a limitation of
 
 \paragraph{Balanced Termination Heuristic (BTH)}
 \label{par:pt_bth}
-\textcite{dereviannykh2024} propose combining SAH with a stochastic path termination strategy based on the balance heuristic (\autoref{eq:balance_heuristic}) for more aggressive termination already at the first vertex.
+\textcite{dereviannykh2024} propose combining SAH with a stochastic path termination strategy based on the balance heuristic (\cref{eq:balance_heuristic}) for more aggressive termination already at the first vertex.
 They define the continuation probability by calculating the MIS weight against a factor $1/\pi$ per NIRC sample.
 Instead, I propose to use the power heuristic with $\beta=2$ against the Lambertian diffuse PDF $p_d(\wi)$:
 \begin{equation}

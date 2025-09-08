@@ -72,7 +72,7 @@ The integral is measured over the surface of the scene $A(\vec{x})$.
 \caption{To estimate the outgoing radiance $L_o(\pdir{2}{3})$ with the path space integral formulation, we fix the last two vertices defining the position and direction, here $\vec{x}_2$ and $\vec{x}_3$ highlighted in red. Furthermore, we drop the sensor weighting term $W$ and the last geometry term $\G{2}{3}$, because they are not part of the path anymore.}
 \label{fig:path_space_integral_radiance}
 \end{figure}
-In the following derivations, I will also use a slightly adapted formulation of the path space integral, that estimates \emph{radiance} instead of \emph{intensity} (see \autoref{fig:path_space_integral_radiance}).
+In the following derivations, I will also use a slightly adapted formulation of the path space integral, that estimates \emph{radiance} instead of \emph{intensity} (see \cref{fig:path_space_integral_radiance}).
 Therefore, we only have to drop the sensor weighting term $W$ and the last geometry term $\G{n-1}{n}$ and fix the last two vertices, which define the position and direction of outgoing radiance, by excluding them from the integration domain:
 \begin{equation}
 \label{eq:path_space_integral_radiance}
@@ -102,8 +102,8 @@ p(\vec{y}) = \frac{\cos \theta_{\vec{y}\veryshortarrow\vec{x}}}{\|\vec{y} - \vec
 
 \section{Inference}
 \label{sec:inference}
-Using this framework a simple inference scheme naturally emerges from the Path Space Integral Formulation (\autoref{eq:path_space_integral}).
-The path length $n$ is limited by a path termination strategy (\autoref{sec:path_termination}), so we only need to calculate the finite sum up to the termination length $l$ because we terminate with a valid radiance estimate which incorporates the sum over longer paths.
+Using this framework a simple inference scheme naturally emerges from the Path Space Integral Formulation (\cref{eq:path_space_integral}).
+The path length $n$ is limited by a path termination strategy (\cref{sec:path_termination}), so we only need to calculate the finite sum up to the termination length $l$ because we terminate with a valid radiance estimate which incorporates the sum over longer paths.
 We replace the integral over the path space $X_n$ by a single-sample Monte-Carlo Estimator.
 For readability, I will do an exemplary derivation for a path of length $n=2$ without intermediate emission:
 \begin{subequations}
@@ -122,9 +122,9 @@ For readability, I will do an exemplary derivation for a path of length $n=2$ wi
     % &= \frac{\widehat{L}_o(\pdir{0}{1}) \cos\theta_{0\veryshortarrow1}}{p(\pdir{1}{0}\mid\pdir{2}{1})}  \frac{\f{0}{1}{2} \cos\theta_{1\veryshortarrow2}}{p(\pdir{2}{1}\mid\pdir{3}{2})} \frac{\f{1}{2}{3} \cos\theta_{2\veryshortarrow3}}{p(\pdir{3}{2})}\\
 \end{align} % TODO: Make generic
 \end{subequations}
-In the first step, the sensor weighting term $W$ cancels with the integration over the eye vertex (\autoref{eq:cancelw}).
-We then replace the integral by a single-sample Monte Carlo estimator (\autoref{eq:pmc}).
-Finally, we convert from area measure to solid angle measure using (\autoref{eq:area_solid_angle_p}) which cancels with $G$ leaving only the cosine terms at the sampled vertices (\autoref{eq:area2solid}).
+In the first step, the sensor weighting term $W$ cancels with the integration over the eye vertex (\cref{eq:cancelw}).
+We then replace the integral by a single-sample Monte Carlo estimator (\cref{eq:pmc}).
+Finally, we convert from area measure to solid angle measure using (\cref{eq:area_solid_angle_p}) which cancels with $G$ leaving only the cosine terms at the sampled vertices (\cref{eq:area2solid}).
 The visibility term implicitly vanishes in the ray tracing step.
 \begin{figure}[ht]
     \centering
@@ -143,7 +143,7 @@ Applying these observations to all path lengths up to termination, we get:
 \end{equation}
 where $T_n$ is the accumulated throughput along the first $n$ segments of the path and $\widehat{L}_o(\pdir{n}{n-1})$ is the interpolated radiance estimate at the termination vertex.
 To simplify notation, the path now starts at the eye vertex $\vec{x}_0$.
-Note, that we do not have to divide by the path termination probability like we did in Russian Roulette Termination (\autoref{eq:rr}), as we terminate the path with a valid radiance estimate.
+Note, that we do not have to divide by the path termination probability like we did in Russian Roulette Termination (\cref{eq:rr}), as we terminate the path with a valid radiance estimate.
 
 To improve the quality of the inference pass, we can additionally apply Next Event Estimation with Multiple Importance Sampling like in the following section and the reference pathtracer.
 
@@ -155,7 +155,7 @@ To improve the quality of the inference pass, we can additionally apply Next Eve
 \caption{The simplest way to estimate the outgoing radiance $L_o(\x_0, \wo_0)$ is eye tracing, which shoots a path from the surface into the scene and collects emissions at each intersection.}
 \label{fig:eye_tracing}
 \end{figure}
-We can apply the observations made in \autoref{sec:inference} to the path space formulation for radiance (\autoref{eq:path_space_integral_radiance}) to derive a path tracing based radiance estimator:
+We can apply the observations made in \cref{sec:inference} to the path space formulation for radiance (\cref{eq:path_space_integral_radiance}) to derive a path tracing based radiance estimator:
 \begin{equation}
     L_o(\vec{x}_0, \wo_0)
     \hateq \sum_{k=1}^{\infty} T_k L_e(\vec{x}_k, \wo_k), \quad
@@ -169,28 +169,28 @@ We can apply the observations made in \autoref{sec:inference} to the path space 
 \caption{Direct light sampling also known as Next Event Estimation (NEE) performs significantly better than BSDF sampling on small direct lighting.}
 \label{fig:nee}
 \end{figure}
-This estimator alone however is ineffective at finding small light sources, so we combine it with Next Event Estimation through Multiple Importance Sampling (\autoref{sec:mis}), as we already did in the reference pathtracer:
+This estimator alone however is ineffective at finding small light sources, so we combine it with Next Event Estimation through Multiple Importance Sampling (\cref{sec:mis}), as we already did in the reference pathtracer:
 \begin{equation}
 \begin{aligned}
     L_o(\vec{x}_0, \wo_0)
     \hateq \sum_{k=1}^{\infty} T_k \left( w_\text{BSDF} L_e(\x_k, \wo_k) + w_\text{L} \frac{f(\pdir{L}{k}, \wo_k) \G{k}{L} L_e(\pdir{L}{k})}{p(\x_L)} \right)
 \end{aligned}
 \end{equation}
-By combining the two techniques by weighting them with their respective MIS-weights $w_\text{BSDF}(\wo)$ and $w_\text{L}(\x_L)$ (\autoref{eq:balance_heuristic} and \autoref{eq:power_heuristic}), we get the best of both worlds.
+By combining the two techniques by weighting them with their respective MIS-weights $w_\text{BSDF}(\wo)$ and $w_\text{L}(\x_L)$ (\cref{eq:balance_heuristic} and \cref{eq:power_heuristic}), we get the best of both worlds.
 For brevity, the parametrization of the MIS-weights is dropped in the equation above.
 This combined with ReSTIR DI \parencite{bitterli2020} and a LightBVH \parencite{moreau2019} for efficient many light sampling is the radiance estimator used by \textcite{muller2021}.
 Nevertheless, I simply sample the light source from a precomputed CDF-table by inversion sampling, because my test scenes only contain a few light sources.
-To limit the path length, I use Russian Roulette Termination (\autoref{eq:rr}) again, and in praxis the path length also has to be limited to a maximum length, which introduces potential bias.
+To limit the path length, I use Russian Roulette Termination (\cref{eq:rr}) again, and in praxis the path length also has to be limited to a maximum length, which introduces potential bias.
 
 \paragraph{Query Prediction}
-In practice, I only predict queries by shooting primary camera rays, because this is already a good approximation of the query sampling distribution $Q(q)$ for the path termination strategies given in \autoref{sec:path_termination}.
+In practice, I only predict queries by shooting primary camera rays, because this is already a good approximation of the query sampling distribution $Q(q)$ for the path termination strategies given in \cref{sec:path_termination}.
 A more accurate and efficient method however would be to randomly draw queries from the queries already generated in the inference stage.
 Unfortunately, I did not have the time to implement this.
 % TODO: Implement
 
 \section{Bidirectional Training (BT)}
 \label{sec:re_bidir}
-A major weakness of the aforementioned radiance estimator (\autoref{sec:re_eye}) is indirect lighting where the light paths undergo glossy reflections/refractions before getting diffused.
+A major weakness of the aforementioned radiance estimator (\cref{sec:re_eye}) is indirect lighting where the light paths undergo glossy reflections/refractions before getting diffused.
 This effect is known as a caustic.
 In the extreme case of an infinitesimal light source being ideally reflected/refracted and then diffused, path tracing and NEE even fail completely to capture this effect, because the probability to sample such a path by BSDF sampling is zero. % TODO: Figure
 However, we can do the exact opposite of NEE by tracing light paths and connecting them to query points sampled from the eye.
@@ -206,7 +206,7 @@ Specifically, I propose the following alternative radiance estimator based on th
 First, sample a query point $q = (\vec{x}_q, \wo_q)$ from the query sampling distribution $Q(q)$.
 Then, trace a light path carrying flux from a randomly selected light source via BSDF sampling and connect each vertex $\vec{x}_k$ to the query point $\vec{x}_q$.
 
-Starting again with a single-sample Monte Carlo Estimator for the Path Space Integral for Radiance (\autoref{eq:path_space_integral_radiance}) and applying the same observations as in \autoref{sec:inference}, we get:
+Starting again with a single-sample Monte Carlo Estimator for the Path Space Integral for Radiance (\cref{eq:path_space_integral_radiance}) and applying the same observations as in \cref{sec:inference}, we get:
 \begin{equation}
 \label{eq:bidir}
 \begin{aligned}
@@ -226,17 +226,17 @@ The sum over the path length is split into two parts because the first vertex $\
     \includegraphics{asy/light_bootstrapping_1.pdf}
     \includegraphics{asy/light_bootstrapping_2.pdf}
     \includegraphics{asy/light_bootstrapping_3.pdf}
-    \caption{Visualization of light tracing for query prediction: Every new light vertex is first handled as a query ($\vec{q}_i$) and collects radiance from all previous vertices according to \autoref{eq:bidir}.}
+    \caption{Visualization of light tracing for query prediction: Every new light vertex is first handled as a query ($\vec{q}_i$) and collects radiance from all previous vertices according to \cref{eq:bidir}.}
     \label{fig:light_bootstrap}
 \end{figure}
-However, despite already sampling light paths, the estimator from \autoref{sec:re_bidir} only finds indirect illumination by caustics efficiently, since given a specific query, the probability to connect to a glossy light path directly is still low. % TODO: Figure
+However, despite already sampling light paths, the estimator from \cref{sec:re_bidir} only finds indirect illumination by caustics efficiently, since given a specific query, the probability to connect to a glossy light path directly is still low. % TODO: Figure
 So, instead of predicting queries solely from the eye, we can also collect radiance at future vertices of the light path.
 At a light vertex, we are guaranteed to get strong contribution at least from the previous vertex, because we sampled it directly through BSDF sampling.
 It would also be possible to sample independent queries from the light vertices instead of reusing the next light vertex and this may in fact be an interesting algorithm to explore, though this is outside the scope of this thesis.
 
-\paragraph{Balancing} Although this estimator may look promising at first, it is important to note that it exhibits the problem already discussed in my motivation of bidirectional radiance caching (\autoref{par:cache_efficiency}):
+\paragraph{Balancing} Although this estimator may look promising at first, it is important to note that it exhibits the problem already discussed in my motivation of bidirectional radiance caching (\cref{par:cache_efficiency}):
 By sampling queries solely from the light, queries that are shadowed will never be predicted, which introduces bias into the cache.
-This can be clearly visible depending on the scene and will be further discussed in the results chapter (\autoref{chap:results}). % TODO: Figure
+This can be clearly visible depending on the scene and will be further discussed in the results chapter (\cref{chap:results}). % TODO: Figure
 
 To counteract this drawback, we can make a simple observation:
 If a query is not reachable from a light source, it does not receive energy, thus the radiance at such queries can be safely assumed to be zero.
@@ -254,7 +254,7 @@ Furthermore, it is a waste of bandwidth to spend resources on learning zero radi
 \label{sec:sppc}
 The final radiance estimator I propose is an adaptation of Progressive Photon Mapping by \textcite{jensen1996,hachisuka2008}.
 We again shoot flux into the scene by light tracing.
-However, instead of collecting the flux by connecting to an infinitesimal query point, we collect the incoming flux over all sampled light paths in a \emph{query region} by kernel density estimation (see \autoref{fig:pm_collection}).
+However, instead of collecting the flux by connecting to an infinitesimal query point, we collect the incoming flux over all sampled light paths in a \emph{query region} by kernel density estimation (see \cref{fig:pm_collection}).
 
 The radiance at a query point $\x$ in direction $\wo$ can be estimated by:
 \begin{subequations}
@@ -268,15 +268,15 @@ The radiance at a query point $\x$ in direction $\wo$ can be estimated by:
 \end{align}
 \end{subequations}
 where $w_{\vec{x},r}(\hat{\x}_k)$ is the kernel weight for the photon position $\hat{\x}_k$.
-We start with the rendering equation (\autoref{eq:pm:lo}) and replace the incoming radiance $L_i$ by its definition as incoming flux per area and solid angle (\autoref{eq:pm:defrad}).
-We then replace the integral by a Monte Carlo estimator over $n$ sampled flux packages \emph{(photons)} (\autoref{eq:pm:est}).
+We start with the rendering equation (\cref{eq:pm:lo}) and replace the incoming radiance $L_i$ by its definition as incoming flux per area and solid angle (\cref{eq:pm:defrad}).
+We then replace the integral by a Monte Carlo estimator over $n$ sampled flux packages \emph{(photons)} (\cref{eq:pm:est}).
 Finally, we assume that the kernel function $w_{\vec{x},r}(\hat{\x}_k)$ is limited to a sphere of radius $r$.
-Assuming the surface is locally flat, this allows us to approximate the surface area $\Delta A$ over which we are integrating by a disk of area $A=\pi r^2$ (\autoref{eq:pm:sphere}).
+Assuming the surface is locally flat, this allows us to approximate the surface area $\Delta A$ over which we are integrating by a disk of area $A=\pi r^2$ (\cref{eq:pm:sphere}).
 The simplest such kernel function is the box function, with $w_{\vec{x},r}(\hat{\x}_k)=1$ inside the sphere and $0$ outside.
 \begin{figure}[ht]
     \centering
     \includegraphics{asy/pm_collection.pdf}
-    \caption{Visualization of photon mapping. Photons (packages of flux, here small black arrows) are distributed in the scene and collected over query regions (dashed circle). In this example, three light paths were sampled ($n=3$). Note, that in practice photons and queries are not recorded at glossy surfaces, since they probably can not be connected with high contribution. This removes glossy features from the radiance estimate, however the path termination strategies from \autoref{sec:path_termination} avoid querying glossy surfaces in the first place.}
+    \caption{Visualization of photon mapping. Photons (packages of flux, here small black arrows) are distributed in the scene and collected over query regions (dashed circle). In this example, three light paths were sampled ($n=3$). Note, that in practice photons and queries are not recorded at glossy surfaces, since they probably can not be connected with high contribution. This removes glossy features from the radiance estimate, however the path termination strategies from \cref{sec:path_termination} avoid querying glossy surfaces in the first place.}
     \label{fig:pm_collection}
 \end{figure}
 
@@ -287,7 +287,7 @@ So, we can reduce the amount of queries to a fixed number independent of render 
 Secondly, I chose to store the \emph{queries} instead of the \emph{photons} in a spatial data structure.
 This enables the queries to persist across multiple frames and collect incoming flux over multiple light passes.
 The lifetimes of the queries can be made completely independent of each other by keeping track of the total amount of light samples already drawn at creation time of a query.
-The difference between the current count of light samples and the count at creation gives the number of total light samples $n$ that are used in the collection of flux for that query (\autoref{eq:pm}).
+The difference between the current count of light samples and the count at creation gives the number of total light samples $n$ that are used in the collection of flux for that query (\cref{eq:pm}).
 Flux is simply accumulated to the query whenever a photon hits the query region.
 To maintain a constant number of queries I use a ring buffer with an atomic index counter and a constant query replacement fraction $\kappa$.
 The lifetime of a query is thus approximately $1/\kappa$ frames, yet it can also be longer if query prediction fails to produce a valid result, for example if a camera ray does not hit any geometry.
@@ -341,8 +341,8 @@ More precisely, \textcite{knaus2011} showed that $\mathrm{Bias}\left[\estimator{
 
 Leveraging this observation, \textcite{hachisuka2008} developed Progressive Photon Mapping (PPM), originally as a technique to make classic Photon Mapping consistent and to overcome the memory constraint of storing a single photon map.
 Their idea was to perform multiple light passes, shrinking the radius after every iteration, yet never too much, as there has to be a gain in the total amount of photons, otherwise the estimator diverges.
-Therefore, they introduce a factor $\alpha$ to control the fraction of photons to keep after each light pass (\autoref{eq:ppm_n}).
-By fixing the photon density inside the area of the query (\autoref{eq:ppm_r}), they derive following update rules:
+Therefore, they introduce a factor $\alpha$ to control the fraction of photons to keep after each light pass (\cref{eq:ppm_n}).
+By fixing the photon density inside the area of the query (\cref{eq:ppm_r}), they derive following update rules:
 \begin{subequations}
 \begin{align}
     \text{Let } N' = N + \alpha M \label{eq:ppm_n}\\
@@ -351,7 +351,7 @@ By fixing the photon density inside the area of the query (\autoref{eq:ppm_r}), 
 \end{align}
 \end{subequations}
 where $N$ is the total amount of collected photons, $M$ is the number of new photons found during the light pass, and $r$ and $A$ are the respective radius and area of the query.
-The total outgoing flux has also to be scaled down to the reduced area $A'$ (\autoref{eq:ppm_f}).
+The total outgoing flux has also to be scaled down to the reduced area $A'$ (\cref{eq:ppm_f}).
 
 \paragraph{Hardware Acceleration}
 The original k-d-tree method of storing photons by \textcite{jensen1996} is not suitable for GPUs.
@@ -361,7 +361,7 @@ Finding an intersection is then equivalent to finding a data point within $r_i$ 
 
 \paragraph{Algorithm Overview}
 Applied to Photon Mapping, this means we first store the Axis-Aligned Bounding Boxes (AABBs) of the queries in an array and use OptiX to construct a BVH.
-Then, we sample the light paths and at each non-specular scene intersection (\autoref{par:pt_1st_diffuse}), we shoot infinitesimal rays into the query-BVH.
+Then, we sample the light paths and at each non-specular scene intersection (\cref{par:pt_1st_diffuse}), we shoot infinitesimal rays into the query-BVH.
 In the intersection program, we simply compare the squared distance of the ray origin with the squared radius of the query ball.
 If the distance is smaller, we atomically accumulate the BSDF-weighted incoming flux of the photon to the flux of the query $\Phi_o$.
 After the light pass we apply Radius Reduction and use the radiance estimates to update the radiance cache.

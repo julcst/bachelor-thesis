@@ -65,3 +65,5 @@ Kneiphof
 surfel
 Auguste
 remeshed
+tiny-cuda-nn
+uber-kernels

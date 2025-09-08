@@ -3,7 +3,40 @@
 \label{chap:conclusion}
 
 \section{Summary}
+The bidirectional estimator performs very comparable to NRC, while improving the quality of indirect illumination.
+It struggles, however, with direct lighting and caustics, because the probability of finding a matching pair of a query and a directly contributing light path is low.
+
+The light tracing estimator has potential to capture sharp details, but suffers from bias which is caused by not sampling shadowed areas.
+
+The estimator based on Progressive Photon Mapping is particularly robust and produces high quality caustics and indirect illumination, while coming only at a mild performance overhead compared to the original NRC.
+
+\section{Future Work}
+By generalizing Neural Radiance Caching, this thesis opens a wide array of possible future improvements.
+
+\paragraph{Radiance Estimators}
+Particularly interesting is the integration of different radiance estimators.
+Although the SPPC estimator already produces high quality caustics, the density estimation step of Photon Mapping reduces sharpness of high-frequency features and introduces bias at edges.
+It could be interesting to use e.g. Vertex Connection and Merging \parencite{georgiev2012}, Metropolis Light Sampling \parencite{veach1997a}, full MIS-weighted Bidirectional Pathtracing \parencite{lafortune1993,veach1997} or Manifold Exploration techniques \parencite{jakob2012} to generate training data.
+The proposed framework for Radiance Caching does not impose any restrictions on \emph{mixing} different radiance estimators, so independently choosing the best suited radiance estimation strategy for different areas of the scene could also be interesting.
+
+\paragraph{Radiance Caches}
+The Neural Radiance Cache is fairly expensive to train and infer.
+The MHE encoding significantly improves quality, but the benefit largely comes from the underlying hash grid.
+Thus, manually crafted grid based approaches could also be promising and lighter on performance.
+Using Spherical Harmonics to represent outgoing radiance fields.
 
 \section{Further Optimization}
 
-\paragraph{SPPC} As already discussed in \autoref{sec:sppc}
+\paragraph{Query Prediction}
+Currently, query points are predicted mostly by shooting primary camera rays.
+A better approach would be to stochastically store queries during the inference phase and use these in the following training pass to estimate radiance.
+This would not only be a more accurate approximation of the future querying, it would also likely be lighter on performance because it prevents redundant intersection tests.
+The only downside could be a one frame latency in query prediction, but because the NRC inference is already filtered by an Exponential-Moving-Average this is likely negligible.
+
+\paragraph{SPPC} As already discussed in \cref{sec:sppc}, synchronization of the atomic accumulation is likely the biggest factor that holds back the performance of hardware accelerated photon mapping.
+Thus, it could be interesting to either explore stochastic evaluation techniques like \textcite{kern2023} or to reduce overlap during query prediction, similar to what e.g. \textcite{stachowiak2018} did for surfel placement.
+Warp Aggregation is a common technique to resolve this in classical GPU programming by first aggregating subsets and then reducing, however OptiX does not expose warps.
+
+\paragraph{Kernel Fusion} Recently, the \emph{tiny-cuda-nn} library of \textcite{muller2021a} was extended by a feature that allows combining the encoding, MLP, loss function, training and inference steps together into fused monolithic kernels by on-the-fly JIT compilation.
+Using this approach, \textcite{muller2021a} report a potential speedup of $1.5\times$ up to $2.5\times$ for training and inference, especially for modern GPU architectures.
+Applying this technique could have a high potential for further performance improvements, unfortunately, I could not finish the implementation in time for this thesis.

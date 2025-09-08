@@ -5,26 +5,35 @@
 \section{Methodology}
 For the purpose of reproducible evaluation, a JSON-configurable CLI tool was used to generate all results presented in this thesis and the exact parametrization is distributed along the source code on my repository \parencite{stamm2025}.
 
+\paragraph{Network Architecture} For the training and inference, the fully fused network architecture introduced by \textcite{muller2021} and described in \cref{sec:fully_fused} is used.
+The implementation uses the \emph{tiny-cuda-nn} library \parencite{muller2021a} that was distributed alongside the original NRC paper and updated to also provide an implementation of the Multiresolution Hash Encoding (MHE) presented by \textcite{muller2022}.
+The network architectures are kept identical to those in the original papers.
+Specifically, the MHE network uses 3 hidden layers with 64 neurons, while the Triangle Wave Encoding variant uses 5 hidden layers instead to compensate for the lower quality of the encoding.
+
+\paragraph{Training} Like recommended by \textcite{muller2022}, training is performed using the Adam optimizer \parencite{kingma2014} with a learning rate of $10^{-2}$, $\beta_1 = 0.9$, $\beta_2 = 0.99$, $\epsilon = 10^{-15}$ and an L2 regularization factor of $10^{-6}$.
+Furthermore, they use 4 training steps with a batch size of $2^{14}=16,384$ each.
+I use only a single training step with $2^{17}$ samples instead.
+
 \paragraph{Performance Measurement}
 Cuda Events are used to evaluate performance.
 Tone mapping and screen blitting are not included into the measurements, so only the pure rendering time is reported.
 If not otherwise stated, all measurements are taken on an NVIDIA RTX 3060 Ti GPU and averaged over at least 10 seconds.
 
 \paragraph{Error Metric}
-Reference images are generated using Path Tracing (PT) or Stochastic Progressive Photon Mapping (SPPM) \parencite{hachisuka2009a} in caustic scenes where PT does not converge.
+Reference images are generated using Path Tracing (PT) and Stochastic Progressive Photon Mapping (SPPM) \parencite{hachisuka2009a} in the \textsc{Caustics} scene where PT does not converge in reasonable time.
 To compare the quality of different techniques, the Mean Squared Error (MSE) in linear RGB space is reported for numerical error and the HDR variant of the \FLIP metric \parencite{andersson2021} for humanly perceived error.
-Furthermore, bias and variance are measured separately by computing the first and second moment over 1000 independent 1spp renders.
+Furthermore, bias and variance are measured separately by computing the first and second moment over 1,000 independent 1spp renders.
 Between the bias and variance samples the configuration and cache are kept constant, but for the inference pass different samples are drawn from a Quasi-Random Low Discrepancy Sequence.
 
 \paragraph{Scenes}
 Tests are performed on a set of scenes that are also included in the source code repository \parencite{stamm2025}:
 \begin{itemize}
-\item The \emph{Diffuse} scene is an adaptation of the Cornell Box and highlights diffuse indirect illumination.
-\item The \emph{Thinker} scene incorporates glossy and transmissive materials with complex specular highlights.
-It contains decimated and remeshed version of the Thinker statue by Auguste Rodin scanned by \textcite{scantheworld2014} and the Stanford Bunny scanned by \textcite{stanforduniversitycomputergraphicslaboratory1994}.
-\item The \emph{Chess} scene is a complex textured scene composed of public domain assets from \textcite{polyhaven}.
-\item The \emph{Ajar} scene is mostly lit by long indirect light paths, which are difficult to find with eye tracing.
-\item The \emph{Caustics} scene contains complex sharp caustic patterns that are challenging for traditional path tracing.
+\item The \textsc{Diffuse} scene is an adaptation of the Cornell Box and highlights diffuse indirect illumination.
+\item The \textsc{Thinker} scene incorporates glossy and transmissive materials with complex specular highlights.
+It contains decimated and remeshed version of the Thinker statue by Auguste Rodin scanned by \textcite{scantheworld2014} and the Stanford Bunny scanned by the \textcite{stanforduniversitycomputergraphicslaboratory1994}.
+\item The \textsc{Chess} scene is a complex textured scene composed of public domain assets from \textcite{polyhaven}.
+\item The \textsc{Ajar} scene is mostly lit by long indirect light paths, which are difficult to find with eye tracing.
+\item The \textsc{Caustics} scene contains complex sharp caustic patterns that are challenging for traditional path tracing.
 \end{itemize}
 
 \section{Inference}
@@ -38,7 +47,7 @@ It contains decimated and remeshed version of the Thinker statue by Auguste Rodi
         & Reference (PT) & PT & 1st Vert & 1st Diff & SAH & BTH $1/2$ & BTH $1/10$ \\
         \input{figures/py/tests/path_termination/Thinker}
     \end{tabularx}
-    \caption{Comparison of the Path Termination strategies from \autoref{sec:path_termination}.}
+    \caption{Comparison of the Path Termination strategies from \cref{sec:path_termination}.}
     \label{fig:pathterm_comparison}
 \end{figure}
 
@@ -59,14 +68,14 @@ It contains decimated and remeshed version of the Thinker statue by Auguste Rodi
     \centering
     \tiny
     \begin{tabularx}{\textwidth}{r*{9}{>{\centering\arraybackslash}X}}
-        &Reference (PT) & PT & NRC+PT & NRC+PT+SL & NRC+BT & NRC+LT & NRC+LT+Bal & NRC+SPPC & PM \\
+        &Reference & PT & NRC+PT & NRC+PT+SL & NRC+BT & NRC+LT & NRC+LT+Bal & NRC+SPPC & PM \\
         \input{figures/py/tests/quality_comparison/Diffuse}\\
         \input{figures/py/tests/quality_comparison/Thinker}\\
         \input{figures/py/tests/quality_comparison/Chess}\\
         \input{figures/py/tests/quality_comparison/Ajar}\\
         \input{figures/py/tests/quality_comparison/Caustics}
     \end{tabularx}
-    \caption{Comparison of the different radiance estimators from \autoref{chap:bidirectional_caching}. To isolate training quality, inference is terminated after the first diffuse vertex and is not combined with NEE.}
+    \caption{Comparison of the different radiance estimators from \cref{chap:bidirectional_caching}. To isolate training quality, inference is terminated after the first diffuse vertex and is not combined with NEE.}
     \label{fig:quality_comparison}
 \end{figure}
 
