@@ -3,16 +3,12 @@
 \label{chap:results}
 
 \section{Methodology}
-For the purpose of reproducible evaluation, a JSON-configurable CLI tool was used to generate all results presented in this thesis and the exact parametrization is distributed along the source code on my repository \parencite{stamm2025}.
+For the purpose of reproducible evaluation, a JSON-configurable CLI tool was used to generate all results presented in this thesis and the exact parametrization is distributed along the source code on the accompanying repository \parencite{stamm2025}.
 
 \paragraph{Network Architecture} For the training and inference, the fully fused network architecture introduced by \textcite{muller2021} and described in \cref{sec:fully_fused} is used.
 The implementation uses the \emph{tiny-cuda-nn} library \parencite{muller2021a} that was distributed alongside the original NRC paper and updated to also provide an implementation of the Multiresolution Hash Encoding (MHE) presented by \textcite{muller2022}.
 The network architectures are kept identical to those in the original papers.
 Specifically, the MHE network uses 3 hidden layers with 64 neurons, while the Triangle Wave Encoding variant uses 5 hidden layers instead to compensate for the lower quality of the encoding.
-
-\paragraph{Training} Like recommended by \textcite{muller2022}, training is performed using the Adam optimizer \parencite{kingma2014} with a learning rate of $10^{-2}$, $\beta_1 = 0.9$, $\beta_2 = 0.99$, $\epsilon = 10^{-15}$ and an L2 regularization factor of $10^{-6}$.
-Furthermore, they use 4 training steps with a batch size of $2^{14}=16,384$ each.
-I use only a single training step with $2^{17}$ samples instead.
 
 \paragraph{Performance Measurement}
 Cuda Events are used to evaluate performance.
@@ -36,50 +32,70 @@ It contains decimated and remeshed version of the Thinker statue by Auguste Rodi
 \item The \textsc{Caustics} scene contains complex sharp caustic patterns that are challenging for traditional path tracing.
 \end{itemize}
 
-\section{Inference}
-
+\section{Parametrizing the NRC}
+\begin{figure}[htb!]
+    \centering
+    \tiny
+    \begin{tabularx}{\textwidth}{r*{7}{>{\centering\arraybackslash}X}}
+        & Reference (PT) & PT & SAH & BTH $1/2$ & BTH $1/10$ & 1st Diffuse & 1st Vertex\\
+        \input{figures/py/tests/path_termination/Thinker}
+        \input{figures/py/tests/path_termination/Thinker+NEE.tex}
+    \end{tabularx}
+    \caption{Comparison of the Path Termination strategies from \cref{sec:path_termination}.}
+    \label{fig:pathterm_comparison}
+\end{figure}
 \paragraph{Path Termination Strategies}
+Choosing a path termination strategy is a trade-off between bias and variance (see \cref{fig:pathterm_comparison}).
+The SAH termination strategy has the highest variance and also the highest performance cost, because it terminates paths the least aggressively.
+On the other end of the spectrum, terminating on the first vertex directly has the lowest variance and is also the fastest but has some issues with specular highlights.
+All the other strategies lie somewhere in between, with the parametrized BTH strategy bridging the gap.
+As the SPPC strategy does not learn glossy highlights at all and since the quality of the NRC seems good enough for early termination, the following tests use termination at the first diffuse vertex.
+
+\begin{figure}[htb!]
+    \centering
+    \tiny
+    \begin{tabularx}{0.4\textwidth}{r*{3}{>{\centering\arraybackslash}X}}
+        & Reference & TWE & MHE \\
+        \input{figures/py/tests/encodings/Thinker.tex}
+    \end{tabularx}
+    \caption{Comparison of different input encodings}
+    \label{fig:encodings}
+\end{figure}
+\paragraph{Input Encodings}
+The input encoding has a significant impact on both quality and performance of the cache (see \cref{fig:encodings}).
+The Multiresolution Hash Encoding (MHE) by \textcite{muller2022} comes at a great performance hit compared to the original Triangle Wave Encoding (TWE) by \textcite{muller2021} (more than $2\times$ in the test), but distinctly enhances the representation of high-frequency features.
+Thus, since we aim to capture caustics, the MHE is the natural choice used in the following evaluations.
 
 \begin{figure}[htb!]
     \centering
     \tiny
     \begin{tabularx}{\textwidth}{r*{7}{>{\centering\arraybackslash}X}}
-        & Reference (PT) & PT & 1st Vert & 1st Diff & SAH & BTH $1/2$ & BTH $1/10$ \\
-        \input{figures/py/tests/path_termination/Thinker}
+        & Reference & 1 & 5 & 25 & 100 & 500 & 2500 \\
+        \input{figures/py/tests/batch_size/PT14.tex}
+        \input{figures/py/tests/batch_size/PT14@4.tex}
+        \input{figures/py/tests/batch_size/PT16.tex}
+        \input{figures/py/tests/batch_size/PT16@4.tex}
     \end{tabularx}
-    \caption{Comparison of the Path Termination strategies from \cref{sec:path_termination}.}
-    \label{fig:pathterm_comparison}
+    \caption{Comparison of cache convergence for different training set sizes (14: $2^{14}=16,384$, 16: $2^{16}=65,536$) and training steps per frame (@4 indicates that the training set is split into 4 batches, otherwise it is processed as a single batch). The columns indicate how many frames were rendered to train the cache (1, 5, 25, 100, 500, 2500).}
+    \label{fig:batch_size}
 \end{figure}
+\paragraph{Training} Like recommended by \textcite{muller2022}, training is performed using the Adam optimizer \parencite{kingma2014} with a learning rate of $10^{-2}$, $\beta_1 = 0.9$, $\beta_2 = 0.99$, $\epsilon = 10^{-15}$ and an L2 regularization factor of $10^{-6}$.
+Furthermore, they use 4 training steps with a batch size of $2^{14}=16,384$ each.
+Tests show, that the usage of multiple training steps per frame leads to faster cache convergence (see \cref{fig:batch_size}) while larger training sets evidently result in lower error.
 
-\paragraph{Next Event Estimation}
-
-\section{Training}
+\section{Optimizations}
 
 \begin{figure}[htb!]
     \centering
-    \input{figures/py/loss_history.pgf}
-    \caption{Comparison of training convergence.}
-    \label{fig:convergence}
+    \input{figures/py/jit.pgf}
+    \caption{Applying JIT kernel fusion. \emph{+Fused} indicates fusion of the encoding with the training and inference kernels, \emph{+FusedVis} also fuses the visualization step, where the output of the network is multiplied with the reflectance and accumulated to the render buffer. Unfortunately, enabling JIT-fusion \emph{decreases} performance, probably because of the older GPU architecture.}
+    \label{fig:jit}
 \end{figure}
+\paragraph{Kernel Fusion} Recently, the \emph{tiny-cuda-nn} library of \textcite{muller2021a} was extended by a feature that allows combining the encoding, MLP, loss function, training and inference steps together into fused monolithic kernels by on-the-fly JIT compilation.
+Using this approach, \textcite{muller2021a} report a potential speedup of $1.5\times$ up to $2.5\times$ for training and inference, especially for modern GPU architectures.
+Measurements on an NVIDIA RTX 3060 Ti, however, show a performance \emph{decrease} in the inference step and similar performance for training (see \cref{fig:jit}).
+This could potentially be caused by an older GPU architecture, the following tests are thus performed without JIT-fusion.
 
-\subsection{Radiance Estimators}
-
-\begin{figure}[htb!]
-    \centering
-    \tiny
-    \begin{tabularx}{\textwidth}{r*{9}{>{\centering\arraybackslash}X}}
-        &Reference & PT & NRC+PT & NRC+PT+SL & NRC+BT & NRC+LT & NRC+LT+Bal & NRC+SPPC & PM \\
-        \input{figures/py/tests/quality_comparison/Diffuse}\\
-        \input{figures/py/tests/quality_comparison/Thinker}\\
-        \input{figures/py/tests/quality_comparison/Chess}\\
-        \input{figures/py/tests/quality_comparison/Ajar}\\
-        \input{figures/py/tests/quality_comparison/Caustics}
-    \end{tabularx}
-    \caption{Comparison of the different radiance estimators from \cref{chap:bidirectional_caching}. To isolate training quality, inference is terminated after the first diffuse vertex and is not combined with NEE.}
-    \label{fig:quality_comparison}
-\end{figure}
-
-\section{Performance and Optimization}
 \begin{figure}[htb!]
     \centering
     \begin{subfigure}{0.5\textwidth}
@@ -104,18 +120,59 @@ It contains decimated and remeshed version of the Thinker statue by Auguste Rodi
         \end{tabular}
     \end{subfigure}
     \caption{Optimizations to Photon Mapping. \emph{IS only} directly accumulates in the Intersection Shader (IS) and skips the Any Hit Shader (AH). \emph{SER} uses Shader Execution Reordering between the Intersection and Any Hit shader to improve coherence. \emph{SER, 70\%} additionally rejects 70\% of the non-caustic photons in the Any Hit shader \parencite{kern2023}. \emph{SER, 70\%, 30$^{\circ}$} rejects photon hits whose surface normals deviate more than 30° from the surface normals at the query point \parencite{kern2023}. The most notable performance improvement comes from rejecting non-caustic photons, however, this notably increases error in non-caustic areas. Rejecting photons based on normal deviation has a small positive performance impact and decreases bias.}
+    \label{fig:photon_optimization}
+\end{figure}
+\paragraph{Photon Mapping} To optimize SPPC, several optimizations were tested (see \cref{fig:photon_optimization}).
+
+\section{Evaluation}
+
+\begin{figure}[htb!]
+    \centering
+    \tiny
+    \begin{tabularx}{\textwidth}{r*{9}{>{\centering\arraybackslash}X}}
+        &Reference & PT & NRC+PT & NRC+PT+SL & NRC+BT & NRC+LT & NRC+LT+Bal & NRC+SPPC & PM \\
+        \input{figures/py/tests/quality_comparison/Diffuse}\\
+        \input{figures/py/tests/quality_comparison/Thinker}\\
+        \input{figures/py/tests/quality_comparison/Chess}\\
+        \input{figures/py/tests/quality_comparison/Ajar}\\
+        \input{figures/py/tests/quality_comparison/Caustics}
+    \end{tabularx}
+    \caption{Comparison of the different radiance estimators from \cref{chap:bidirectional_caching}. To isolate training quality, inference is terminated after the first diffuse vertex and is not combined with NEE.}
+    \label{fig:quality_comparison}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[htb!]
+    \centering
+    \tiny
+    \begin{tabularx}{\textwidth}{r*{7}{>{\centering\arraybackslash}X}}
+        &Reference & NRC+LT & NRC+LT+Bal & NRC+LT+BalCam & NRC+Naïve & NRC+Naïve+Bal & NRC+Naïve+BalCam \\
+        \input{figures/py/tests/quality_comparison/DiffuseBal}\\
+        \input{figures/py/tests/quality_comparison/ThinkerBal}\\
+        \input{figures/py/tests/quality_comparison/CausticsBal}\\
+    \end{tabularx}
+    \caption{Comparing light training and balancing strategies specifically.}
+    \label{fig:light_training_comparison}
+\end{figure}
+
+\begin{figure}[htb!]
+    \centering
+    \input{figures/py/loss_history.pgf}
+    \caption{Comparison of training convergence. Because the training is online, there is no ground truth validation step. The loss thus mainly indicates the variance of the training set. BT has the highest training error because it samples both the light and the camera, SPPC has the lowest training error because it keeps estimates in a fixed ring buffer for accumulation.}
+    \label{fig:convergence}
+\end{figure}
+
+\section{Performance and Optimization}
+
+\begin{figure}[htb!]
     \centering
     \input{figures/py/breakdown.pgf}
-    \caption{Performance breakdown of the different rendering techniques. Measured in HD-equivalent $960^2$px resolution on an NVIDIA RTX 3060 Ti and averaged over 10s.}
+    \caption{Performance breakdown of the different rendering techniques. Measured in 720p-equivalent $960^2$px resolution on an NVIDIA RTX 3060 Ti and averaged over 10s.}
     \label{fig:breakdown}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[htb!]
     \centering
     \input{figures/py/perfres.pgf}
-    \caption{Performance vs resolution of SPPC. For reference, the performance of PT (black line) and NRC+PT (purple line) is also shown. The resolution sequence is linear in total pixel count, going up to FullHD-equivalent $1440^2$px. Measurements are averaged over 10s. Note, that PT has a near zero constant overhead, but a significantly higher per-pixel cost, whereas both Radiance Caching techniques have a much lower per-pixel cost but higher overhead.}
+    \caption{Performance vs resolution of SPPC. For reference, the performance of PT (black line) and NRC+PT (purple line) is also shown. The resolution sequence is linear in total pixel count, going up to 1080p-equivalent $1440^2$px. Measurements are averaged over 10s. Note, that PT has a near zero constant overhead, but a significantly higher per-pixel cost, whereas both Radiance Caching techniques have a much lower per-pixel cost but higher overhead.}
     \label{fig:perres}
 \end{figure}

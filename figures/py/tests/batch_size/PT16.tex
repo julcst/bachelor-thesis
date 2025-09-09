@@ -1,0 +1,38 @@
+&8608spp (3m)
+ & 1spp (12.40ms)
+ & 1spp (13.52ms)
+ & 1spp (11.76ms)
+ & 1spp (13.58ms)
+ & 1spp (13.58ms)
+ & 1spp (\textbf{10.58ms})
+\\
+\rotatebox{90}{\textsc{PT16}}\hspace{-1.5em}
+&\includegraphics[width=\linewidth]{figures/py/tests/batch_size/../quality_comparison/refpt_3min_thinker.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/batch_size/1+nrc+pt+16_1spp.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/batch_size/5+nrc+pt+16_1spp.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/batch_size/25+nrc+pt+16_1spp.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/batch_size/100+nrc+pt+16_1spp.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/batch_size/500+nrc+pt+16_1spp.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/batch_size/2500+nrc+pt+16_1spp.png}
+\\
+&& \includegraphics[width=\linewidth]{figures/py/tests/batch_size/1+nrc+pt+16_1spp_flip.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/batch_size/5+nrc+pt+16_1spp_flip.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/batch_size/25+nrc+pt+16_1spp_flip.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/batch_size/100+nrc+pt+16_1spp_flip.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/batch_size/500+nrc+pt+16_1spp_flip.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/batch_size/2500+nrc+pt+16_1spp_flip.png}
+\\
+&\FLIP/MSE: & \num{0.892}/\num{0.045}
+ & \num{0.700}/\num{0.020}
+ & \num{0.641}/\num{0.017}
+ & \num{0.413}/\num{0.015}
+ & \num{0.393}/\num{0.014}
+ & \textbf{\num{0.340}}/\textbf{\num{0.014}}
+\\
+&$\mathrm{Bias}^2/\mathrm{Variance}$ & \num{3.87e-03}/\num{1.50e-02}
+ & \num{3.21e-04}/\num{1.49e-02}
+ & \num{8.17e-04}/\textbf{\num{1.48e-02}}
+ & \num{2.73e-04}/\num{1.48e-02}
+ & \num{2.00e-04}/\num{1.48e-02}
+ & \textbf{\num{1.61e-04}}/\num{1.48e-02}
+\\

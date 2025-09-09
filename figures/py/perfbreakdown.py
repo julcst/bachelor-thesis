@@ -8,7 +8,7 @@ plt.rcParams['font.family'] = 'serif'
 #plt.rcParams['font.family'] = 'Futura'
 #plt.rcParams['legend.framealpha'] = 0.4
 
-def plot_breakdown(label_file_pairs, size=(6, 4), bar_width=0.5, headroom=1.1):
+def plot_breakdown(label_file_pairs, size=(6, 3), bar_width=0.5, headroom=1.1, legloc='outside left center'):
     """
     Plot stacked bar breakdowns for one or more JSON files.
 
@@ -58,7 +58,7 @@ def plot_breakdown(label_file_pairs, size=(6, 4), bar_width=0.5, headroom=1.1):
         "Other": "orchid"
     }
 
-    fig, ax = plt.subplots(figsize=size)
+    fig, ax = plt.subplots(figsize=size, layout='constrained')
     x_positions = np.arange(len(label_file_pairs))
 
     for idx, (label, file) in enumerate(label_file_pairs):
@@ -102,7 +102,10 @@ def plot_breakdown(label_file_pairs, size=(6, 4), bar_width=0.5, headroom=1.1):
         if label in unique:
             newl.append(label)
             newh.append(unique[label])
-    ax.legend(newh, newl, fontsize="xx-small")
+    if legloc.startswith('outside'):
+        fig.legend(newh, newl, fontsize="xx-small", loc=legloc)
+    else:
+        ax.legend(newh, newl, fontsize="xx-small", loc=legloc)
 
     # Use provided labels for x-axis
     ax.set_ylabel("Time (ms)")
@@ -125,6 +128,14 @@ fig, ax = plot_breakdown([
 ])
 fig.savefig("breakdown.pgf", bbox_inches='tight')
 #fig.savefig("breakdown.pdf", bbox_inches='tight')
+
+fig, ax = plot_breakdown([
+    ("NRC+PT", "tests/jit/nrc+pt_1spp.hdr.json"),
+    ("+Fused", "tests/jit/nrc+pt+JIT_1spp.hdr.json"),
+    ("+FusedVis", "tests/jit/nrc+pt+fullJIT_1spp.hdr.json"),
+], size=(4, 2), headroom=1.3)
+fig.savefig("jit.pgf", bbox_inches='tight')
+#fig.savefig("jit.pdf", bbox_inches='tight')
 
 import glob, re, os
 

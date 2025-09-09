@@ -4,6 +4,9 @@ import numpy as np
 import json
 import os.path
 
+COMPRESSION = 0 # PNG compression level [0-9], 0=none, 9=max
+SCALE = 0.5 # Downscale factor
+
 def load_hdr(path):
     img = cv2.imread(path, cv2.IMREAD_UNCHANGED)  # float32 BGR
     if img is None:
@@ -26,7 +29,9 @@ def write_png(path, img, srgb=True): # img is float32 RGB
     if srgb:
         img = to_srgb(img)
     img = cv2.cvtColor(to_uint8(img), cv2.COLOR_RGB2BGR)  # Convert back to BGR
-    cv2.imwrite(path, img, [cv2.IMWRITE_PNG_COMPRESSION, 9])
+    if SCALE != 1.0:
+        img = cv2.resize(img, None, fx=SCALE, fy=SCALE)
+    cv2.imwrite(path, img, [cv2.IMWRITE_PNG_COMPRESSION, COMPRESSION])
 
 def save_flip_png(ref_img, test_path: str):
     # Load HDRs as numpy arrays (HxWxC)
@@ -165,12 +170,62 @@ def save_flip_pngs(prefix: str, ref: str, tests: list[str], suffix="", msuffix="
 
 save_flip_pngs("tests/path_termination/", "ref_1min_thinker", [
     "ref",
-    "1stvert",
-    "1stdiff",
     "sah",
     "bth",
     "bthk9",
+    "1stdiff",
+    "1stvert",
 ], suffix="_1spp_thinker", msuffix="_thinker", table_name="Thinker")
+
+save_flip_pngs("tests/path_termination/", "ref_1min_thinker", [
+    "ref",
+    "sah+nee",
+    "bth+nee",
+    "bthk9+nee",
+    "1stdiff+nee",
+    "1stvert+nee",
+], suffix="_1spp_thinker", msuffix="_thinker", table_name="Thinker+NEE")
+
+save_flip_pngs("tests/encodings/", "../quality_comparison/refpt_3min_thinker", [
+    "nrc+ptTWE",
+    "nrc+ptMHE",
+], suffix="_1spp", msuffix="", table_name="Thinker")
+
+save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", [
+    "1+nrc+pt+14",
+    "5+nrc+pt+14",
+    "25+nrc+pt+14",
+    "100+nrc+pt+14",
+    "500+nrc+pt+14",
+    "2500+nrc+pt+14",
+], suffix="_1spp", msuffix="", table_name="PT14")
+
+save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", [
+    "1+nrc+pt+14@4",
+    "5+nrc+pt+14@4",
+    "25+nrc+pt+14@4",
+    "100+nrc+pt+14@4",
+    "500+nrc+pt+14@4",
+    "2500+nrc+pt+14@4",
+], suffix="_1spp", msuffix="", table_name="PT14@4")
+
+save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", [
+    "1+nrc+pt+16",
+    "5+nrc+pt+16",
+    "25+nrc+pt+16",
+    "100+nrc+pt+16",
+    "500+nrc+pt+16",
+    "2500+nrc+pt+16",
+], suffix="_1spp", msuffix="", table_name="PT16")
+
+save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", [
+    "1+nrc+pt+16@4",
+    "5+nrc+pt+16@4",
+    "25+nrc+pt+16@4",
+    "100+nrc+pt+16@4",
+    "500+nrc+pt+16@4",
+    "2500+nrc+pt+16@4",
+], suffix="_1spp", msuffix="", table_name="PT16@4")
 
 save_flip_pngs("tests/quality_comparison/", "refpt_3min_diffuse", [
     "pt",
@@ -226,6 +281,33 @@ save_flip_pngs("tests/quality_comparison/", "refsppm_2min", [
     "nrc+sppc",
     "sppm"
 ], suffix="_1spp_caustics_small", msuffix="_caustics_small", table_name="Caustics")
+
+save_flip_pngs("tests/quality_comparison/", "refpt_3min_diffuse", [
+    "nrc+lt",
+    "nrc+lt+bal",
+    "nrc+lt+balcam",
+    "nrc+naive",
+    "nrc+naive+bal",
+    "nrc+naive+balcam",
+], suffix="_1spp_diffuse", msuffix="_diffuse", table_name="DiffuseBal")
+
+save_flip_pngs("tests/quality_comparison/", "refpt_3min_thinker", [
+    "nrc+lt",
+    "nrc+lt+bal",
+    "nrc+lt+balcam",
+    "nrc+naive",
+    "nrc+naive+bal",
+    "nrc+naive+balcam",
+], suffix="_1spp_thinker", msuffix="_thinker", table_name="ThinkerBal")
+
+save_flip_pngs("tests/quality_comparison/", "refsppm_2min", [
+    "nrc+lt",
+    "nrc+lt+bal",
+    "nrc+lt+balcam",
+    "nrc+naive",
+    "nrc+naive+bal",
+    "nrc+naive+balcam",
+], suffix="_1spp_caustics_small", msuffix="_caustics_small", table_name="CausticsBal")
 
 save_flip_pngs("tests/photon_optimization/", "ref_2min", [
     "SER",

@@ -17,7 +17,7 @@ By generalizing Neural Radiance Caching, this thesis opens a wide array of possi
 Particularly interesting is the integration of different radiance estimators.
 Although the SPPC estimator already produces high quality caustics, the density estimation step of Photon Mapping reduces sharpness of high-frequency features and introduces bias at edges.
 It could be interesting to use e.g. Vertex Connection and Merging \parencite{georgiev2012}, Metropolis Light Sampling \parencite{veach1997a}, full MIS-weighted Bidirectional Pathtracing \parencite{lafortune1993,veach1997} or Manifold Exploration techniques \parencite{jakob2012} to generate training data.
-The proposed framework for Radiance Caching does not impose any restrictions on \emph{mixing} different radiance estimators, so independently choosing the best suited radiance estimation strategy for different areas of the scene could also be interesting.
+The proposed framework for Radiance Caching does not impose any restrictions on \emph{mixing} different radiance estimators, so independently choosing the best suited radiance estimation strategy for different areas of the scene could also prove interesting.
 
 \paragraph{Radiance Caches}
 The Neural Radiance Cache is fairly expensive to train and infer.
@@ -25,7 +25,8 @@ The MHE encoding significantly improves quality, but the benefit largely comes f
 Thus, manually crafted grid based approaches could also be promising and lighter on performance.
 Using Spherical Harmonics to represent outgoing radiance fields.
 
-It may also be possible, to derive a better radiance cache by storing the incoming radiance and BSDFs in a data structure and connecting to them stochastically through ReSTIR DI \parencite{bitterli2020} similar to Virtual Point Lights in Instant Radiosity techniques \parencite{keller1997}.
+It may also be possible to derive a better radiance cache by storing the incoming radiance and BSDFs in a data structure similar to Virtual Point Lights in Instant Radiosity techniques \parencite{keller1997} and connecting to them stochastically through e.g. ReSTIR DI \parencite{bitterli2020}.
+For Virtual Point Lights, this has already been explored by \textcite{bruin2025}.
 
 \section{Further Optimization}
 
@@ -38,7 +39,3 @@ The only downside could be a one frame latency in query prediction, but because 
 \paragraph{SPPC} As already discussed in \cref{sec:sppc}, synchronization of the atomic accumulation is likely the biggest factor that holds back the performance of hardware accelerated photon mapping.
 Thus, it could be interesting to either explore stochastic evaluation techniques like \textcite{kern2023} or to reduce overlap during query prediction, similar to what e.g. \textcite{stachowiak2018} did for surfel placement.
 Warp Aggregation is a common technique to resolve this in classical GPU programming by first aggregating subsets and then reducing, however OptiX does not expose warps.
-
-\paragraph{Kernel Fusion} Recently, the \emph{tiny-cuda-nn} library of \textcite{muller2021a} was extended by a feature that allows combining the encoding, MLP, loss function, training and inference steps together into fused monolithic kernels by on-the-fly JIT compilation.
-Using this approach, \textcite{muller2021a} report a potential speedup of $1.5\times$ up to $2.5\times$ for training and inference, especially for modern GPU architectures.
-Applying this technique could have a high potential for further performance improvements, unfortunately, I could not finish the implementation in time for this thesis.
