@@ -4,7 +4,7 @@ usepackage("amsmath");
 usepackage("bm");
 usepackage("array");
 texpreamble("\input{../../tex/macros}");
-size(6cm);
+size(4cm);
 
 pair eye = (1, -2);
 pair sun = (2.0pi, 4);

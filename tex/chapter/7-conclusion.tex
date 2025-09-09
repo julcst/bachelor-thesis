@@ -6,7 +6,7 @@
 The bidirectional estimator performs very comparable to NRC, while improving the quality of indirect illumination.
 It struggles, however, with direct lighting and caustics, because the probability of finding a matching pair of a query and a directly contributing light path is low.
 
-The light tracing estimator has potential to capture sharp details, but suffers from bias which is caused by not sampling shadowed areas.
+The light training estimator has potential to capture sharp details, but suffers from bias which is caused by not sampling shadowed areas.
 
 The estimator based on Progressive Photon Mapping is particularly robust and produces high quality caustics and indirect illumination, while coming only at a mild performance overhead compared to the original NRC.
 
@@ -24,6 +24,8 @@ The Neural Radiance Cache is fairly expensive to train and infer.
 The MHE encoding significantly improves quality, but the benefit largely comes from the underlying hash grid.
 Thus, manually crafted grid based approaches could also be promising and lighter on performance.
 Using Spherical Harmonics to represent outgoing radiance fields.
+
+It may also be possible, to derive a better radiance cache by storing the incoming radiance and BSDFs in a data structure and connecting to them stochastically through ReSTIR DI \parencite{bitterli2020} similar to Virtual Point Lights in Instant Radiosity techniques \parencite{keller1997}.
 
 \section{Further Optimization}
 

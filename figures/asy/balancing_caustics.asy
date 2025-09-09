@@ -4,7 +4,7 @@ usepackage("amsmath");
 usepackage("bm");
 usepackage("array");
 texpreamble("\input{../../tex/macros}");
-size(7cm);
+size(5cm);
 
 void drawLo(pair x1, pair x2) {
     draw(x2--x2-0.1unit(x2-x1), linewidth(2), Arrow);

@@ -29,15 +29,12 @@ Using this framework we can observe that the \emph{cache efficiency} is optimal 
 Conversely, if we sample a query $q^*$ that can not be predicted by the query predictor (i.e. $\hat{Q}(q^*)=0$), we introduce fundamental bias into the radiance cache $\hat{L}_o(q^*)$, because the radiance cache will not contain an accurate radiance estimate for that query.
 This happens, whenever the support of the query sampling distribution $Q$ is not contained in the support of the query prediction distribution $\hat{Q}$, i.e. $\supp(Q) \not\subseteq \supp(\hat{Q})$.
 
-\paragraph{Discussion:} It may be possible, to derive a better radiance cache by storing the incoming radiance and BSDFs in a data structure and connecting to them stochastically through ReSTIR DI \parencite{bitterli2020} similar to Virtual Point Lights in Instant Radiosity techniques \parencite{keller1997}.
-% Or VCM
-
 The general idea of decoupling radiance estimation and visualization was already explored by others, notably \textcite{walter1999} and \textcite{tole2002}.
 
 \section{The Path Space Integral Formulation}
 \label{sec:path_space_integral}
 To be able to robustly derive the following radiance estimators, I will use an alternative but equivalent formulation of the rendering equation as an integral over the path space, which was first introduced by \textcite{veach1997}.
-\begin{figure}[ht]
+\begin{figure}[htb!]
     \centering
     \includegraphics{asy/path_integral.pdf}
 \caption{Radiance transfer along a path of length $n=3$ according to the path space integral formulation.}
@@ -66,7 +63,7 @@ G(\vec{x} \leftrightarrow \vec{y}) \defeq V(\vec{x} \leftrightarrow \vec{y}) \fr
 where $V(\vec{x} \leftrightarrow \vec{y}) \in \{0,1\}$ defines visibility and $\theta$ denotes the respective angles of incidence.
 The integral is measured over the surface of the scene $A(\vec{x})$.
 
-\begin{figure}[ht]
+\begin{figure}[htb!]
     \centering
     \includegraphics{asy/path_integral_radiance.pdf}
 \caption{To estimate the outgoing radiance $L_o(\pdir{2}{3})$ with the path space integral formulation, we fix the last two vertices defining the position and direction, here $\vec{x}_2$ and $\vec{x}_3$ highlighted in red. Furthermore, we drop the sensor weighting term $W$ and the last geometry term $\G{2}{3}$, because they are not part of the path anymore.}
@@ -126,7 +123,7 @@ In the first step, the sensor weighting term $W$ cancels with the integration ov
 We then replace the integral by a single-sample Monte Carlo estimator (\cref{eq:pmc}).
 Finally, we convert from area measure to solid angle measure using (\cref{eq:area_solid_angle_p}) which cancels with $G$ leaving only the cosine terms at the sampled vertices (\cref{eq:area2solid}).
 The visibility term implicitly vanishes in the ray tracing step.
-\begin{figure}[ht]
+\begin{figure}[htb!]
     \centering
     \includegraphics{asy/inference.pdf}
 \caption{Visualization of the inference process.}
@@ -149,7 +146,7 @@ To improve the quality of the inference pass, we can additionally apply Next Eve
 
 \section{Path Tracing}
 \label{sec:re_eye}
-\begin{figure}[ht]
+\begin{figure}[htb!]
     \centering
     \includegraphics{asy/eye_tracing.pdf}
 \caption{The simplest way to estimate the outgoing radiance $L_o(\x_0, \wo_0)$ is eye tracing, which shoots a path from the surface into the scene and collects emissions at each intersection.}
@@ -163,7 +160,7 @@ We can apply the observations made in \cref{sec:inference} to the path space for
     = \prod_{k=0}^{n-1} \frac{f(\wi_k, \x_k, \wo_k) \cos {\theta_i}_k}{p(\wi_k \mid \wo_k)}
 \end{equation}
 
-\begin{figure}[ht]
+\begin{figure}[htb!]
     \centering
     \includegraphics{asy/nee.pdf}
 \caption{Direct light sampling also known as Next Event Estimation (NEE) performs significantly better than BSDF sampling on small direct lighting.}
@@ -190,13 +187,30 @@ Unfortunately, I did not have the time to implement this.
 
 \section{Bidirectional Training (BT)}
 \label{sec:re_bidir}
+\begin{figure}[htb!]
+    \centering
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics{asy/caustic.pdf}
+        \caption{NEE}
+        \label{fig:caustic_nee}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics{asy/caustic_bidir.pdf}
+        \caption{Reverse NEE}
+        \label{fig:caustic_bidir}
+    \end{subfigure}
+    \caption{Caustics are difficult to capture with path tracing, since only a small fraction of the path space actually contributes to the caustic (dotted lines). NEE does not help, as most connecting samples will have zero contribution (crossed line) when the material is glossy.}
+    \label{fig:caustic}
+\end{figure}
 A major weakness of the aforementioned radiance estimator (\cref{sec:re_eye}) is indirect lighting where the light paths undergo glossy reflections/refractions before getting diffused.
 This effect is known as a caustic.
-In the extreme case of an infinitesimal light source being ideally reflected/refracted and then diffused, path tracing and NEE even fail completely to capture this effect, because the probability to sample such a path by BSDF sampling is zero. % TODO: Figure
+In the extreme case of an infinitesimal light source being ideally reflected/refracted and then diffused, path tracing and NEE even fail completely to capture this effect, because the probability to sample such a path by BSDF sampling is zero (\cref{fig:caustic_nee}). 
 However, we can do the exact opposite of NEE by tracing light paths and connecting them to query points sampled from the eye.
-This technique elegantly resolves even long glossy light paths.
+This has the same problem as NEE for finding direct caustics (\cref{fig:caustic_bidir}), yet it discovers indirect illumination by caustics and long light paths very efficiently.
 
-\begin{figure}[ht]
+\begin{figure}[htb!]
     \centering
     \includegraphics{asy/bidir.pdf}
     \caption{Flux is distributed along a BSDF-sampled path from a random point on a light source ($\x_0$). At the query point $\x_q$ radiance is collected by deterministically connecting to every vertex of the light path.}
@@ -219,24 +233,42 @@ Starting again with a single-sample Monte Carlo Estimator for the Path Space Int
 where $\Phi_n$ is the light flux transported along the path.
 The sum over the path length is split into two parts because the first vertex $\vec{x}_0$ is sampled directly on the light source and requires special handling.
 
-\section{Light Tracing (LT)}
+\section{Light Training (LT)}
 \label{sec:lt}
-\begin{figure}[ht]
+\begin{figure}[htb!]
     \centering
     \includegraphics{asy/light_bootstrapping_1.pdf}
     \includegraphics{asy/light_bootstrapping_2.pdf}
     \includegraphics{asy/light_bootstrapping_3.pdf}
-    \caption{Visualization of light tracing for query prediction: Every new light vertex is first handled as a query ($\vec{q}_i$) and collects radiance from all previous vertices according to \cref{eq:bidir}.}
+    \caption{Visualization of light training for query prediction: Every new light vertex is first handled as a query ($\vec{q}_i$) and collects radiance from all previous vertices according to \cref{eq:bidir}.}
     \label{fig:light_bootstrap}
 \end{figure}
-However, despite already sampling light paths, the estimator from \cref{sec:re_bidir} only finds indirect illumination by caustics efficiently, since given a specific query, the probability to connect to a glossy light path directly is still low. % TODO: Figure
+However, despite sampling light paths, the estimator from \cref{sec:re_bidir} only finds indirect illumination by caustics efficiently, since given a specific query, the probability to connect to a glossy light path directly is still low (\cref{fig:caustic_bidir}).
 So, instead of predicting queries solely from the eye, we can also collect radiance at future vertices of the light path.
 At a light vertex, we are guaranteed to get strong contribution at least from the previous vertex, because we sampled it directly through BSDF sampling.
 It would also be possible to sample independent queries from the light vertices instead of reusing the next light vertex and this may in fact be an interesting algorithm to explore, though this is outside the scope of this thesis.
 
+\begin{figure}[htb!]
+    \centering
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics{asy/balancing.pdf}
+        \caption{Shadows}
+        \label{fig:balancing_shadows}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics{asy/balancing_caustics.pdf}
+        \caption{Caustics}
+        \label{fig:balancing_caustics}
+    \end{subfigure}
+    \caption{Sources of bias in light training: The solid arrows indicate cache queries. In both cases, the interpolation should return zero radiance, as the points are not reached by light. However, since the cache is filled by light tracing, all available nearby estimates are lit, resulting in a bright prediction.}
+    \label{fig:balancing}
+\end{figure}
+
 \paragraph{Balancing} Although this estimator may look promising at first, it is important to note that it exhibits the problem already discussed in my motivation of bidirectional radiance caching (\cref{par:cache_efficiency}):
-By sampling queries solely from the light, queries that are shadowed will never be predicted, which introduces bias into the cache.
-This can be clearly visible depending on the scene and will be further discussed in the results chapter (\cref{chap:results}). % TODO: Figure
+By sampling queries solely from the light, queries that are shadowed will never be predicted, which introduces bias into the cache (see \cref{fig:balancing}).
+This can be clearly visible depending on the scene and will be further discussed in the results chapter (\cref{chap:results}).
 
 To counteract this drawback, we can make a simple observation:
 If a query is not reachable from a light source, it does not receive energy, thus the radiance at such queries can be safely assumed to be zero.
@@ -247,7 +279,7 @@ By weighting the valid samples with the inverse of the ratio of zero samples, we
 \end{equation}
 
 Essentially this algorithm models a sort of output decay on the NRC, dragging its prediction towards zero.
-This can work, but it degrades the quality of the cache, since it introduces additional noise with the zero radiance samples.
+This can work, but it degrades the quality of the cache and makes training unstable, since it introduces additional noise with the zero radiance samples.
 Furthermore, it is a waste of bandwidth to spend resources on learning zero radiance, as it does not provide any information gain.
 
 \section{Sparse Progressive Photon Collection (SPPC)}
@@ -273,7 +305,7 @@ We then replace the integral by a Monte Carlo estimator over $n$ sampled flux pa
 Finally, we assume that the kernel function $w_{\vec{x},r}(\hat{\x}_k)$ is limited to a sphere of radius $r$.
 Assuming the surface is locally flat, this allows us to approximate the surface area $\Delta A$ over which we are integrating by a disk of area $A=\pi r^2$ (\cref{eq:pm:sphere}).
 The simplest such kernel function is the box function, with $w_{\vec{x},r}(\hat{\x}_k)=1$ inside the sphere and $0$ outside.
-\begin{figure}[ht]
+\begin{figure}[htb!]
     \centering
     \includegraphics{asy/pm_collection.pdf}
     \caption{Visualization of photon mapping. Photons (packages of flux, here small black arrows) are distributed in the scene and collected over query regions (dashed circle). In this example, three light paths were sampled ($n=3$). Note, that in practice photons and queries are not recorded at glossy surfaces, since they probably can not be connected with high contribution. This removes glossy features from the radiance estimate, however the path termination strategies from \cref{sec:path_termination} avoid querying glossy surfaces in the first place.}
