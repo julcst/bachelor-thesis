@@ -5,6 +5,7 @@ import numpy as np
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
+#plt.rcParams['font.family'] = 'Futura'
 #plt.rcParams['legend.framealpha'] = 0.4
 
 def plot_breakdown(label_file_pairs, size=(6, 4), bar_width=0.5, headroom=1.1):
@@ -123,6 +124,7 @@ fig, ax = plot_breakdown([
     ("PM ($1/4$)", "tests/performance_comparison/sppm_1spp.hdr.json")
 ])
 fig.savefig("breakdown.pgf", bbox_inches='tight')
+#fig.savefig("breakdown.pdf", bbox_inches='tight')
 
 import glob, re, os
 
@@ -154,5 +156,6 @@ fig, ax = plot_breakdown(nrc_sppc)
 overlay_totals(ax, pt, "PT", '.--', 'black')
 overlay_totals(ax, nrc_pt, "NRC+PT", '.--', 'purple')
 fig.savefig("perfres.pgf", bbox_inches='tight')
+#fig.savefig("perfres.pdf", bbox_inches='tight')
 
 plt.show()
