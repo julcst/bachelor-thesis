@@ -57,8 +57,8 @@ The arrow notation $\vec{x} \pto \vec{y}$ denotes a ray starting at $\vec{x}$ tr
 The triples represent surface interactions, $f(\vec{x} \pto \vec{y} \pto \vec{z}) \defeq f(\vec{y} - \vec{x}, \vec{y}, \vec{z} - \vec{y})$. 
 Double arrow notation is used for path segments, $G(\vec{x} \leftrightarrow \vec{y})$ models the radiance transfer between the vertices $\vec{x}$ and $\vec{y}$:
 \begin{equation}
-\label{eq:transfer}
-G(\vec{x} \leftrightarrow \vec{y}) \defeq V(\vec{x} \leftrightarrow \vec{y}) \frac{\cos \theta_{\vec{x} \veryshortarrow \vec{y}} \cos \theta_{\vec{y} \veryshortarrow \vec{x}}}{\|\vec{y} - \vec{x}\|^2},
+    \label{eq:transfer}
+    G(\vec{x} \leftrightarrow \vec{y}) \defeq V(\vec{x} \leftrightarrow \vec{y}) \frac{\cos \theta_{\vec{x} \veryshortarrow \vec{y}} \cos \theta_{\vec{y} \veryshortarrow \vec{x}}}{\|\vec{y} - \vec{x}\|^2},
 \end{equation}
 where $V(\vec{x} \leftrightarrow \vec{y}) \in \{0,1\}$ defines visibility and $\theta$ denotes the respective angles of incidence.
 The integral is measured over the surface of the scene $A(\vec{x})$.
@@ -66,8 +66,8 @@ The integral is measured over the surface of the scene $A(\vec{x})$.
 \begin{figure}[htb!]
     \centering
     \includegraphics{asy/path_integral_radiance.pdf}
-\caption{To estimate the outgoing radiance $L_o(\pdir{2}{3})$ with the path space integral formulation, we fix the last two vertices defining the position and direction, here $\vec{x}_2$ and $\vec{x}_3$ highlighted in red. Furthermore, we drop the sensor weighting term $W$ and the last geometry term $\G{2}{3}$, because they are not part of the path anymore.}
-\label{fig:path_space_integral_radiance}
+    \caption{To estimate the outgoing radiance $L_o(\pdir{2}{3})$ with the path space integral formulation, we fix the last two vertices defining the position and direction, here $\vec{x}_2$ and $\vec{x}_3$ highlighted in red. Furthermore, we drop the sensor weighting term $W$ and the last geometry term $\G{2}{3}$, because they are not part of the path anymore.}
+    \label{fig:path_space_integral_radiance}
 \end{figure}
 In the following derivations, I will also use a slightly adapted formulation of the path space integral, that estimates \emph{radiance} instead of \emph{intensity} (see \cref{fig:path_space_integral_radiance}).
 Therefore, we only have to drop the sensor weighting term $W$ and the last geometry term $\G{n-1}{n}$ and fix the last two vertices, which define the position and direction of outgoing radiance, by excluding them from the integration domain:
@@ -89,12 +89,15 @@ This for example allows for straightforward bidirectional sampling.
 An essential tool for the derivation of path samplers is the conversion between area and solid angle measure, given by:
 \begin{equation}
 \label{eq:area_solid_angle}
-\diff A(\vec{y}) = \frac{\cos \theta_{\vec{y}\veryshortarrow\vec{x}}}{\|\vec{y} - \vec{x}\|^2} \diff \omega(\vec{x}\pto\vec{y}),
+    \diff \omega(\vec{x}\pto\vec{y}) = \frac{\cos \theta_{\vec{y}\veryshortarrow\vec{x}}}{\|\vec{y} - \vec{x}\|^2} \diff A(\vec{y}),
 \end{equation}
-or directly applied to sampling probabilities:
+or applied to sampling probabilities:
 \begin{equation}
 \label{eq:area_solid_angle_p}
-p(\vec{y}) = \frac{\cos \theta_{\vec{y}\veryshortarrow\vec{x}}}{\|\vec{y} - \vec{x}\|^2} p(\vec{x}\pto\vec{y}).
+    p(\vec{y}) \diff A(\vec{y}) = p(\vec{x}\pto\vec{y}) \diff \omega(\vec{x}\pto\vec{y}) \implies
+    p(\vec{y})
+    = \left| \frac{\diff \omega(\vec{x}\pto\vec{y})}{\diff A(\vec{y})}\right| p(\vec{x}\pto\vec{y})
+    = \frac{\cos \theta_{\vec{y}\veryshortarrow\vec{x}}}{\|\vec{y} - \vec{x}\|^2} p(\vec{x}\pto\vec{y}).
 \end{equation}
 
 \section{Inference}
