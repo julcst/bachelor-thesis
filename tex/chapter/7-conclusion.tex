@@ -3,8 +3,8 @@
 \label{chap:conclusion}
 
 \section{Summary}
-In this thesis, I presented a generalization of radiance caching that enables bidirectional radiance estimation.
-Evaluation showed, that two of the three proposed radiance estimators improve upon the original paper.
+In this thesis, I presented and derived three new radiance estimation techniques to train the Neural Radiance Cache.
+Evaluation showed, that two of these three proposed radiance estimators improve upon the original paper, especially in the area of caustics and indirect illumination.
 
 The bidirectional estimator performs very comparable to NRC, while improving the quality of indirect illumination.
 It struggles, however, with direct lighting and caustics, because the probability of finding a matching pair of a query and a directly contributing light path is low.
@@ -14,7 +14,7 @@ The light training estimator has potential to capture sharp details, but suffers
 Unfortunately, this makes it largely unusable in practice.
 
 The estimator based on Progressive Photon Mapping is particularly robust and produces high quality caustics and indirect illumination, while coming only at a mild performance overhead compared to training by PT.
-This one is promising for practical use cases, since it can produce fairly accurate and noise free renderings of caustics in real-time, which can neither be achieved by pure path tracing nor by the original NRC.
+This one is particularly promising for practical use cases, since it can produce fairly accurate and noise free renderings of caustics in real-time, which can neither be achieved by pure path tracing nor by the original NRC.
 It comes, however, at the cost of sharpness and time lag, thus it would be interesting to evaluate its performance in dynamic scenes.
 
 \section{Further Optimization}
