@@ -118,13 +118,13 @@ def plot_breakdown(label_file_pairs, size=(6, 3), bar_width=0.5, headroom=1.1, l
     return fig, ax
 
 fig, ax = plot_breakdown([
-    ("PT", "tests/performance_comparison/pt_1spp.hdr.json"),
-    ("NRC+PT", "tests/performance_comparison/nrc+pt_1spp.hdr.json"),
-    ("NRC+PT+SL", "tests/performance_comparison/nrc+pt+sl_1spp.hdr.json"),
-    ("NRC+BT", "tests/performance_comparison/nrc+bt_1spp.hdr.json"),
-    ("NRC+LT", "tests/performance_comparison/nrc+lt_1spp.hdr.json"),
-    ("NRC+SPPC", "tests/performance_comparison/nrc+sppc_1spp.hdr.json"),
-    ("PM ($1/4$)", "tests/performance_comparison/sppm_1spp.hdr.json")
+    ("PT", "tests/quality_comparison/pt_1spp_thinker.hdr.json"),
+    ("NRC+PT", "tests/quality_comparison/nrc+pt_1spp_thinker.hdr.json"),
+    ("NRC+PT+SL", "tests/quality_comparison/nrc+pt+sl_1spp_thinker.hdr.json"),
+    ("NRC+BT", "tests/quality_comparison/nrc+bt_1spp_thinker.hdr.json"),
+    ("NRC+LT", "tests/quality_comparison/nrc+lt_1spp_thinker.hdr.json"),
+    ("NRC+SPPC", "tests/quality_comparison/nrc+sppc_1spp_thinker.hdr.json"),
+    ("PM", "tests/quality_comparison/sppm_1spp_thinker.hdr.json")
 ])
 fig.savefig("breakdown.pgf", bbox_inches='tight')
 #fig.savefig("breakdown.pdf", bbox_inches='tight')

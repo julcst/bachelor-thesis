@@ -287,7 +287,7 @@ save_flip_pngs("tests/quality_comparison/", "refsppm_2min", [
     "sppm"
 ], suffix="_1spp_caustics_small", msuffix="_caustics_small", table_name="Caustics")
 
-save_flip_pngs("tests/quality_comparison/", "refpt_3min_thinker", [
+save_flip_pngs("tests/sppc_optimization/", "../quality_comparison/refpt_3min_thinker", [
     "nrc+sppc",
     "nrc+sppc+Rej70",
     "nrc+sppc+Rej70+RejN",
@@ -297,7 +297,7 @@ save_flip_pngs("tests/quality_comparison/", "refpt_3min_thinker", [
     "nrc+sppc16@4",
 ], suffix="_1spp_thinker", msuffix="_thinker", table_name="Thinker", file_name="ThinkerSPPC")
 
-save_flip_pngs("tests/quality_comparison/", "refsppm_2min", [
+save_flip_pngs("tests/sppc_optimization/", "../quality_comparison/refsppm_2min", [
     "nrc+sppc",
     "nrc+sppc+Rej70",
     "nrc+sppc+Rej70+RejN",

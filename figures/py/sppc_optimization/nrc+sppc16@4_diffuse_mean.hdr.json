@@ -1,0 +1,128 @@
+{
+    "breakdown": {
+        "backwardSampleGeneration": 0.0,
+        "balanceSampleGeneration": 0.0,
+        "forwardSampleGeneration": 0.0,
+        "inference": 4.322829723358154,
+        "pathtracing": 1.3265751600265503,
+        "photonGeneration": 0.0,
+        "photonPostprocessing": 0.0,
+        "photonQueryGeneration": 0.0,
+        "photonQueryMapBuildTime": 0.0,
+        "selfLearningInference": 0.0,
+        "selfLearningPostprocessing": 0.0,
+        "total": 6.534821033477783,
+        "training": 0.0,
+        "visualization": 0.5482876300811768
+    },
+    "config": {
+        "jit_fusion": false,
+        "jit_supported": true,
+        "nrc": {
+            "network": {
+                "encoding": {
+                    "nested": [
+                        {
+                            "base_resolution": 16,
+                            "hash": "CoherentPrime",
+                            "interpolation": "Linear",
+                            "log2_hashmap_size": 19,
+                            "n_features_per_level": 2,
+                            "n_levels": 16,
+                            "otype": "Grid",
+                            "per_level_scale": 2.0,
+                            "type": "Hash"
+                        },
+                        {
+                            "n_bins": 4,
+                            "otype": "OneBlob"
+                        },
+                        {
+                            "offset": 0.0,
+                            "otype": "Identity",
+                            "scale": 1.0
+                        }
+                    ],
+                    "otype": "Composite"
+                },
+                "network": {
+                    "activation": "ReLU",
+                    "n_hidden_layers": 2,
+                    "n_neurons": 64,
+                    "otype": "FullyFusedMLP",
+                    "output_activation": "None"
+                },
+                "otype": "NetworkWithInputEncoding"
+            },
+            "trainer": {
+                "loss": {
+                    "otype": "RelativeL2Luminance"
+                },
+                "optimizer": {
+                    "decay": 0.949999988079071,
+                    "full_precision": false,
+                    "nested": {
+                        "absolute_decay": 0.0,
+                        "adabound": false,
+                        "beta1": 0.8999999761581421,
+                        "beta2": 0.9900000095367432,
+                        "clipping_magnitude": 0.0,
+                        "epsilon": 1.0000000036274937e-15,
+                        "gradient_clipping_magnitude": 0.0,
+                        "l2_reg": 9.999999974752427e-07,
+                        "learning_rate": 0.009999999776482582,
+                        "non_matrix_l2_reg": 0.0,
+                        "non_matrix_learning_rate_factor": 1.0,
+                        "optimize_matrix_params": true,
+                        "optimize_non_matrix_params": true,
+                        "otype": "Adam",
+                        "relative_decay": 0.0,
+                        "skip_zero_grad_non_matrix_params": true
+                    },
+                    "otype": "EMA"
+                },
+                "otype": "Trainer"
+            }
+        },
+        "rendering": {
+            "backward_rr": false,
+            "bth_K": 1,
+            "diffuse_encoding": false,
+            "forward_rr": false,
+            "inference_mode": "first_diffuse",
+            "inference_nee": false,
+            "light_trace_fix": false,
+            "max_path_length": 16,
+            "nee": true,
+            "russian_roulette_weight": 10.0,
+            "scene_epsilon": 9.999999747378752e-05,
+            "self_learning": false,
+            "training_nee": false,
+            "transmission": true,
+            "variance_tradeoff": 0.009999999776482582
+        },
+        "training": {
+            "backward_trainer": "train_light",
+            "balance_from_camera": false,
+            "balance_weight": 1.0,
+            "enable_training": false,
+            "nrc_size": 65536,
+            "photon_count": 100000,
+            "photon_mapping_amount": 1.0,
+            "photon_normal_tolerance": 0.8600000143051147,
+            "photon_query_replacement": 0.009999999776482582,
+            "photon_radius": 0.009999999776482582,
+            "photon_radius_reduction": 0.699999988079071,
+            "photon_record_probability": 1.0,
+            "train_direction": 1.0,
+            "training_steps": 4,
+            "use_fused_inference": false,
+            "use_jit_fusion": false
+        }
+    },
+    "resolution": [
+        960,
+        960
+    ],
+    "samples": 1000
+}

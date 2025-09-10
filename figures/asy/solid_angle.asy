@@ -11,6 +11,10 @@ pair y = (2,2);
 pair yn = W;
 pair yt = rotate(90)*0.5yn;
 
+draw(y--y+yn, dashed);
+draw(y--y-unit(y), dashed);
+markangle("$\theta_{\vec{y}\veryshortarrow\vec{x}}$", y+0.5yn, y, x);
+
 draw(x+W--x+E);
 draw(arc(x,1,0,180),dashed);
 dot(x);
@@ -25,6 +29,7 @@ draw(x--y-yt);
 draw(x--y+yt);
 
 // Find angle of line x--y-yt
-real a1 = angle(y+yt);
-real a2 = angle(y-yt);
+real a1 = degrees(y+yt);
+real a2 = degrees(y-yt);
+label("$\diff \omega(\vec{x}\pto\vec{y})$", unit(y+yt), SE+E);
 draw(arc(x,1,a1,a2),linewidth(2));

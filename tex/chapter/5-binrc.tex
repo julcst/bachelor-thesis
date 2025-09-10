@@ -83,10 +83,17 @@ Therefore, we only have to drop the sensor weighting term $W$ and the last geome
     \diff A(\vec{x}_0) \dots \diff A(\vec{x}_{n-2})
 \end{aligned}
 \end{equation}
-
 The main advantage of these formulations is the independence of the individual vertices.
 This for example allows for straightforward bidirectional sampling.
-An essential tool for the derivation of path samplers is the conversion between area and solid angle measure, given by:
+
+\begin{figure}[htb!]
+    \centering
+    \includegraphics{asy/solid_angle.pdf}
+    \caption{Conversion between area and solid angle measure: The differential area $\diff A(\vec{y})$ multiplied by the cosine of $\theta_{\vec{y}\veryshortarrow\vec{x}}$ is the area apparent from $\vec{x}$. By dividing by the squared distance it is projected onto the unit sphere, yielding the differential solid angle $\diff \omega(\vec{x}\pto\vec{y})$.}
+    \label{fig:solid_angle}
+\end{figure}
+
+An essential tool for the derivation of path samplers is the conversion between area and solid angle measure (see \cref{fig:solid_angle}), given by:
 \begin{equation}
 \label{eq:area_solid_angle}
     \diff \omega(\vec{x}\pto\vec{y}) = \frac{\cos \theta_{\vec{y}\veryshortarrow\vec{x}}}{\|\vec{y} - \vec{x}\|^2} \diff A(\vec{y}),
@@ -279,7 +286,6 @@ By weighting the valid samples with the inverse of the ratio of valid samples, w
 \begin{equation}
 \expectationvar{q}{{\widehat{L}_o}(\vec{x}_q, \wo_q)} = \frac{1}{n} \sum_{q \in Q} (1 - p_0) \cdot \frac{L_o(\vec{x}_q, \wo_q)}{(1 - p_0)} + p_0 \cdot 0 = \frac{1}{n} \sum_{q \in Q} L_o(\vec{x}_q, \wo_q)
 \end{equation}
-
 Essentially this algorithm models a sort of output decay on the NRC, dragging its prediction towards zero.
 This can work, but it degrades the quality of the cache and makes training unstable, since it introduces additional noise with the zero radiance samples.
 Furthermore, it is a waste of bandwidth to spend resources on learning zero radiance, as it does not provide any information gain.

@@ -67,6 +67,7 @@ The SAH termination strategy has the highest variance and also the highest perfo
 On the other end of the spectrum, terminating on the first vertex directly has the lowest variance and is also the fastest but has some issues with specular highlights.
 All the other strategies lie somewhere in between, with the parametrized BTH strategy bridging the gap.
 As the SPPC strategy does not learn glossy highlights at all and since the quality of the NRC seems good enough for early termination, the following tests use termination at the first diffuse vertex.
+Combining the inference with NEE did only benefit the less aggressive termination strategies, so the rest of the test only use BSDF sampling for inference.
 
 \begin{figure}[htb!]
     \centering
@@ -82,7 +83,7 @@ As the SPPC strategy does not learn glossy highlights at all and since the quali
         \rule{0pt}{4ex}
         \input{figures/py/tests/batch_size/16@4.tex}
     \end{tabularx}
-    \caption{Comparison of cache convergence for different training set sizes (14: $2^{14}=16,384$, 16: $2^{16}=65,536$) and training steps per frame (@4 indicates that the training set is split into 4 batches, otherwise it is processed as a single batch). The columns indicate how many frames were rendered to train the cache (1, 5, 25, 100, 500, 2500).}
+    \caption{Comparison of cache convergence for different training set sizes (14: $2^{14}=16,384$, 16: $2^{16}=65,536$) and training steps per frame (@4 indicates that the training set is split into 4 batches, otherwise it is processed as a single batch). The columns indicate how many frames were rendered to train the cache (1, 5, 25, 100, 500, 2500). Above the images, the numbers in parentheses denote the total time spent on training and inference.}
     \label{fig:batch_size}
 \end{figure}
 \paragraph{Training} Like recommended by \textcite{muller2022}, training is performed using the Adam optimizer \parencite{kingma2014} with a learning rate of $10^{-2}$, $\beta_1 = 0.9$, $\beta_2 = 0.99$, $\epsilon = 10^{-15}$ and an L2 regularization factor of $10^{-6}$.
@@ -97,9 +98,9 @@ The following tests use single training steps of size $2^{17}=131,072$, as this 
     \begin{tabularx}{\textwidth}{r*{8}{>{\centering\arraybackslash}X}}
         & Reference & 17@1 & + Reject 70\% & + Reject Normal & 14@1 & 14@4 & 16@1 & 16@4 \\
         \rule{0pt}{2ex}
-        \input{figures/py/tests/quality_comparison/ThinkerSPPC.tex}
+        \input{figures/py/tests/sppc_optimization/ThinkerSPPC.tex}
         \rule{0pt}{4ex}
-        \input{figures/py/tests/quality_comparison/CausticsSPPC.tex}
+        \input{figures/py/tests/sppc_optimization/CausticsSPPC.tex}
     \end{tabularx}
     \caption{Error and bias for SPPC with different configurations. 17@1 indicates a cache size of $2^{17}=131,072$ and 1 training step per frame, 14@4 indicates a cache size of $2^{14}=16,384$ and 4 training steps per frame, etc.}
     \label{fig:sppc_optimization}
@@ -147,34 +148,20 @@ This could potentially be caused by an older GPU architecture, the following tes
 \paragraph{Photon Mapping} To optimize Photon Mapping, several optimizations were tested on full SPPM (see \cref{fig:photon_optimization}).
 The biggest performance improvement was achieved by stochastically rejecting a significant portion of the non-caustic photons, as proposed by \textcite{kern2023}.
 This however decreases quality in non-caustic areas, and the performance gain does not carry over to SPPC (see \cref{fig:sppc_optimization}), where the overlap of queries is limited, so we do not use rejection for evaluation.
+In the following tests, $100,000$ photons are traced per frame, with an initial query radius of $0.001$ and a radius reduction factor of $\alpha=0.7$.
 
 \section{Evaluation}
 
-\begin{figure}[htb]
-    \centering
-    \tiny
-    \begin{tabularx}{\textwidth}{r*{8}{>{\centering\arraybackslash}X}}
-        &Reference & PT & NRC+PT & NRC+PT+SL & NRC+BT & NRC+LT & NRC+SPPC & PM \\
-        \input{figures/py/tests/quality_comparison/Diffuse}\\
-        \input{figures/py/tests/quality_comparison/Thinker}\\
-        \input{figures/py/tests/quality_comparison/Chess}\\
-        \input{figures/py/tests/quality_comparison/Ajar}\\
-        \input{figures/py/tests/quality_comparison/Caustics}
-    \end{tabularx}
-    \caption{Comparison of the different radiance estimators from \cref{chap:bidirectional_caching}. To isolate training quality, inference is terminated after the first diffuse vertex and is not combined with NEE.}
-    \label{fig:quality_comparison}
-\end{figure}
-
 \paragraph{Quality} \Cref{fig:quality_comparison} compares the different radiance estimation techniques from \cref{chap:bidirectional_caching} with respect to quality.
 Applying self learning (SL) to the original NRC method degraded quality in almost all scenes except for the \textsc{Caustics} scene.
-This could be caused by a faulty implementation, because \textcite{muller2021} report a decrease in bias when applying self learning.
+This could be caused by a faulty implementation, since \textcite{muller2021} report a \emph{decrease} in bias when applying self learning.
 Bidirectional training (BT) was consistently either faster or comparably fast to the original PT method and even decreased perceived error in all scenes except the \textsc{Chess} scene.
 Light training (LT) on the other hand, did not produce usable results.
 Finally, the SPPC estimator produced the lowest perceived error in all scenes, except in the \textsc{Thinker} scene, where the glossy specular highlights exhibit a bright bias.
-This should however normally be covered by the path termination strategy continuing the querying paths, so this may as well be caused by a bug in the implementation of inference.
+This should however normally be covered by the path termination strategy continuing the querying paths, so this may likely be caused by a bug in the implementation of the inference phase.
 The improved quality comes with an overhead of around $3-5$ms per frame but still stays in the budget for interactive rendering ($16$ms).
 
-\begin{figure}[htb]
+\begin{figure}[htb!]
     \centering
     \tiny
     \begin{tabularx}{\textwidth}{r*{7}{>{\centering\arraybackslash}X}}
@@ -198,14 +185,14 @@ Yet, it is still too far from the reference to be usable.
 \begin{figure}[htb!]
     \centering
     \input{figures/py/loss_history.pgf}
-    \caption{Comparison of training convergence. Because the training is online, there is no ground truth validation step. The loss thus mainly indicates the variance of the training set. BT has the highest training error because it samples both the light and the camera, SPPC has the lowest training error because it keeps estimates in a fixed ring buffer for accumulation.}
+    \caption{Comparison of training convergence. Because the training is online, there is no ground truth validation step. The loss thus mainly indicates the variance of the training set. BT and LT have the highest training errors because both utilize light sampling, SPPC has the lowest training error because it keeps estimates in a fixed ring buffer for accumulation. Measured in the \textsc{Thinker} scene.}
     \label{fig:convergence}
 \end{figure}
 
 \begin{figure}[htb!]
     \centering
     \input{figures/py/breakdown.pgf}
-    \caption{Performance breakdown of the different rendering techniques. Measured in 720p-equivalent $960^2$px resolution on an NVIDIA RTX 3060 Ti and averaged over 10s.}
+    \caption{Performance breakdown of the different rendering techniques. Measured in 720p-equivalent $960^2$px resolution in the \textsc{Thinker} scene on an NVIDIA RTX 3060 Ti and averaged over 10s.}
     \label{fig:breakdown}
 \end{figure}
 
@@ -222,3 +209,18 @@ The bidirectional training (BT) and the original method come in at around the sa
 Self-learning (SL) adds a small overhead of around 0.5ms per frame caused by the additional inference step.
 SPPC is the slowest NRC-based technique, but still considerably faster than the unoptimized implementation of full SPPM.
 Moreover, its performance can be controlled by changing the number of photons traced per frame, applying stochastic rejection and tweaking the initial query radius.
+
+\begin{figure}[htb]
+    \centering
+    \tiny
+    \begin{tabularx}{\textwidth}{r*{8}{>{\centering\arraybackslash}X}}
+        &Reference & PT & NRC+PT & NRC+PT+SL & NRC+BT & NRC+LT & NRC+SPPC & PM \\
+        \input{figures/py/tests/quality_comparison/Diffuse}\\
+        \input{figures/py/tests/quality_comparison/Thinker}\\
+        \input{figures/py/tests/quality_comparison/Chess}\\
+        \input{figures/py/tests/quality_comparison/Ajar}\\
+        \input{figures/py/tests/quality_comparison/Caustics}
+    \end{tabularx}
+    \caption{Comparison of the different radiance estimators from \cref{chap:bidirectional_caching}. To isolate training quality, inference is terminated after the first diffuse vertex and is not combined with NEE.}
+    \label{fig:quality_comparison}
+\end{figure}
