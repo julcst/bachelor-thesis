@@ -16,6 +16,8 @@ Unfortunately, this makes it largely unusable in practice.
 The estimator based on Progressive Photon Mapping is particularly robust and produces high quality caustics and indirect illumination, while coming only at a mild performance overhead compared to training by PT.
 This one is particularly promising for practical use cases, since it can produce fairly accurate and noise free renderings of caustics in real-time, which can neither be achieved by pure path tracing nor by the original NRC.
 It comes, however, at the cost of sharpness and time lag, thus it would be interesting to evaluate its performance in dynamic scenes.
+Another limitation with this and also the other estimators is, that it is better suited for indoor scenes, as in large-scale or outdoor scenes unguided light sampling would cover large areas not directly visible to the camera.
+In these cases, light culling or guiding would be necessary.
 
 \section{Further Optimization}
 
@@ -29,7 +31,7 @@ Another interesting approach could be to target radiance estimations at prioriti
 
 \paragraph{SPPC} As already discussed in \cref{sec:sppc}, synchronization of the atomic accumulation is likely the biggest factor that holds back the performance of hardware accelerated photon mapping.
 Thus, it could be interesting to either explore stochastic evaluation techniques like \textcite{kern2023} or to reduce overlap during query prediction, similar to what e.g. \textcite{stachowiak2018} did for surfel placement.
-Warp Aggregation is a common technique to resolve this in classical GPU programming by first aggregating subsets and then reducing, however OptiX does not expose warps.
+Warp Aggregation is another common technique to resolve this in classical GPU programming by first aggregating subsets and then reducing, however OptiX does not expose warps and the threads can be unordered, making this not straightforward.
 
 \section{Future Work}
 By generalizing Neural Radiance Caching, this thesis opens a wide array of possible future improvements.

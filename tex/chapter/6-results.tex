@@ -38,7 +38,9 @@ It contains decimated and remeshed version of the Thinker statue by Auguste Rodi
     \tiny
     \begin{tabularx}{\textwidth}{r*{7}{>{\centering\arraybackslash}X}}
         & Reference (PT) & PT & SAH & BTH $1/2$ & BTH $1/10$ & 1st Diffuse & 1st Vertex\\
+        \rule{0pt}{2ex}
         \input{figures/py/tests/path_termination/Thinker}
+        \rule{0pt}{4ex}
         \input{figures/py/tests/path_termination/Thinker+NEE.tex}
     \end{tabularx}
     \caption{Comparison of the Path Termination strategies from \cref{sec:path_termination}.}
@@ -71,9 +73,13 @@ Thus, since we aim to capture caustics, the MHE is the natural choice used in th
     \tiny
     \begin{tabularx}{\textwidth}{r*{7}{>{\centering\arraybackslash}X}}
         & Reference & 1 & 5 & 25 & 100 & 500 & 2500 \\
+        \rule{0pt}{2ex}
         \input{figures/py/tests/batch_size/14.tex}
+        \rule{0pt}{4ex}
         \input{figures/py/tests/batch_size/14@4.tex}
+        \rule{0pt}{4ex}
         \input{figures/py/tests/batch_size/16.tex}
+        \rule{0pt}{4ex}
         \input{figures/py/tests/batch_size/16@4.tex}
     \end{tabularx}
     \caption{Comparison of cache convergence for different training set sizes (14: $2^{14}=16,384$, 16: $2^{16}=65,536$) and training steps per frame (@4 indicates that the training set is split into 4 batches, otherwise it is processed as a single batch). The columns indicate how many frames were rendered to train the cache (1, 5, 25, 100, 500, 2500).}
@@ -92,7 +98,7 @@ Tests show, that the usage of multiple training steps per frame leads to faster 
     \label{fig:jit}
 \end{figure}
 \paragraph{Kernel Fusion} Recently, the \emph{tiny-cuda-nn} library of \textcite{muller2021a} was extended by a feature that allows combining the encoding, MLP, loss function, training and inference steps together into fused monolithic kernels by on-the-fly JIT compilation.
-Using this approach, \textcite{muller2021a} report a potential speedup of $1.5\times$ up to $2.5\times$ for training and inference, especially for modern GPU architectures.
+Using this approach, \textcite{muller2021a} reports a potential speedup of $1.5\times$ up to $2.5\times$ for training and inference, especially for modern GPU architectures.
 Measurements on an NVIDIA RTX 3060 Ti, however, show a performance \emph{decrease} in the inference step and similar performance for training (see \cref{fig:jit}).
 This could potentially be caused by an older GPU architecture, the following tests are thus performed without JIT-fusion.
 
@@ -131,8 +137,8 @@ Since this however decreases quality in non-caustic areas, we will test against 
 \begin{figure}[htb!]
     \centering
     \tiny
-    \begin{tabularx}{\textwidth}{r*{9}{>{\centering\arraybackslash}X}}
-        &Reference & PT & NRC+PT & NRC+PT+SL & NRC+BT & NRC+LT & NRC+LT+Bal & NRC+SPPC & PM \\
+    \begin{tabularx}{\textwidth}{r*{8}{>{\centering\arraybackslash}X}}
+        &Reference & PT & NRC+PT & NRC+PT+SL & NRC+BT & NRC+LT & NRC+SPPC & PM \\
         \input{figures/py/tests/quality_comparison/Diffuse}\\
         \input{figures/py/tests/quality_comparison/Thinker}\\
         \input{figures/py/tests/quality_comparison/Chess}\\

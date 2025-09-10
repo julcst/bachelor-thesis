@@ -52,7 +52,7 @@ With this hardware-optimized implementation, \textcite{muller2021} achieve a spe
         Padding $\vec{1} \in \mathbb{R}^7$ & $\vec{1} \in \mathbb{R}^7$ & 57--63 \\ % TODO: Check implementation
         %\bottomrule
     \end{tabular}
-    \caption{The components of the 64-dimensional input vector to the neural network.}
+    \caption{The components of the 64-dimensional input vector to the neural network. $\mathrm{mhe}(\cdot)$ is the Multiresolution Hash Encoding from \textcite{muller2022}, $\mathrm{ob}(\cdot)$ is the One Blob Encoding from \textcite{muller2021}.}
     \label{tab:input-encoding}
 \end{table}
 As shown by \textcite{ren2013}, parametrizing the network with the outgoing direction $\wo$ and the position $\vec{x}$ alone is not sufficient for an accurate representation of the radiance field.
@@ -106,7 +106,7 @@ However, the number of basis functions is quadratic in the degree $m$, which lim
 The limited degree also hinders the representation of high-frequency details in the radiance field.
 Thus, it is worth-while to also explore alternative encodings for $\wo$ and $\vec{n}$.
 
-\paragraph{One Blob and One Blob Diffuse Encoding}
+\paragraph{One Blob Encoding}
 For bounded domains, \textcite{muller2019} propose a simple encoding scheme, which is a continuous generalization of the popular one-hot encoding, they call One Blob Encoding.
 The idea is, to divide the input space into a fixed number of bins along each dimension.
 Each input vector is then assumed to be distributed over the bins by a Gaussian distribution and the activation of the bin is the probability of the input vector to fall into that bin.
@@ -134,11 +134,11 @@ To improve performance, \textcite{muller2021} approximate the Gaussian distribut
 This encoding is used by \textcite{muller2021} on the roughness but also on the direction vectors $\wo$ and $\vec{n}$, by first converting these to spherical coordinates and then encoding the azimuthal angle $\phi$ and the polar angle $\theta$.
 However, the azimuthal angle is periodic, so the encoding has also to be periodic to avoid discontinuities at the boundaries.
 To achieve this, \textcite{muller2021} use a wrapped CDF (see \cref{fig:oneblob}), which comes with the added performance benefit of being able to compute just one boundary per thread and obtaining the other through warp shuffling.
-However, this encoding is not perfect as it establishes visible artifacts at the poles.
+However, this encoding is not perfect as it establishes singularities at the poles that can become visible at early training stages.
 
-To avoid these artifacts, I implemented a variant of the One Blob Encoding which can be selectively disabled for diffuse surfaces by passing IEEE 754 NaNs as input.
-For such surfaces, the direction vector $\wo$ is irrelevant, as we use the constant Lambertian reflectance model.
-Thus, to omit $\wo$ without breaking the encoding, I assume that the distribution of the input values converges to a uniform distribution over all bins, which is equivalent to a constant activation value of $1 / n$ for each bin.
+% To avoid these artifacts, I implemented a variant of the One Blob Encoding which can be selectively disabled for diffuse surfaces by passing IEEE 754 NaNs as input.
+% For such surfaces, the direction vector $\wo$ is irrelevant, as we use the constant Lambertian reflectance model.
+% Thus, to omit $\wo$ without breaking the encoding, I assume that the distribution of the input values converges to a uniform distribution over all bins, which is equivalent to a constant activation value of $1 / n$ for each bin.
 
 %\paragraph{Positional Encoding on an Octahedron}
 
