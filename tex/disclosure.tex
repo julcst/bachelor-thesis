@@ -1,0 +1,36 @@
+
+
+% Disclosure
+\ifthenelse{\boolean{generativeAiUsed}}
+{
+
+\chapter*{\GetTranslation{thesis-disclosure}}
+\label{sec:disclosure}
+%\addcontentsline{toc}{chapter}{\nameref{sec:disclosure}}
+
+\GetTranslation{thesis-disclosure-statement}
+
+}
+{
+% Skip printing hint
+}
+
+
+
+\ifthenelse{\boolean{disclosureconfirmed}}
+{
+    % Skip printing hint
+}
+{
+    \begin{tikzpicture}[remember picture,overlay]%
+        \node[fill=lightgray,align=center,yshift=0.0cm] at (current page.center) {%
+        \begin{minipage}[c]{\textwidth}\large\color{red}\textbf{%
+            Please check whether Generative AI was used in this thesis.%
+            \begin{itemize}%
+                \item If used, uncomment \texttt{\textbackslash IConfirmGenerativeAiUsage} in \texttt{thesis.tex} to confirm.%
+                \item If NOT used, uncomment \texttt{\textbackslash IConfirmNoUsageOfGenerativeAi} in \texttt{thesis.tex} to confirm.%
+            \end{itemize}%
+        }\end{minipage}%
+        };%
+    \end{tikzpicture}%
+}

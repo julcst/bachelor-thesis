@@ -163,11 +163,28 @@
 
 
 
-% Confirmation macro
+% Confirmation macros
 \newboolean{titlepageconfirmed}
 \setboolean{titlepageconfirmed}{false}
 
-\newcommand{\iconfirmconsistency}{%
+\newcommand{\IConfirmConsistency}{%
   \setboolean{titlepageconfirmed}{true}%
 }
+
+
+\newboolean{generativeAiUsed}
+\setboolean{generativeAiUsed}{true}
+
+\newboolean{disclosureconfirmed}
+\setboolean{disclosureconfirmed}{false}
+
+\newcommand{\IConfirmGenerativeAiUsage}{%
+  \setboolean{generativeAiUsed}{true}%
+  \setboolean{disclosureconfirmed}{true}%
+}
+\newcommand{\IConfirmNoUsageOfGenerativeAi}{%
+  \setboolean{generativeAiUsed}{false}%
+  \setboolean{disclosureconfirmed}{true}%
+}
+
 
