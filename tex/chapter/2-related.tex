@@ -79,7 +79,7 @@ Another interesting and closely related technique is that of Path Space Filterin
 The most recent advancements in path tracing are based on spatio-temporal path reuse through reservoir resampling (original work: \cite{bitterli2020}; generalization: \cite{lin2022}; see also \cite{wyman2023}) and already achieve acceptable noise at close to real-time performance.
 The core idea is to draw samples from a pool of reused candidates according to their estimated contribution, and was already motivated by \textcite{talbot2005}.
 These methods are also fully dynamic, yet they differ from radiance caching in that they are theoretically unbiased.
-Although the original paper used reservoir resampling only for direct illumination \parencite{bitterli2020}, the idea was recently extended among others to indirect lighting \parencite{ouyang2021}, full path tracing \parencite{lin2022}, photon mapping \parencite{kern2024} and bidirectional path tracing \parencite{hedstrom2025}.
+Although the original paper used reservoir resampling only for direct illumination \parencite{bitterli2020}, the idea was extended among others to indirect lighting \parencite{ouyang2021}, full path tracing \parencite{lin2022}, photon mapping \parencite{kern2024} and bidirectional path tracing \parencite{hedstrom2025}.
 ReSTIR can also be combined with other techniques like radiance caching \parencite{muller2021,majercik2021,boisse2023}.
 
 \section{Neural Rendering}

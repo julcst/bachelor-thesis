@@ -151,7 +151,7 @@ For the diffuse component, we simply use the Lambertian reflectance model:
 \end{equation}
 Several other, more physically accurate, models have been proposed for the diffuse component, such as the microfacet-based Oren-Nayar reflectance model \parencite{oren1994} or the heuristic model from \textcite{burley2012}.
 The Oren-Nayar model is rather computational expensive and not fully energy conserving, although these deficiencies can be mostly overcome by the improvements made by \textcite{fujii}.
-Burley's model suffers also from energy conservation issues, but renormalized versions exist \parencite{lagarde2014}.
+Burley's model also suffers from energy conservation issues, but renormalized versions exist \parencite{lagarde2014}.
 However, the Lambertian model has the nice property of being constant over the hemisphere, which can be advantageous for caching.
 
 To parameterize the BSDF, we will use a base color $\vec{c} \in [0, 1]^3$, a metallic factor $m \in [0, 1]$, a roughness factor $r \in [0, 1]$ and a transmission factor $t \in [0, 1]$, as follows:

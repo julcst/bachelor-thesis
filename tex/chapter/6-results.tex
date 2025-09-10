@@ -46,7 +46,7 @@ It contains decimated and remeshed version of the Thinker statue by Auguste Rodi
 \paragraph{Input Encodings}
 The input encoding has a significant impact on both quality and performance of the cache (see \cref{fig:encodings}).
 The Multiresolution Hash Encoding (MHE) by \textcite{muller2022} comes at a great performance hit compared to the original Triangle Wave Encoding (TWE) by \textcite{muller2021} (more than $2\times$ in the test), but distinctly enhances the representation of high-frequency features.
-Thus, since we aim to capture caustics, the MHE is the natural choice used in the following evaluations.
+Since we aim to capture caustics, the MHE is the natural choice used in the following evaluations.
 
 \begin{figure}[htb!]
     \centering
@@ -185,14 +185,14 @@ Yet, it is still too far from the reference to be usable.
 \begin{figure}[htb!]
     \centering
     \input{figures/py/loss_history.pgf}
-    \caption{Comparison of training convergence. Because the training is online, there is no ground truth validation step. The loss thus mainly indicates the variance of the training set. BT and LT have the highest training errors because both utilize light sampling, SPPC has the lowest training error because it keeps estimates in a fixed ring buffer for accumulation. Measured in the \textsc{Thinker} scene.}
+    \caption{Comparison of training convergence. Because the training is online, there is no ground truth validation step. The loss thus mainly indicates the variance of the training set. BT and LT have the highest training errors because both utilize light sampling, SPPC has the lowest training error because it keeps estimates in a fixed ring buffer for accumulation. Measured on the \textsc{Thinker} scene.}
     \label{fig:convergence}
 \end{figure}
 
 \begin{figure}[htb!]
     \centering
     \input{figures/py/breakdown.pgf}
-    \caption{Performance breakdown of the different rendering techniques. Measured in 720p-equivalent $960^2$px resolution in the \textsc{Thinker} scene on an NVIDIA RTX 3060 Ti and averaged over 10s.}
+    \caption{Performance breakdown of the different rendering techniques. Measured in 720p-equivalent $960^2$px resolution on the \textsc{Thinker} scene on an NVIDIA RTX 3060 Ti and averaged over 10s.}
     \label{fig:breakdown}
 \end{figure}
 

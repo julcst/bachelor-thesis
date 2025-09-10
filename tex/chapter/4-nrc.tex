@@ -33,7 +33,7 @@ Because of the shallow architecture, skip connections are not needed to preserve
 To maximize the inference and training performance, \textcite{muller2021} introduce a fully fused implementation of the network, which fully utilizes shared memory and per-thread registers.
 For this, the whole network is implemented as a single CUDA kernel, with each block handling a batch of 128 64-dimensional input vectors and keeping the $64\times128$ activations in shared memory.
 Each block then consists of 4 warps, computing 16 neuron activations each by applying a $16\times64$ matrix multiplication and the element-wise activation function.
-For this, the hardware accelerated $16\times16$ FP16 matrix multiplication instruction is used when available.
+The hardware accelerated $16\times16$ FP16 matrix multiplication instruction is used when available.
 With this hardware-optimized implementation, \textcite{muller2021} achieve a speedup of $5\times$ to $10\times$ compared to the widely used TensorFlow framework \parencite{tensorflowdevelopers2021} on large batch sizes corresponding to HD resolution.
 
 \section{Input Encodings}
@@ -134,7 +134,7 @@ To improve performance, \textcite{muller2021} approximate the Gaussian distribut
 This encoding is used by \textcite{muller2021} on the roughness but also on the direction vectors $\wo$ and $\vec{n}$, by first converting these to spherical coordinates and then encoding the azimuthal angle $\phi$ and the polar angle $\theta$.
 However, the azimuthal angle is periodic, so the encoding has also to be periodic to avoid discontinuities at the boundaries.
 To achieve this, \textcite{muller2021} use a wrapped CDF (see \cref{fig:oneblob}), which comes with the added performance benefit of being able to compute just one boundary per thread and obtaining the other through warp shuffling.
-However, this encoding is not perfect as it establishes singularities at the poles that can become visible at early training stages.
+Yet, this encoding is not perfect as it establishes singularities at the poles that can become visible at early training stages.
 
 % To avoid these artifacts, I implemented a variant of the One Blob Encoding which can be selectively disabled for diffuse surfaces by passing IEEE 754 NaNs as input.
 % For such surfaces, the direction vector $\wo$ is irrelevant, as we use the constant Lambertian reflectance model.
@@ -150,7 +150,7 @@ To help the neural network learn the radiance field, \textcite{muller2021} propo
     \widehat{L}'(\vec{x}, \wo) = \left( \vec{F}_d(\vec{x}, \wo) + \vec{F}_s(\vec{x}, \wo) \right) \cdot \mathrm{NRC}(\vec{x}, \wo),
 \end{equation}
 This way the variance in the training data is reduced, as the remaining part is approximately reduced to just the incoming radiance which is commonly low frequent.
-Note however, that these terms are nonetheless given as input, so this information is already available to the network and this is merely a normalization of the training data.
+Note, however, that these terms are nonetheless given as input, so this information is already available to the network and this is merely a normalization of the training data.
 
 \begin{figure}[htb!]
     \centering

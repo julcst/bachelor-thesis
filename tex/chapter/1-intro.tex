@@ -5,7 +5,7 @@
 A longstanding and essential problem in computer graphics is Global illumination (GI), which is the simulation of both direct and indirect lighting.
 Many algorithms were developed to approach this problem, the most prominent and widely used of which is path tracing \parencite{kajiya1986} for its simplicity and generality.
 In recent years, huge advancements in GPU architecture made interactive path tracing feasible.
-However, path tracing is still slow compared to traditional rasterization and suffers from high temporally instable noise.
+Yet, path tracing is still slow compared to traditional rasterization and suffers from high temporally instable noise.
 Radiance caching \parencite{ward1988} tackles both of these shortcomings.
 By only estimating radiance sparsely and interpolating in between, reusing radiance estimates from previous frames, radiance caching can significantly reduce the number of samples per pixel while also averaging temporally and spatially near estimates to reduce noise.
 

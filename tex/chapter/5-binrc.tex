@@ -17,7 +17,7 @@ Radiance caching generally can be broken down into four steps:
         \item \textbf{Query Sampling} We sample queries $q = (\vec{x}, \vec{\omega}_o)$ according to a distribution $Q(q)$.
         \item \textbf{Interpolation} Given a query $q$, we want to approximate the outgoing radiance $\hat{L}_o(q)$ by interpolating the radiance estimates of spatio-temporally nearby query predictions $\hat{q}$.
         We can use any storing and interpolation technique for this, such as nearest neighbor, linear interpolation or, in our case, the NRC.
-        Note however, that this step generally introduces \emph{bias}.
+        Note, however, that this step generally introduces \emph{bias}.
     \end{enumerate}
 \end{enumerate}
 
@@ -369,7 +369,7 @@ The lifetime of a query is thus approximately $1/\kappa$ frames, yet it can also
             %\bottomrule
         \end{tabular}
     \end{subtable}
-    \caption{The structs used to represent photons and queries. Unit vector compression strategies \parencite{cigolle2014} could be applied to reduce the memory footprint. To keep the code simple however, this is not done in the accompanying implementation.}
+    \caption{The structs used to represent photons and queries. Unit vector compression strategies \parencite{cigolle2014} could be applied to reduce the memory footprint. To keep the code simple, this is not done in the accompanying implementation.}
 \end{table}
 
 \paragraph{Radius Reduction}
