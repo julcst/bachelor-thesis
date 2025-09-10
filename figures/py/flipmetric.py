@@ -94,7 +94,7 @@ def bold_if_min(val, min_val, fmt, none_allowed=False):
         return f"\\textbf{{{s}}}"
     return s
 
-def save_flip_pngs(prefix: str, ref: str, tests: list[str], suffix="", msuffix="", latex_prefix="figures/py/", table_name="table"):
+def save_flip_pngs(prefix: str, ref: str, tests: list[str], suffix="", msuffix="", latex_prefix="figures/py/", table_name="table", enable_flip_row=True):
     print(f"Creating {prefix}{table_name}...")
     ref_img = load_hdr(f"{prefix}{ref}.hdr")
     write_png(f"{prefix}{ref}.png", ref_img)
@@ -164,7 +164,7 @@ def save_flip_pngs(prefix: str, ref: str, tests: list[str], suffix="", msuffix="
         f.write(f"&{perf_row}\\\\\n"
                 f"\\rotatebox{{90}}{{\\textsc{{{table_name}}}}}\\hspace{{-1.5em}}\n"
                 f"&{img_row}\\\\\n"
-                f"&{flip_row}\\\\\n"
+                + (f"&{flip_row}\\\\\n" if enable_flip_row else "") +
                 f"&\\FLIP/MSE:{error_row}\\\\\n"
                 f"&$\\mathrm{{Bias}}^2/\\mathrm{{Variance}}${bias_var_row}\\\\\n")
 
@@ -198,7 +198,7 @@ save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", 
     "100+nrc+pt+14",
     "500+nrc+pt+14",
     "2500+nrc+pt+14",
-], suffix="_1spp", msuffix="", table_name="PT14")
+], suffix="_1spp", msuffix="", table_name="14", enable_flip_row=False)
 
 save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", [
     "1+nrc+pt+14@4",
@@ -207,7 +207,7 @@ save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", 
     "100+nrc+pt+14@4",
     "500+nrc+pt+14@4",
     "2500+nrc+pt+14@4",
-], suffix="_1spp", msuffix="", table_name="PT14@4")
+], suffix="_1spp", msuffix="", table_name="14@4", enable_flip_row=False)
 
 save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", [
     "1+nrc+pt+16",
@@ -216,7 +216,7 @@ save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", 
     "100+nrc+pt+16",
     "500+nrc+pt+16",
     "2500+nrc+pt+16",
-], suffix="_1spp", msuffix="", table_name="PT16")
+], suffix="_1spp", msuffix="", table_name="16", enable_flip_row=False)
 
 save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", [
     "1+nrc+pt+16@4",
@@ -225,7 +225,7 @@ save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", 
     "100+nrc+pt+16@4",
     "500+nrc+pt+16@4",
     "2500+nrc+pt+16@4",
-], suffix="_1spp", msuffix="", table_name="PT16@4")
+], suffix="_1spp", msuffix="", table_name="16@4", enable_flip_row=False)
 
 save_flip_pngs("tests/quality_comparison/", "refpt_3min_diffuse", [
     "pt",
@@ -233,7 +233,6 @@ save_flip_pngs("tests/quality_comparison/", "refpt_3min_diffuse", [
     "nrc+pt+sl",
     "nrc+bt",
     "nrc+lt",
-    "nrc+lt+bal",
     "nrc+sppc",
     "sppm"
 ], suffix="_1spp_diffuse", msuffix="_diffuse", table_name="Diffuse")
@@ -244,7 +243,6 @@ save_flip_pngs("tests/quality_comparison/", "refpt_3min_thinker", [
     "nrc+pt+sl",
     "nrc+bt",
     "nrc+lt",
-    "nrc+lt+bal",
     "nrc+sppc",
     "sppm"
 ], suffix="_1spp_thinker", msuffix="_thinker", table_name="Thinker")
@@ -255,7 +253,6 @@ save_flip_pngs("tests/quality_comparison/", "refpt_3min_chess", [
     "nrc+pt+sl",
     "nrc+bt",
     "nrc+lt",
-    "nrc+lt+bal",
     "nrc+sppc",
     "sppm"
 ], suffix="_1spp_chess", msuffix="_chess", table_name="Chess")
@@ -266,7 +263,6 @@ save_flip_pngs("tests/quality_comparison/", "refpt_3min_ajar_caustic", [
     "nrc+pt+sl",
     "nrc+bt",
     "nrc+lt",
-    "nrc+lt+bal",
     "nrc+sppc",
     "sppm"
 ], suffix="_1spp_ajar_caustic", msuffix="_ajar_caustic", table_name="Ajar")
@@ -277,7 +273,6 @@ save_flip_pngs("tests/quality_comparison/", "refsppm_2min", [
     "nrc+pt+sl",
     "nrc+bt",
     "nrc+lt",
-    "nrc+lt+bal",
     "nrc+sppc",
     "sppm"
 ], suffix="_1spp_caustics_small", msuffix="_caustics_small", table_name="Caustics")
