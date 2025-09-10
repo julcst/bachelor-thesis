@@ -36,6 +36,21 @@ It contains decimated and remeshed version of the Thinker statue by Auguste Rodi
 \begin{figure}[htb!]
     \centering
     \tiny
+    \begin{tabularx}{0.4\textwidth}{r*{3}{>{\centering\arraybackslash}X}}
+        & Reference & TWE & MHE \\
+        \input{figures/py/tests/encodings/Thinker.tex}
+    \end{tabularx}
+    \caption{Comparison of different input encodings}
+    \label{fig:encodings}
+\end{figure}
+\paragraph{Input Encodings}
+The input encoding has a significant impact on both quality and performance of the cache (see \cref{fig:encodings}).
+The Multiresolution Hash Encoding (MHE) by \textcite{muller2022} comes at a great performance hit compared to the original Triangle Wave Encoding (TWE) by \textcite{muller2021} (more than $2\times$ in the test), but distinctly enhances the representation of high-frequency features.
+Thus, since we aim to capture caustics, the MHE is the natural choice used in the following evaluations.
+
+\begin{figure}[htb!]
+    \centering
+    \tiny
     \begin{tabularx}{\textwidth}{r*{7}{>{\centering\arraybackslash}X}}
         & Reference (PT) & PT & SAH & BTH $1/2$ & BTH $1/10$ & 1st Diffuse & 1st Vertex\\
         \rule{0pt}{2ex}
@@ -52,21 +67,6 @@ The SAH termination strategy has the highest variance and also the highest perfo
 On the other end of the spectrum, terminating on the first vertex directly has the lowest variance and is also the fastest but has some issues with specular highlights.
 All the other strategies lie somewhere in between, with the parametrized BTH strategy bridging the gap.
 As the SPPC strategy does not learn glossy highlights at all and since the quality of the NRC seems good enough for early termination, the following tests use termination at the first diffuse vertex.
-
-\begin{figure}[htb!]
-    \centering
-    \tiny
-    \begin{tabularx}{0.4\textwidth}{r*{3}{>{\centering\arraybackslash}X}}
-        & Reference & TWE & MHE \\
-        \input{figures/py/tests/encodings/Thinker.tex}
-    \end{tabularx}
-    \caption{Comparison of different input encodings}
-    \label{fig:encodings}
-\end{figure}
-\paragraph{Input Encodings}
-The input encoding has a significant impact on both quality and performance of the cache (see \cref{fig:encodings}).
-The Multiresolution Hash Encoding (MHE) by \textcite{muller2022} comes at a great performance hit compared to the original Triangle Wave Encoding (TWE) by \textcite{muller2021} (more than $2\times$ in the test), but distinctly enhances the representation of high-frequency features.
-Thus, since we aim to capture caustics, the MHE is the natural choice used in the following evaluations.
 
 \begin{figure}[htb!]
     \centering
@@ -88,6 +88,22 @@ Thus, since we aim to capture caustics, the MHE is the natural choice used in th
 \paragraph{Training} Like recommended by \textcite{muller2022}, training is performed using the Adam optimizer \parencite{kingma2014} with a learning rate of $10^{-2}$, $\beta_1 = 0.9$, $\beta_2 = 0.99$, $\epsilon = 10^{-15}$ and an L2 regularization factor of $10^{-6}$.
 Furthermore, they use 4 training steps with a batch size of $2^{14}=16,384$ each.
 Tests show, that the usage of multiple training steps per frame leads to faster cache convergence (see \cref{fig:batch_size}) while larger training sets evidently result in lower error.
+However, multiple training steps also slow down performance.
+The following tests use single training steps of size $2^{17}=131,072$, as this gave the best results for SPPC (see \cref{fig:sppc_optimization}).
+
+\begin{figure}[htb!]
+    \centering
+    \tiny
+    \begin{tabularx}{\textwidth}{r*{8}{>{\centering\arraybackslash}X}}
+        & Reference & 17@1 & + Reject 70\% & + Reject Normal & 14@1 & 14@4 & 16@1 & 16@4 \\
+        \rule{0pt}{2ex}
+        \input{figures/py/tests/quality_comparison/ThinkerSPPC.tex}
+        \rule{0pt}{4ex}
+        \input{figures/py/tests/quality_comparison/CausticsSPPC.tex}
+    \end{tabularx}
+    \caption{Error and bias for SPPC with different configurations. 17@1 indicates a cache size of $2^{17}=131,072$ and 1 training step per frame, 14@4 indicates a cache size of $2^{14}=16,384$ and 4 training steps per frame, etc.}
+    \label{fig:sppc_optimization}
+\end{figure}
 
 \section{Optimizations}
 
@@ -128,13 +144,13 @@ This could potentially be caused by an older GPU architecture, the following tes
     \caption{Optimizations to Photon Mapping. \emph{IS only} directly accumulates in the Intersection Shader (IS) and skips the Any Hit Shader (AH). \emph{SER} uses Shader Execution Reordering between the Intersection and Any Hit shader to improve coherence. \emph{SER, 70\%} additionally rejects 70\% of the non-caustic photons in the Any Hit shader \parencite{kern2023}. \emph{SER, 70\%, 30$^{\circ}$} rejects photon hits whose surface normals deviate more than 30° from the surface normals at the query point \parencite{kern2023}. The most notable performance improvement comes from rejecting non-caustic photons, however, this notably increases error in non-caustic areas. Rejecting photons based on normal deviation has a small positive performance impact and decreases bias.}
     \label{fig:photon_optimization}
 \end{figure}
-\paragraph{Photon Mapping} To optimize SPPC, several optimizations were tested (see \cref{fig:photon_optimization}).
-The biggest performance improvement can be achieved by stochastically rejecting a significant portion of the non-caustic photons, as proposed by \textcite{kern2023}.
-Since this however decreases quality in non-caustic areas, we will test against both the full and the rejecting variant.
+\paragraph{Photon Mapping} To optimize Photon Mapping, several optimizations were tested on full SPPM (see \cref{fig:photon_optimization}).
+The biggest performance improvement was achieved by stochastically rejecting a significant portion of the non-caustic photons, as proposed by \textcite{kern2023}.
+This however decreases quality in non-caustic areas, and the performance gain does not carry over to SPPC (see \cref{fig:sppc_optimization}), where the overlap of queries is limited, so we do not use rejection for evaluation.
 
 \section{Evaluation}
 
-\begin{figure}[htb!]
+\begin{figure}[htb]
     \centering
     \tiny
     \begin{tabularx}{\textwidth}{r*{8}{>{\centering\arraybackslash}X}}
@@ -149,11 +165,20 @@ Since this however decreases quality in non-caustic areas, we will test against 
     \label{fig:quality_comparison}
 \end{figure}
 
-\begin{figure}[htb!]
+\paragraph{Quality} \Cref{fig:quality_comparison} compares the different radiance estimation techniques from \cref{chap:bidirectional_caching} with respect to quality.
+Applying self learning (SL) to the original NRC method degraded quality in almost all scenes except for the \textsc{Caustics} scene.
+This could be caused by a faulty implementation, because \textcite{muller2021} report a decrease in bias when applying self learning.
+Bidirectional training (BT) was consistently either faster or comparably fast to the original PT method and even decreased perceived error in all scenes except the \textsc{Chess} scene.
+Light training (LT) on the other hand, did not produce usable results.
+Finally, the SPPC estimator produced the lowest perceived error in all scenes, except in the \textsc{Thinker} scene, where the glossy specular highlights exhibit a bright bias.
+This should however normally be covered by the path termination strategy continuing the querying paths, so this may as well be caused by a bug in the implementation of inference.
+The improved quality comes with an overhead of around $3-5$ms per frame but still stays in the budget for interactive rendering ($16$ms).
+
+\begin{figure}[htb]
     \centering
     \tiny
     \begin{tabularx}{\textwidth}{r*{7}{>{\centering\arraybackslash}X}}
-        &Reference & NRC+LT & NRC+LT+Bal & NRC+LT+BalCam & NRC+Naïve & NRC+Naïve+Bal & NRC+Naïve+BalCam \\
+        &Reference & NRC+LT & +Surface Balancing & +Camera Balancing & NRC+Naïve & +Surface balancing & +Camera Balancing \\
         \input{figures/py/tests/quality_comparison/DiffuseBal}\\
         \input{figures/py/tests/quality_comparison/ThinkerBal}\\
         \input{figures/py/tests/quality_comparison/CausticsBal}\\
@@ -161,6 +186,14 @@ Since this however decreases quality in non-caustic areas, we will test against 
     \caption{Comparing light training and balancing strategies specifically.}
     \label{fig:light_training_comparison}
 \end{figure}
+
+\Cref{fig:light_training_comparison} takes a closer look at light training.
+Different balancing strategies were tested to counteract the bias, \emph{Surface Balancing} generates zero samples uniformly on the surfaces in the scene, while \emph{Camera Balancing} generates zero samples by shooting primary camera rays.
+Both times, the samples are mixed in at a ratio of 1:1 with the light training samples.
+Unfortunately, neither of these strategies achieve a stable mixing ratio, with surface balancing dragging the cache too little towards zero and camera balancing dragging it too much.
+Light training is also compared to simply storing the outgoing flux at the light path vertices (\emph{Naïve}).
+Surprisingly, this produces better results than light training, even with the technique not being a valid radiance estimator.
+Yet, it is still too far from the reference to be usable.
 
 \begin{figure}[htb!]
     \centering
@@ -185,7 +218,7 @@ Since this however decreases quality in non-caustic areas, we will test against 
 
 \paragraph{Performance} \Cref{fig:breakdown} compares the performance of the different radiance estimation techniques.
 All the NRC-based techniques are faster than pure path tracing (PT) since they terminate paths early and only evaluate long paths sparsely.
-The bidirectional training (BT) and original method come at around the same performance cost.
+The bidirectional training (BT) and the original method come in at around the same performance cost.
 Self-learning (SL) adds a small overhead of around 0.5ms per frame caused by the additional inference step.
 SPPC is the slowest NRC-based technique, but still considerably faster than the unoptimized implementation of full SPPM.
 Moreover, its performance can be controlled by changing the number of photons traced per frame, applying stochastic rejection and tweaking the initial query radius.

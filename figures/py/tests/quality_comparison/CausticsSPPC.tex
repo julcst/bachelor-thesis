@@ -1,0 +1,43 @@
+&3032spp (2m)
+ & 1spp (15.11ms)
+ & 1spp (16.41ms)
+ & 1spp (16.42ms)
+ & 1spp (\textbf{12.54ms})
+ & 1spp (15.11ms)
+ & 1spp (14.62ms)
+ & 1spp (17.61ms)
+\\
+\rotatebox{90}{\textsc{Caustics}}\hspace{-1.5em}
+&\includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/refsppm_2min.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+sppc_1spp_caustics_small.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+sppc+Rej70_1spp_caustics_small.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+sppc+Rej70+RejN_1spp_caustics_small.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+sppc14@1_1spp_caustics_small.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+sppc14@4_1spp_caustics_small.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+sppc16@1_1spp_caustics_small.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+sppc16@4_1spp_caustics_small.png}
+\\
+&& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+sppc_1spp_caustics_small_flip.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+sppc+Rej70_1spp_caustics_small_flip.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+sppc+Rej70+RejN_1spp_caustics_small_flip.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+sppc14@1_1spp_caustics_small_flip.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+sppc14@4_1spp_caustics_small_flip.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+sppc16@1_1spp_caustics_small_flip.png}
+& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+sppc16@4_1spp_caustics_small_flip.png}
+\\
+&\FLIP/MSE: & \textbf{\num{0.285}}/\num{346.860}
+ & \num{0.330}/\num{346.863}
+ & \num{0.358}/\num{346.870}
+ & \num{0.329}/\textbf{\num{346.842}}
+ & \num{0.306}/\num{346.885}
+ & \num{0.304}/\num{346.869}
+ & \num{0.305}/\num{346.871}
+\\
+&$\mathrm{Bias}^2/\mathrm{Variance}$ & \num{3.45e-04}/\num{5.19e+02}
+ & \num{2.65e-04}/\num{5.19e+02}
+ & \num{3.52e-04}/\num{5.19e+02}
+ & \textbf{\num{1.72e-04}}/\num{5.19e+02}
+ & \num{2.27e-04}/\textbf{\num{5.19e+02}}
+ & \num{4.11e-04}/\num{5.19e+02}
+ & \num{4.24e-04}/\num{5.19e+02}
+\\

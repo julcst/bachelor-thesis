@@ -1,12 +1,12 @@
 &13398spp (3m)
- & 1spp (11.36ms)
- & 1spp (13.12ms)
- & 1spp (11.15ms)
- & 1spp (\textbf{9.72ms})
- & 1spp (11.88ms)
- & 1spp (12.12ms)
+ & 1spp (11.35ms)
+ & 1spp (11.72ms)
+ & 1spp (12.59ms)
+ & 1spp (\textbf{9.70ms})
+ & 1spp (10.86ms)
+ & 1spp (11.53ms)
 \\
-\rotatebox{90}{\textsc{DiffuseBal}}\hspace{-1.5em}
+\rotatebox{90}{\textsc{Diffuse}}\hspace{-1.5em}
 &\includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/refpt_3min_diffuse.png}
 & \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+lt_1spp_diffuse.png}
 & \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+lt+bal_1spp_diffuse.png}
@@ -15,24 +15,17 @@
 & \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+naive+bal_1spp_diffuse.png}
 & \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+naive+balcam_1spp_diffuse.png}
 \\
-&& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+lt_1spp_diffuse_flip.png}
-& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+lt+bal_1spp_diffuse_flip.png}
-& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+lt+balcam_1spp_diffuse_flip.png}
-& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+naive_1spp_diffuse_flip.png}
-& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+naive+bal_1spp_diffuse_flip.png}
-& \includegraphics[width=\linewidth]{figures/py/tests/quality_comparison/nrc+naive+balcam_1spp_diffuse_flip.png}
-\\
 &\FLIP/MSE: & \num{0.614}/\num{0.019}
- & \num{0.967}/\num{0.021}
+ & \num{0.700}/\num{0.030}
  & \num{0.966}/\num{0.021}
  & \textbf{\num{0.534}}/\textbf{\num{0.014}}
- & \num{0.966}/\num{0.021}
+ & \num{0.754}/\num{0.046}
  & \num{0.966}/\num{0.021}
 \\
 &$\mathrm{Bias}^2/\mathrm{Variance}$ & \num{5.89e-03}/\textbf{\num{8.47e-03}}
- & \num{7.61e-03}/\num{8.49e-03}
+ & \num{1.25e-02}/\num{8.55e-03}
  & \num{7.56e-03}/\num{8.49e-03}
  & \textbf{\num{3.30e-03}}/\num{8.51e-03}
- & \num{7.58e-03}/\num{8.49e-03}
+ & \num{2.58e-02}/\num{8.54e-03}
  & \num{7.56e-03}/\num{8.49e-03}
 \\

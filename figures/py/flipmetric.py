@@ -4,8 +4,8 @@ import numpy as np
 import json
 import os.path
 
-COMPRESSION = 0 # PNG compression level [0-9], 0=none, 9=max
-SCALE = 0.5 # Downscale factor
+COMPRESSION = 9 # PNG compression level [0-9], 0=none, 9=max
+SCALE = 1.0 # Downscale factor
 
 def load_hdr(path):
     img = cv2.imread(path, cv2.IMREAD_UNCHANGED)  # float32 BGR
@@ -94,7 +94,10 @@ def bold_if_min(val, min_val, fmt, none_allowed=False):
         return f"\\textbf{{{s}}}"
     return s
 
-def save_flip_pngs(prefix: str, ref: str, tests: list[str], suffix="", msuffix="", latex_prefix="figures/py/", table_name="table", enable_flip_row=True):
+def save_flip_pngs(prefix: str, ref: str, tests: list[str], suffix="", msuffix="", latex_prefix="figures/py/", table_name="table", enable_flip_row=True, file_name=None, use_total=False):
+    if file_name is None:
+        file_name = table_name
+    
     print(f"Creating {prefix}{table_name}...")
     ref_img = load_hdr(f"{prefix}{ref}.hdr")
     write_png(f"{prefix}{ref}.png", ref_img)
@@ -115,11 +118,16 @@ def save_flip_pngs(prefix: str, ref: str, tests: list[str], suffix="", msuffix="
             b2 = b * b
         except FileNotFoundError:
             b2, v = None, None
-
+        
+        samples = data["samples"]
+        duration = data["breakdown"]["total"] / 1000 if samples == 1 else data["duration"]
+        if use_total and "pretraining_time" in data:
+            duration += data["pretraining_time"]
+        
         results.append(TestResult(
             name=test,
-            duration=data["duration"],
-            samples=data["samples"],
+            duration=duration,
+            samples=samples,
             flip=flip_mean,
             mse=mse,
             bias2=b2,
@@ -160,7 +168,7 @@ def save_flip_pngs(prefix: str, ref: str, tests: list[str], suffix="", msuffix="
         img_row  += f"& \\includegraphics[width=\\linewidth]{{{latex_prefix}{prefix}{r.name}{suffix}.png}}\n"
         flip_row += f"& \\includegraphics[width=\\linewidth]{{{latex_prefix}{prefix}{r.name}{suffix}_flip.png}}\n"
 
-    with open(f"{prefix}{table_name}.tex", "w") as f:
+    with open(f"{prefix}{file_name}.tex", "w") as f:
         f.write(f"&{perf_row}\\\\\n"
                 f"\\rotatebox{{90}}{{\\textsc{{{table_name}}}}}\\hspace{{-1.5em}}\n"
                 f"&{img_row}\\\\\n"
@@ -200,7 +208,7 @@ save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", 
     "100+nrc+pt+14",
     "500+nrc+pt+14",
     "2500+nrc+pt+14",
-], suffix="_1spp", msuffix="", table_name="14", enable_flip_row=False)
+], suffix="_1spp", msuffix="", table_name="14", enable_flip_row=False, use_total=True)
 
 save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", [
     "1+nrc+pt+14@4",
@@ -209,7 +217,7 @@ save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", 
     "100+nrc+pt+14@4",
     "500+nrc+pt+14@4",
     "2500+nrc+pt+14@4",
-], suffix="_1spp", msuffix="", table_name="14@4", enable_flip_row=False)
+], suffix="_1spp", msuffix="", table_name="14@4", enable_flip_row=False, use_total=True)
 
 save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", [
     "1+nrc+pt+16",
@@ -218,7 +226,7 @@ save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", 
     "100+nrc+pt+16",
     "500+nrc+pt+16",
     "2500+nrc+pt+16",
-], suffix="_1spp", msuffix="", table_name="16", enable_flip_row=False)
+], suffix="_1spp", msuffix="", table_name="16", enable_flip_row=False, use_total=True)
 
 save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", [
     "1+nrc+pt+16@4",
@@ -227,7 +235,7 @@ save_flip_pngs("tests/batch_size/", "../quality_comparison/refpt_3min_thinker", 
     "100+nrc+pt+16@4",
     "500+nrc+pt+16@4",
     "2500+nrc+pt+16@4",
-], suffix="_1spp", msuffix="", table_name="16@4", enable_flip_row=False)
+], suffix="_1spp", msuffix="", table_name="16@4", enable_flip_row=False, use_total=True)
 
 save_flip_pngs("tests/quality_comparison/", "refpt_3min_diffuse", [
     "pt",
@@ -279,6 +287,26 @@ save_flip_pngs("tests/quality_comparison/", "refsppm_2min", [
     "sppm"
 ], suffix="_1spp_caustics_small", msuffix="_caustics_small", table_name="Caustics")
 
+save_flip_pngs("tests/quality_comparison/", "refpt_3min_thinker", [
+    "nrc+sppc",
+    "nrc+sppc+Rej70",
+    "nrc+sppc+Rej70+RejN",
+    "nrc+sppc14@1",
+    "nrc+sppc14@4",
+    "nrc+sppc16@1",
+    "nrc+sppc16@4",
+], suffix="_1spp_thinker", msuffix="_thinker", table_name="Thinker", file_name="ThinkerSPPC")
+
+save_flip_pngs("tests/quality_comparison/", "refsppm_2min", [
+    "nrc+sppc",
+    "nrc+sppc+Rej70",
+    "nrc+sppc+Rej70+RejN",
+    "nrc+sppc14@1",
+    "nrc+sppc14@4",
+    "nrc+sppc16@1",
+    "nrc+sppc16@4",
+], suffix="_1spp_caustics_small", msuffix="_caustics_small", table_name="Caustics", file_name="CausticsSPPC")
+
 save_flip_pngs("tests/quality_comparison/", "refpt_3min_diffuse", [
     "nrc+lt",
     "nrc+lt+bal",
@@ -286,7 +314,7 @@ save_flip_pngs("tests/quality_comparison/", "refpt_3min_diffuse", [
     "nrc+naive",
     "nrc+naive+bal",
     "nrc+naive+balcam",
-], suffix="_1spp_diffuse", msuffix="_diffuse", table_name="DiffuseBal")
+], suffix="_1spp_diffuse", msuffix="_diffuse", table_name="Diffuse", file_name="DiffuseBal", enable_flip_row=False)
 
 save_flip_pngs("tests/quality_comparison/", "refpt_3min_thinker", [
     "nrc+lt",
@@ -295,7 +323,7 @@ save_flip_pngs("tests/quality_comparison/", "refpt_3min_thinker", [
     "nrc+naive",
     "nrc+naive+bal",
     "nrc+naive+balcam",
-], suffix="_1spp_thinker", msuffix="_thinker", table_name="ThinkerBal")
+], suffix="_1spp_thinker", msuffix="_thinker", table_name="Thinker", file_name="ThinkerBal", enable_flip_row=False)
 
 save_flip_pngs("tests/quality_comparison/", "refsppm_2min", [
     "nrc+lt",
@@ -304,7 +332,7 @@ save_flip_pngs("tests/quality_comparison/", "refsppm_2min", [
     "nrc+naive",
     "nrc+naive+bal",
     "nrc+naive+balcam",
-], suffix="_1spp_caustics_small", msuffix="_caustics_small", table_name="CausticsBal")
+], suffix="_1spp_caustics_small", msuffix="_caustics_small", table_name="Caustics", file_name="CausticsBal", enable_flip_row=False)
 
 save_flip_pngs("tests/photon_optimization/", "ref_2min", [
     "SER",
