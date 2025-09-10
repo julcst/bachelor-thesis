@@ -20,7 +20,7 @@ The first universal unbiased algorithm to solve the global illumination problem 
 Simultaneously, \textcite{arvo1986} discovered the potential of light tracing to simulate indirect lighting effects.
 \textcite{lafortune1993} later combined light tracing and path tracing into Bidirectional Path Tracing (BDPT), and \textcite{veach1997} introduced provably optimal weighting strategies to maximize convergence speed.
 \textcite{keller1995,owen1995} improved convergence of Monte-Carlo samplers in general by using low discrepancy samples.
-Furthermore, \textcite{veach1997a} also proposed a new mutation-based sampling strategy which exceeds in finding low-probability high-contribution paths which can cause significant noise in classic Monte Carlo methods.
+Furthermore, \textcite{veach1997a} proposed a new mutation-based sampling strategy which exceeds in finding low-probability high-contribution paths which can cause significant noise in classic Monte Carlo methods.
 In addition, Manifold Exploration techniques were developed which excel at discovering highly specular paths \parencite{jakob2012}.
 
 \paragraph{Photon Mapping}
@@ -34,10 +34,10 @@ The original estimator of \textcite{jensen1996} was made consistent by \textcite
 Yet, k-d-tree construction and querying are highly incoherent tasks that are commonly implemented using stacks.
 GPU hardware neither natively supports stacks nor extensive branching, making k-d-trees impractical for real-time rendering.
 To solve this, \textcite{hachisuka2010} proposed to stochastically store photons in a fixed-size hash grid, which improves parallelization and reduces memory access, yet increases noise.
-\textcite{mara2013} later published four further GPU-optimized photon mapping algorithms, two rasterizing photons and two using grids.
+\textcite{mara2013} later published four further GPU-optimized photon mapping algorithms, two of which rasterize photons and two use grids.
 The problem with such linear data structures nonetheless is that they either require stochastic sampling, increasing variance, or linear counting, increasing runtime.
-With the recent advancements in GPU architectures however, traversal of bounding volume hierarchies is hardware accelerated.
-\textcite{evangelou2021} successfully leveraged these modern hardware features to perform fast FRNN queries, leading \textcite{kern2023} to apply this to photon mapping and together with culling and stochastic rejection they achieve real-time performance.
+With the recent advancements in GPU architectures however, traversal of bounding volume hierarchies has become hardware accelerated.
+\textcite{evangelou2021} successfully leverage these modern hardware features to perform fast FRNN queries, leading \textcite{kern2023} to apply this to photon mapping and together with culling and stochastic rejection they achieve real-time performance.
 
 \paragraph{Path Guiding}
 Alternatively, to obtain unbiased estimators, photon maps \parencite{jensen1996} can also be used only to \emph{guide} path sampling \parencite{jensen1995}.
@@ -48,8 +48,9 @@ Alternatively, to obtain unbiased estimators, photon maps \parencite{jensen1996}
 
 \paragraph{Precomputed GI}
 Under the assumption of static geometry and lighting, radiance information can also be precomputed and reused at runtime.
-The first paper to explicitly introduce this concept was \textcite{greger1998} who proposed precomputing irradiance inside a volume to capture indirect illumination, although photon maps \parencite{jensen1996} and illumination maps \parencite{arvo1986,heckbert1990} were already similar in concept.
-\textcite{sloan2002} expanded on this idea by using spherical harmonics to represent the radiance field, allowing for real-time directional global illumination by simply evaluating the dot product between the coefficients of the radiance field and the surface transfer function, a more approachable introduction to their paper is given by \textcite{green2003}.
+The first paper to explicitly introduce this concept was published by \textcite{greger1998} who proposed precomputing irradiance inside a volume to capture indirect illumination, although photon maps \parencite{jensen1996} and illumination maps \parencite{arvo1986,heckbert1990} were already similar in concept.
+\textcite{sloan2002} expanded on this idea by using spherical harmonics to represent the radiance field, allowing for real-time directional global illumination by simply evaluating the dot product between the coefficients of the radiance field and the surface transfer function.
+A more approachable introduction to their paper is given by \textcite{green2003}.
 Since their invention, various improvements to the original method were made \parencite{krivanek2007}.
 Notably, \textcite{kautz2002} generalized this technique to arbitrary BRDFs.
 \textcite{mcguire2017} approached the light leaking problem by introducing light probes that capture radial distance together with radiance in octahedral maps \parencite{engelhardt2008,cigolle2014} which they use for efficient visibility tests.
@@ -85,13 +86,14 @@ ReSTIR can also be combined with other techniques like radiance caching \parenci
 With the recent advancements in Deep Learning, neural rendering techniques have gained great interest in the rendering community and have been applied to a vast array of rendering problems.
 
 \paragraph{Neural GI}
-Several papers exist that add lighting effects as a screen-space post-processing effect to deferred shading buffers, notably \textcite{nalbach2017} use a convolutional U-net that was trained on a wide variety of scenes, while \textcite{thomas2018} use a generative adversarial network (GAN) trained on a per-scene basis.
+Several papers exist that add lighting effects as a screen-space post-processing effect to deferred shading buffers.
+Notably, \textcite{nalbach2017} use a convolutional U-net that was trained on a wide variety of scenes, while \textcite{thomas2018} use a generative adversarial network (GAN) trained on a per-scene basis.
 However, in contrast to world-space methods, screen-space methods have only a limited amount of information about the scene available.
 \textcite{hermosilla2019} thus trained a network to predict global illumination effects on point clouds.
 Other works use per-scene trained networks to approximate indirect illumination in world space \parencite{ren2013}.
 
 \paragraph{Neural Path Guiding}
-\textcite{muller2019} use a specialized variant of normalized flow networks to learn a distribution over the light field, which they use for importance sampling.
+\textcite{muller2019} use a specialized variant of normalized flow networks to learn a probability distribution over the light field, which they use for importance sampling.
 Building on this, \textcite{muller2020} were able to further reduce variance by learning Neural Control Variates.
 
 \paragraph{Neural Interpolation}
@@ -114,4 +116,4 @@ For interactive applications, \textcite{hasselgren2020} combine temporally stabl
 On a further note, Neural Radiance Caching \parencite{muller2021} can also be thought of as a form of Path Space Filtering \parencite{keller2016}.
 
 \section{Prerequisites}
-In this thesis I will mainly build on the NRC by \textcite{muller2021} with the extension of \textcite{muller2022}, but I will introduce a decoupling of the radiance cache similar to what \textcite{walter1999,tole2002} did to combine it with Bidirectional Path Tracing \parencite{veach1997}, light tracing \parencite{arvo1986} and hardware accelerated progressive photon mapping \parencite{jensen1996,kern2023,hachisuka2008}.
+This thesis mainly builds on the NRC by \textcite{muller2021} with the extension of \textcite{muller2022}, but I will introduce a decoupling of the radiance cache similar to what \textcite{walter1999,tole2002} did to combine it with bidirectional path tracing \parencite{veach1997}, light tracing \parencite{arvo1986} and hardware accelerated progressive photon mapping \parencite{jensen1996,kern2023,hachisuka2008}.

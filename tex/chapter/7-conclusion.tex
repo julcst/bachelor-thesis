@@ -3,30 +3,19 @@
 \label{chap:conclusion}
 
 \section{Summary}
+In this thesis, I presented a generalization of radiance caching that enables bidirectional radiance estimation.
+Evaluation showed, that two of the three proposed radiance estimators improve upon the original paper.
+
 The bidirectional estimator performs very comparable to NRC, while improving the quality of indirect illumination.
 It struggles, however, with direct lighting and caustics, because the probability of finding a matching pair of a query and a directly contributing light path is low.
+Nevertheless, it is a competitive alternative to the PT-based training from the original paper \parencite{muller2021}.
 
 The light training estimator has potential to capture sharp details, but suffers from bias which is caused by not sampling shadowed areas.
+Unfortunately, this makes it largely unusable in practice.
 
-The estimator based on Progressive Photon Mapping is particularly robust and produces high quality caustics and indirect illumination, while coming only at a mild performance overhead compared to the original NRC.
-
-\section{Future Work}
-By generalizing Neural Radiance Caching, this thesis opens a wide array of possible future improvements.
-
-\paragraph{Radiance Estimators}
-Particularly interesting is the integration of different radiance estimators.
-Although the SPPC estimator already produces high quality caustics, the density estimation step of Photon Mapping reduces sharpness of high-frequency features and introduces bias at edges.
-It could be interesting to use e.g. Vertex Connection and Merging \parencite{georgiev2012}, Metropolis Light Sampling \parencite{veach1997a}, full MIS-weighted Bidirectional Pathtracing \parencite{lafortune1993,veach1997} or Manifold Exploration techniques \parencite{jakob2012} to generate training data.
-The proposed framework for Radiance Caching does not impose any restrictions on \emph{mixing} different radiance estimators, so independently choosing the best suited radiance estimation strategy for different areas of the scene could also prove interesting.
-
-\paragraph{Radiance Caches}
-The Neural Radiance Cache is fairly expensive to train and infer.
-The MHE encoding significantly improves quality, but the benefit largely comes from the underlying hash grid.
-Thus, manually crafted grid based approaches could also be promising and lighter on performance.
-Using Spherical Harmonics to represent outgoing radiance fields.
-
-It may also be possible to derive a better radiance cache by storing the incoming radiance and BSDFs in a data structure similar to Virtual Point Lights in Instant Radiosity techniques \parencite{keller1997} and connecting to them stochastically through e.g. ReSTIR DI \parencite{bitterli2020}.
-For Virtual Point Lights, this has already been explored by \textcite{bruin2025}.
+The estimator based on Progressive Photon Mapping is particularly robust and produces high quality caustics and indirect illumination, while coming only at a mild performance overhead compared to training by PT.
+This one is promising for practical use cases, since it can produce fairly accurate and noise free renderings of caustics in real-time, which can neither be achieved by pure path tracing nor by the original NRC.
+It comes, however, at the cost of sharpness and time lag, thus it would be interesting to evaluate its performance in dynamic scenes.
 
 \section{Further Optimization}
 
@@ -36,6 +25,27 @@ A better approach would be to stochastically store queries during the inference 
 This would not only be a more accurate approximation of the future querying, it would also likely be lighter on performance because it prevents redundant intersection tests.
 The only downside could be a one frame latency in query prediction, but because the NRC inference is already filtered by an Exponential-Moving-Average this is likely negligible.
 
+Another interesting approach could be to target radiance estimations at prioritized areas in the scene, e.g. in areas that received illumination changes by object or light movement or areas that are focused by the user's attention (for example by gaze detection).
+
 \paragraph{SPPC} As already discussed in \cref{sec:sppc}, synchronization of the atomic accumulation is likely the biggest factor that holds back the performance of hardware accelerated photon mapping.
 Thus, it could be interesting to either explore stochastic evaluation techniques like \textcite{kern2023} or to reduce overlap during query prediction, similar to what e.g. \textcite{stachowiak2018} did for surfel placement.
 Warp Aggregation is a common technique to resolve this in classical GPU programming by first aggregating subsets and then reducing, however OptiX does not expose warps.
+
+\section{Future Work}
+By generalizing Neural Radiance Caching, this thesis opens a wide array of possible future improvements.
+
+\paragraph{Radiance Estimators}
+Particularly interesting is the integration of different radiance estimators.
+Although the SPPC estimator already produces high quality caustics, the density estimation step of Photon Mapping reduces sharpness of high-frequency features and introduces bias at edges.
+It could be interesting to use e.g. Vertex Connection and Merging \parencite{georgiev2012}, Metropolis Light Sampling \parencite{veach1997a}, full MIS-weighted Bidirectional Path Tracing \parencite{lafortune1993,veach1997} or Manifold Exploration techniques \parencite{jakob2012} to generate training data.
+The proposed framework for Radiance Caching does not impose any restrictions on \emph{mixing} different radiance estimators, so independently choosing the best suited radiance estimation strategy for different areas of the scene could also prove interesting.
+
+\paragraph{Radiance Caches}
+The Neural Radiance Cache is fairly expensive to train and infer.
+The MHE encoding significantly improves quality, but the benefit largely comes from the underlying hash grid.
+Thus, manually crafted grid based approaches could also be promising and lighter on performance.
+
+It would be interesting to combine the SPPC estimator with other caches, e.g. based on spherical harmonics \parencite{krivanek2005}.
+
+It may also be possible to derive a better radiance cache by storing the incoming radiance and BSDFs in a data structure similar to Virtual Point Lights in Instant Radiosity techniques \parencite{keller1997} and connecting to them stochastically through e.g. ReSTIR DI \parencite{bitterli2020}.
+For Virtual Point Lights, this has already been explored by \textcite{bruin2025}.

@@ -18,7 +18,7 @@ The rendering equation is an infinite recursive integral over all possible light
 Hence, to solve it we need to resort to numerical integration strategies.
 Deterministic integration methods suffer from the curse of dimensionality as the rendering equation is notoriously high dimensional.
 Thus, we utilize probabilistic approaches to solve it.
-In my reference implementation I use Monte Carlo integration, which was originally developed by \textcite{metropolis1949} as part of the Manhattan Project and first introduced to rendering by \textcite{kajiya1986}.
+We will use Monte Carlo integration, which was originally developed by \textcite{metropolis1949} as part of the Manhattan Project and first introduced to rendering by \textcite{kajiya1986}.
 The idea is, to compute the integral using random samples drawn from a probability distribution, which ideally is chosen as proportional to the integrand as possible.
 
 Applying this to the rendering equation, we can formulate an estimator for the outgoing radiance $L_o$:
@@ -63,22 +63,22 @@ I choose $p_\mathrm{continue}$ proportional to the relative luminance $Y$ \paren
 To improve the convergence of the Monte Carlo integration, low-discrepancy sequences can be used instead of purely random samples.
 Low-discrepancy sequence are designed to fill the integration domain more uniformly than random samples, which can lead to a lower variance in the estimator.
 This approach is called Quasi-Monte Carlo integration and was first introduced to rendering by \textcite{heinrich1994a}.
-\textcite{keller1996a} later showed faster convergence of Quasi-Monte Carlo integration compared to random Monte Carlo integration in exemplary pathtracing scenarios.
+\textcite{keller1996a} later showed faster convergence of Quasi-Monte Carlo integration compared to random Monte Carlo integration in exemplary path tracing scenarios.
 
 Carefully introducing randomness to the low-discrepancy sequence can help to improve convergence further and mitigate visible artifacts caused by the deterministic nature of such sequences.
 This is known as Randomized Quasi-Monte Carlo integration and was first introduced by \textcite{owen1995}.
-For a practical application to pathtracing see for example \textcite{burley2020}.
+For a practical application to path tracing see for example \textcite{burley2020}.
 
 I use the scrambled Sobol' sequence from cuRAND \parencite{nvidiacorporation2024} which is based on the work of \textcite{owen2008}.
 Furthermore, I employ the same technique as the \textcite{blenderfoundation} and only precompute a single Sobol' sequence for the entire scene, which is then decorrelated between pixels using constant random per-pixel shifts modulo 1, also known as Cranley-Patterson rotations \parencite{cranley1976}.
-The Sobol' sequence is regularly recomputed in batches on the GPU to allow for unlimited progressive rendering, the per pixel shifts are only recomputed on frame buffer resize, which makes the technique relatively lightweight.
+The Sobol' sequence is regularly recomputed in batches on the GPU to allow for unlimited progressive rendering, the per pixel shifts are only recomputed on frame buffer resize, which makes this technique relatively lightweight.
 
 \section{Principled BSDF}
 
-As a material model I use a simplified physically based model, which is inspired by the Disney principled BSDF \parencite{burley2012} and conformant with the glTF PBR specification \parencite{thekhronosr3dformatsworkinggroup2021}.
-I restrict myself to the diffuse, specular and transmission components, as they can already cover a wide range of interesting materials and suffice to showcase the strengths and weaknesses of the subsequent techniques.
+As a material model we will use a simplified physically based model, which is inspired by the Disney principled BSDF \parencite{burley2012} and conformant with the glTF PBR specification \parencite{thekhronosr3dformatsworkinggroup2021}.
+The BSDF will be restricted to the diffuse, specular and transmission components, as they can already cover a wide range of interesting materials and suffice to showcase the strengths and weaknesses of the subsequent techniques.
 
-The BSDF is split into two parts: If the light direction $\wi$ and the view direction $\wo$ lie in the same hemisphere, the BRDF is composed of a diffuse and a specular lobe, otherwise it consists only of a transmission lobe:
+The BSDF is split into two parts: If the light direction $\wi$ and the view direction $\wo$ lie in the same hemisphere, the BSDF is composed of a diffuse and a specular lobe, otherwise it only consists of a transmission lobe:
 \begin{equation}
     f(\wi, \vec{x}, \wo) =
     \begin{cases}
@@ -106,7 +106,7 @@ The BSDF is split into two parts: If the light direction $\wi$ and the view dire
 }
 \end{figure}
 
-For the specular component, I use the Torrance-Sparrow/Cook-Torrance microfacet model \parencite{torrance1967, cook1982} with the corrected normalization factor from \textcite{walter2007}:
+For the specular component, we will use the Torrance-Sparrow/Cook-Torrance microfacet model \parencite{torrance1967, cook1982} with the corrected normalization factor from \textcite{walter2007}:
 \begin{equation}
     f_s(\wi, \vec{x}, \wo) = \frac{D(\NdotH) G(\n, \wi, \wo) F(\LdotH)}{4 \NdotL \NdotV}
 \end{equation}
@@ -144,7 +144,7 @@ The transmission component is then the following, as derived by \textcite{walter
     f_t(\wi, \vec{x}, \wo) = \rho_t \frac{D(\NdotH) G(\n, \wi, \wo) (1 - F(\LdotH))}{(\LdotH + \VdotH / \eta)^2} \left|\frac{\LdotH \VdotH}{\NdotL \NdotV}\right|
 \end{equation}
 
-For the diffuse component, I simply use the Lambertian reflectance model:
+For the diffuse component, we simply use the Lambertian reflectance model:
 % TODO: (1-specular_albedo) should be right
 \begin{equation}
     f_d(\wi, \vec{x}, \wo) = \frac{\rho_d}{\pi}
@@ -154,7 +154,7 @@ The Oren-Nayar model is rather computational expensive and not fully energy cons
 Burley's model suffers also from energy conservation issues, but renormalized versions exist \parencite{lagarde2014}.
 However, the Lambertian model has the nice property of being constant over the hemisphere, which can be advantageous for caching.
 
-To parameterize the BSDF, I use a base color $\vec{c} \in [0, 1]^3$, a metallic factor $m \in [0, 1]$, a roughness factor $r \in [0, 1]$ and a transmission factor $t \in [0, 1]$, as follows:
+To parameterize the BSDF, we will use a base color $\vec{c} \in [0, 1]^3$, a metallic factor $m \in [0, 1]$, a roughness factor $r \in [0, 1]$ and a transmission factor $t \in [0, 1]$, as follows:
 \begin{equation}
     \begin{aligned}
         \alpha &= r^2 \\
@@ -163,12 +163,11 @@ To parameterize the BSDF, I use a base color $\vec{c} \in [0, 1]^3$, a metallic 
         F_0 &= 0.04 \cdot (1 - m) + \vec{c} \cdot m \\
     \end{aligned}
 \end{equation}
-Here, I assume the IOR of the surface to be $1.5$, which results in a specular reflectance at normal incidence of $F_0 = 0.04$.
+Here, we assume the IOR of the surface to be $1.5$, which results in a specular reflectance at normal incidence of $F_0 = 0.04$.
 For metals, the base color $\vec{c}$ is used directly as the $F_0$ to simulate wavelength dependent complex-valued IOR.
 
 \section{Importance Sampling}
-
-As aforementioned, the variance of a Monte Carlo estimator can be reduced by sampling the integral using a probability distribution that is as proportional to the integrand as possible.
+As mentioned above, the variance of a Monte Carlo estimator can be reduced by sampling the integral using a probability distribution that is as proportional to the integrand as possible.
 Revisiting the rendering equation (\cref{eq:rendering_equation}), we first concentrate on sampling the term $f(\wi, \vec{x}, \wo) \cos(\theta_i)$ of the integrand.
 Also sampling $L_i(\vec{x}, \wi)$ is not that easy, because to obtain $L_i$ we would need to solve the rendering equation again.
 Yet, several approaches have been made to also take $L_i$ into account, notably direct light sampling \parencite{veach1997}, path guiding \parencite{muller2017,muller2019,lafortune1995,jensen1995} and ReSTIR \parencite{bitterli2020}.
@@ -184,7 +183,7 @@ For the specular and transmissive components, I sample the distribution of visib
     p_\mathrm{VNDF}(\wm \mid \wo) = \frac{G_1(\wo, \wm) D(\NdotH) |\VdotH|}{|\NdotV|}
 \end{equation}
 Sampling this instead of the NDF reduces the variance at grazing angles, where many microfacets are shadowed.
-To sample the VNDF, I use the method proposed by \textcite{dupuy2023}, which improves upon the original method \parencite{heitz2014a} and its follow-up \parencite{heitz2018}.
+To sample the VNDF, I use the method proposed by \textcite{dupuy2023}, which improves upon the original method by \textcite{heitz2014a} and its follow-up \parencite{heitz2018}.
 
 To weigh the BSDF, the VNDF has first to be transformed into a probability distribution over the domain of incoming directions $\wi$ using the Jacobian of the reflection operator \parencite{walter2007}:
 \begin{equation}
@@ -232,7 +231,6 @@ The combined sampling distribution is then given by:
 \end{equation}
 
 \section{Evaluation of the Weighted BSDF}
-
 Most of the time, we do not need to evaluate the BSDF directly, but rather the weighted BSDF, which is given by:
 \begin{equation}
     \begin{aligned}
@@ -255,7 +253,6 @@ For the reflective part we then get:
         k &= 4 \NdotL \NdotV
     \end{aligned}
 \end{equation}
-
 And for the transmissive part:
 \begin{equation}
     \begin{aligned}
@@ -265,7 +262,6 @@ And for the transmissive part:
         = \rho_t \frac{G_1^{-1} (1 - F)}{G^{-1} P_t}
     \end{aligned}
 \end{equation}
-
 I used the fact that $G$ and $G_1$ are both reciprocals to eliminate unnecessary divisions:
 \begin{equation}
     \begin{aligned}
@@ -276,8 +272,8 @@ I used the fact that $G$ and $G_1$ are both reciprocals to eliminate unnecessary
 
 \section{Multiple Importance Sampling}
 \label{sec:mis}
-
-BSDF importance sampling already works well for glossy materials and diffuse lighting, when it comes to diffuse materials and direct lighting however, it has rather high variance and does not work at all for infinitesimal light sources.
+BSDF importance sampling already works well for glossy materials and diffuse lighting.
+When it comes to diffuse materials and direct lighting however, it has rather high variance and does not work at all for infinitesimal light sources.
 In these scenarios, direct light sampling is much more efficient, which samples the light sources instead of the BSDF.
 
 To maximize path reuse, a common strategy is to draw from both sampling strategies at every path vertex, using the BSDF sampling for path continuation and the light sampling for light collection.
@@ -291,15 +287,14 @@ where $N$ is the number of sampling strategies, $N_i$ is the number of samples d
 This estimator is again trivially unbiased.
 
 A naïve way to combine these two sampling strategies would be to simply weigh them equally.
-However, this is suboptimal, as the resulting variance is then simply the average of the variances of both sampling strategies.
+However, this is suboptimal, as the resulting variance would then simply be the average of the variances of both sampling strategies.
 Instead, \textcite{veach1997} also introduced a provably optimal way to combine multiple sampling strategies, called the balance heuristic:
 \begin{equation}
 \label{eq:balance_heuristic}
     w_i(\hat{x}) = \frac{N_i p_i(\hat{x})}{\sum_{j} N_j p_j(\hat{x})}
 \end{equation}
-
 Intuitively spoken, each sampling strategy is weighted according to how likely it is to produce the given sample.
-Thus, a sample is weighted lower, if it is in an outlier of the generating distribution.
+Thus, a sample is weighted lower, if it is in an outlier of the generating distribution, and higher, if it is an inlier.
 
 As suggested by \textcite{veach1997}, I use the power heuristic generalization with a sharpening exponent of $\beta=2$ to combine BSDF and light sampling:
 \begin{equation}

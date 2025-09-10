@@ -3,3 +3,4 @@
 {"rule":"ADVERB_OR_HYPHENATED_ADJECTIVE","sentence":"^\\QThe Chess scene is a complex textured scene composed of public domain assets from\\E$"}
 {"rule":"ADVERB_OR_HYPHENATED_ADJECTIVE","sentence":"^\\QThe Chess scene is a complex textured scene composed of public domain assets from \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q.\\E$"}
 {"rule":"POSSESSIVE_APOSTROPHE","sentence":"^\\QThe Caustics scene contains complex sharp caustic patterns challenging for traditional path tracing.\\E$"}
+{"rule":"COMMA_COMPOUND_SENTENCE","sentence":"^\\QAdditionally, they omit biases as they did not observe a measurable benefit and it simplifies the implementation.\\E$"}

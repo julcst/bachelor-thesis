@@ -3,37 +3,37 @@
 \label{chap:bidirectional_caching}
 
 \section{A General Theoretical Framework for Radiance Caching}
-Before proposing new radiance caching techniques, I first want to take a step back and analyze radiance caching in general.
-
+Before proposing new radiance caching techniques, I first want to take a step back and formulate a theoretical backbone.
 Radiance caching generally can be broken down into four steps:
-
 \begin{enumerate}
     \item \textbf{Training}
     \begin{enumerate}
         \item \textbf{Query Prediction} First, we want to predict potential queries $\hat{q} = (\vec{x}, \vec{\omega}_o)$ according to a distribution $\hat{Q}(\hat{q})$.
         \item \textbf{Radiance Estimation} Given a predicted query $\hat{q}$, we want to estimate the outgoing radiance $L_o(\hat{q})$ at that query.
-        For this, we can use any possible combination of radiance estimation techniques, such as path tracing, light tracing, photon mapping or bidirectional path tracing (BDPT).
+        For this, we can use any possible combination of radiance estimation techniques, such as path tracing, light tracing, photon mapping or bidirectional path tracing.
     \end{enumerate}
     \item \textbf{Inference}
     \begin{enumerate}
         \item \textbf{Query Sampling} We sample queries $q = (\vec{x}, \vec{\omega}_o)$ according to a distribution $Q(q)$.
         \item \textbf{Interpolation} Given a query $q$, we want to approximate the outgoing radiance $\hat{L}_o(q)$ by interpolating the radiance estimates of spatio-temporally nearby query predictions $\hat{q}$.
-        We can use any combination of storing and interpolation technique for this, such as nearest neighbor, linear interpolation or, in our case, the NRC.
+        We can use any storing and interpolation technique for this, such as nearest neighbor, linear interpolation or, in our case, the NRC.
         Note however, that this step generally introduces \emph{bias}.
     \end{enumerate}
 \end{enumerate}
 
-\paragraph{Note:}
+\paragraph{Cache Efficiency}
 \label{par:cache_efficiency}
 Using this framework we can observe that the \emph{cache efficiency} is optimal if the query prediction distribution $\hat{Q}(\hat{q})$ is equal to the query sampling distribution $Q(q)$.
 Conversely, if we sample a query $q^*$ that can not be predicted by the query predictor (i.e. $\hat{Q}(q^*)=0$), we introduce fundamental bias into the radiance cache $\hat{L}_o(q^*)$, because the radiance cache will not contain an accurate radiance estimate for that query.
 This happens, whenever the support of the query sampling distribution $Q$ is not contained in the support of the query prediction distribution $\hat{Q}$, i.e. $\supp(Q) \not\subseteq \supp(\hat{Q})$.
 
+In the original formulation of radiance caching by \textcite{ward1988} and in NRC by \textcite{muller2021}, the filling of the cache and the querying are closely linked.
+By decoupling these two steps, however, we gain a lot of flexibility in choosing different strategies for both steps.
 The general idea of decoupling radiance estimation and visualization was already explored by others, notably \textcite{walter1999} and \textcite{tole2002}.
 
 \section{The Path Space Integral Formulation}
 \label{sec:path_space_integral}
-To be able to robustly derive the following radiance estimators, I will use an alternative but equivalent formulation of the rendering equation as an integral over the path space, which was first introduced by \textcite{veach1997}.
+To be able to robustly derive the following radiance estimators, we will use an alternative but equivalent formulation of the rendering equation as an integral over the path space, which was introduced by \textcite{veach1997}.
 \begin{figure}[htb!]
     \centering
     \includegraphics{asy/path_integral.pdf}
@@ -41,7 +41,7 @@ To be able to robustly derive the following radiance estimators, I will use an a
 \label{fig:path_space_integral}
 \end{figure}
 
-A path $\bar{x}$ of length $n$ is defined as a sequence of vertices $\vec{x}_0 \vec{x}_1 \dots \vec{x}_n$.
+A path $\bar{x}$ of length $n$ is defined as a sequence of vertices $\vec{x}_0 \vec{x}_1 \cdots \vec{x}_n$.
 Let the space of all paths of length $n$ be $X_n$ and the space of all paths $X = \bigcup_{n=1}^{\infty} X_n$.
 Then, the path space integral formulation of the rendering equation is given by:
 \begin{equation}
@@ -49,7 +49,7 @@ Then, the path space integral formulation of the rendering equation is given by:
 \begin{aligned}
     I
     = \sum_{n=0}^{\infty} \int_{X_n} L_e(\pdir{0}{1}) \G{0}{1} &\prod_{i=1}^{n - 1} \f{i-1}{i}{i+1} \G{i}{i+1}\\
-    &\cdot W(\pdir{n-1}{n}) \diff A(\vec{x}_0) \dots \diff A(\vec{x}_n)
+    &\cdot W(\pdir{n-1}{n}) \diff A(\vec{x}_0) \cdots \diff A(\vec{x}_n)
 \end{aligned}
 \end{equation}
 To collect incoming radiance at a sensor point $\vec{x}_n$, the path space integral formulation contains a sensor weighting term $W(\pdir{n-1}{n})$, which in the case of an infinitesimal pin-hole camera is simply a Dirac-Delta-function over the eye position and a box function over the viewing directions covered by the pixel.
@@ -181,8 +181,7 @@ To limit the path length, I use Russian Roulette Termination (\cref{eq:rr}) agai
 
 \paragraph{Query Prediction}
 In practice, I only predict queries by shooting primary camera rays, because this is already a good approximation of the query sampling distribution $Q(q)$ for the path termination strategies given in \cref{sec:path_termination}.
-A more accurate and efficient method however would be to randomly draw queries from the queries already generated in the inference stage.
-Unfortunately, I did not have the time to implement this.
+A more accurate and efficient method however would be to randomly draw queries from the queries already generated in the previous inference stage.
 % TODO: Implement
 
 \section{Bidirectional Training (BT)}
@@ -243,8 +242,8 @@ The sum over the path length is split into two parts because the first vertex $\
     \caption{Visualization of light training for query prediction: Every new light vertex is first handled as a query ($\vec{q}_i$) and collects radiance from all previous vertices according to \cref{eq:bidir}.}
     \label{fig:light_bootstrap}
 \end{figure}
-However, despite sampling light paths, the estimator from \cref{sec:re_bidir} only finds indirect illumination by caustics efficiently, since given a specific query, the probability to connect to a glossy light path directly is still low (\cref{fig:caustic_bidir}).
-So, instead of predicting queries solely from the eye, we can also collect radiance at future vertices of the light path.
+Despite sampling light paths, the estimator from \cref{sec:re_bidir} only finds indirect illumination by caustics efficiently, since given a specific query, the probability to connect to a glossy light path directly is still low (\cref{fig:caustic_bidir}).
+So, instead of predicting queries solely from the eye, we can also collect radiance at future vertices of the light path (see \cref{fig:light_bootstrap}).
 At a light vertex, we are guaranteed to get strong contribution at least from the previous vertex, because we sampled it directly through BSDF sampling.
 It would also be possible to sample independent queries from the light vertices instead of reusing the next light vertex and this may in fact be an interesting algorithm to explore, though this is outside the scope of this thesis.
 
@@ -273,9 +272,9 @@ This can be clearly visible depending on the scene and will be further discussed
 To counteract this drawback, we can make a simple observation:
 If a query is not reachable from a light source, it does not receive energy, thus the radiance at such queries can be safely assumed to be zero.
 Because the Neural Radiance Cache performs averaging in local neighborhoods, we can carefully introduce samples with radiance zero according to the query sampling distribution $Q(q)$.
-By weighting the valid samples with the inverse of the ratio of zero samples, we can ensure that the mean over a local neighborhood is still correct:
+By weighting the valid samples with the inverse of the ratio of valid samples, we can ensure that the mean over a local neighborhood is still correct:
 \begin{equation}
-\expectationvar{q}{{\widehat{L}_o}(\vec{x}_q, \wo_q)} = p_0 \cdot 0 + \frac{1}{n} \sum_{q \in Q} \frac{1}{p_0} L_o(\vec{x}_q, \wo_q) = \widehat{L}_o(\vec{x}_q, \wo_q)
+\expectationvar{q}{{\widehat{L}_o}(\vec{x}_q, \wo_q)} = \frac{1}{n} \sum_{q \in Q} (1 - p_0) \cdot \frac{L_o(\vec{x}_q, \wo_q)}{(1 - p_0)} + p_0 \cdot 0 = \frac{1}{n} \sum_{q \in Q} L_o(\vec{x}_q, \wo_q)
 \end{equation}
 
 Essentially this algorithm models a sort of output decay on the NRC, dragging its prediction towards zero.
@@ -313,10 +312,10 @@ The simplest such kernel function is the box function, with $w_{\vec{x},r}(\hat{
 \end{figure}
 
 \paragraph{Query Lifetimes}
-Because we couple Photon Mapping with Radiance Caching, we can make some important modifications to the original algorithm:
-Firstly, we do not need to query the photon map at every pixel, since the Radiance Cache interpolates between sparse samples.
+Because we couple Photon Mapping with radiance caching, we can make some important modifications to the original algorithm:
+Firstly, we do not need to query the photon map at every pixel, since the radiance cache interpolates between sparse samples.
 So, we can reduce the amount of queries to a fixed number independent of render resolution.
-Secondly, I chose to store the \emph{queries} instead of the \emph{photons} in a spatial data structure.
+Secondly, we can store the \emph{queries} instead of the \emph{photons} in a spatial data structure.
 This enables the queries to persist across multiple frames and collect incoming flux over multiple light passes.
 The lifetimes of the queries can be made completely independent of each other by keeping track of the total amount of light samples already drawn at creation time of a query.
 The difference between the current count of light samples and the count at creation gives the number of total light samples $n$ that are used in the collection of flux for that query (\cref{eq:pm}).
@@ -361,7 +360,7 @@ The lifetime of a query is thus approximately $1/\kappa$ frames, yet it can also
             %\bottomrule
         \end{tabular}
     \end{subtable}
-    \caption{The structs used to represent photons and queries. Unit vector compression strategies \parencite{cigolle2014} could be applied to reduce the memory footprint, to keep the code simple I refrained from doing so in my implementation.}
+    \caption{The structs used to represent photons and queries. Unit vector compression strategies \parencite{cigolle2014} could be applied to reduce the memory footprint. To keep the code simple however, this is not done in the accompanying implementation.}
 \end{table}
 
 \paragraph{Radius Reduction}
@@ -371,8 +370,8 @@ However, this also introduces bias, as these additional photons may not be an ac
 Shrinking the radius $r$ towards zero eliminates this bias in the limit, but the number of available estimates also decreases, increasing the variance.
 More precisely, \textcite{knaus2011} showed that $\mathrm{Bias}\left[\estimator{{L_o}_\mathrm{PM}}\right] \sim r^2 \sim 1/\mathrm{Var}\left[\estimator{{L_o}_\mathrm{PM}}\right]$.
 
-Leveraging this observation, \textcite{hachisuka2008} developed Progressive Photon Mapping (PPM), originally as a technique to make classic Photon Mapping consistent and to overcome the memory constraint of storing a single photon map.
-Their idea was to perform multiple light passes, shrinking the radius after every iteration, yet never too much, as there has to be a gain in the total amount of photons, otherwise the estimator diverges.
+Leveraging this observation, \textcite{hachisuka2008} developed Progressive Photon Mapping (PPM), originally as a technique to make classic Photon Mapping consistent and to overcome the memory constraint of storing a single large photon map.
+Their idea was to perform multiple light passes, shrinking the radius after each iteration, yet never too much, as there has to be a gain in the total amount of photons, otherwise the estimator diverges.
 Therefore, they introduce a factor $\alpha$ to control the fraction of photons to keep after each light pass (\cref{eq:ppm_n}).
 By fixing the photon density inside the area of the query (\cref{eq:ppm_r}), they derive following update rules:
 \begin{subequations}
@@ -388,15 +387,15 @@ The total outgoing flux has also to be scaled down to the reduced area $A'$ (\cr
 \paragraph{Hardware Acceleration}
 The original k-d-tree method of storing photons by \textcite{jensen1996} is not suitable for GPUs.
 Thus, this implementation instead follows the idea of \textcite{evangelou2021}, who proposed to leverage hardware accelerated Bounding Volume Hierarchies (BVHs) for fast Fixed-Radius-Near-Neighbor queries.
-Their approach was to store the queries as balls of radius equal to their search radius $r_i$ and to represent the data points by shooting infinitesimal rays.
+Their approach is to store the queries as balls of radius equal to their search radius $r_i$ and to represent the data points by shooting infinitesimal rays.
 Finding an intersection is then equivalent to finding a data point within $r_i$ around the query.
 
 \paragraph{Algorithm Overview}
 Applied to Photon Mapping, this means we first store the Axis-Aligned Bounding Boxes (AABBs) of the queries in an array and use OptiX to construct a BVH.
 Then, we sample the light paths and at each non-specular scene intersection (\cref{par:pt_1st_diffuse}), we shoot infinitesimal rays into the query-BVH.
-In the intersection program, we simply compare the squared distance of the ray origin with the squared radius of the query ball.
+In the intersection program, we simply compare the squared distance to the ray origin with the squared radius of the query ball.
 If the distance is smaller, we atomically accumulate the BSDF-weighted incoming flux of the photon to the flux of the query $\Phi_o$.
-After the light pass we apply Radius Reduction and use the radiance estimates to update the radiance cache.
+After the light pass we apply radius reduction and use the radiance estimates to update the radiance cache.
 
 \paragraph{Notes on Performance}
 If the queries are dense or the radius is large, many queries will overlap, causing the atomic accumulation to be serialized and stalling the GPU threads.
@@ -405,12 +404,7 @@ Yet, because we allow the queries to have independent lifetimes, a global radius
 Fortunately though, we partially avoid serialization since our queries are only distributed sparsely.
 An interesting idea to resolve this problem would be to check for overlap during query prediction and reject queries that overlap too much with existing queries, or to use an iterative screen-space hole-filling approach like \textcite{stachowiak2018}.
 This would also automatically sample caustics more densely, as caustics receive more light samples, making the radius shrink faster, thus reducing overlap and creating space for new queries.
-\textcite{kern2023} stochastically reject $70\%$ of all non-caustic photons, this could also benefit performance in our case.
+Additionally, \textcite{kern2023} stochastically reject $70\%$ of all non-caustic photons, which could also benefit performance in our case.
 Furthermore, to improve quality at corners, they reject photons with strongly deviating normals.
-
-% Global Radius
-% Reject non-caustic photons stochastically
-% Reject Photons with deviating normals
-% Reject overlapping queries
 
 %\section{Hardware Accelerated Vertex Connection and Merging}

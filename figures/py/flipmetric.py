@@ -168,6 +168,8 @@ def save_flip_pngs(prefix: str, ref: str, tests: list[str], suffix="", msuffix="
                 f"&\\FLIP/MSE:{error_row}\\\\\n"
                 f"&$\\mathrm{{Bias}}^2/\\mathrm{{Variance}}${bias_var_row}\\\\\n")
 
+convert_to_png("tests/path_termination/rawcache_1spp_thinker")
+
 save_flip_pngs("tests/path_termination/", "ref_1min_thinker", [
     "ref",
     "sah",
