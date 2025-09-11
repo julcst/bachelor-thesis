@@ -40,7 +40,7 @@ It contains decimated and remeshed version of the Thinker statue by Auguste Rodi
         & Reference & TWE & MHE \\
         \input{figures/py/tests/encodings/Thinker.tex}
     \end{tabularx}
-    \caption{Comparison of different input encodings}
+    \caption{Comparison of the different input encodings.}
     \label{fig:encodings}
 \end{figure}
 \paragraph{Input Encodings}
@@ -126,6 +126,7 @@ This could potentially be caused by an older GPU architecture, the following tes
         \tiny
         \begin{tabularx}{\linewidth}{r*{4}{>{\centering\arraybackslash}X}}
             &Reference & SER & SER, 70\% & SER, 70\%, 30° \\
+            % NOTE: Manually removed timings, because they do not reflect the performance of the first frame
             \input{figures/py/tests/photon_optimization/Caustics}
         \end{tabularx}
     \end{subfigure}%
