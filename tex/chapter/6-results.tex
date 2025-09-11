@@ -90,7 +90,7 @@ Combining the inference with NEE did only benefit the less aggressive terminatio
 Furthermore, they use 4 training steps with a batch size of $2^{14}=16,384$ each.
 Tests show, that the usage of multiple training steps per frame leads to faster cache convergence (see \cref{fig:batch_size}) while larger training sets evidently result in lower error.
 However, multiple training steps also slow down performance.
-The following tests use single training steps of size $2^{17}=131,072$, as this gave the best results for SPPC (see \cref{fig:sppc_optimization}).
+The following tests use single training steps of size $2^{17}=131,072$, to minimize error.
 
 \begin{figure}[htb!]
     \centering
