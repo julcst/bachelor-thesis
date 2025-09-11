@@ -125,7 +125,7 @@ This could potentially be caused by an older GPU architecture, the following tes
         \centering
         \tiny
         \begin{tabularx}{\linewidth}{r*{4}{>{\centering\arraybackslash}X}}
-            &Reference (SPPM) & SER & SER, 70\% & SER, 70\%, 30° \\
+            &Reference & SER & SER, 70\% & SER, 70\%, 30° \\
             \input{figures/py/tests/photon_optimization/Caustics}
         \end{tabularx}
     \end{subfigure}%
@@ -142,13 +142,13 @@ This could potentially be caused by an older GPU architecture, the following tes
             SER, 70\%, 30$^{\circ}$ & 123.58ms & $-22.5\%$
         \end{tabular}
     \end{subfigure}
-    \caption{Optimizations to Photon Mapping. \emph{IS only} directly accumulates in the Intersection Shader (IS) and skips the Any Hit Shader (AH). \emph{SER} uses Shader Execution Reordering between the Intersection and Any Hit shader to improve coherence. \emph{SER, 70\%} additionally rejects 70\% of the non-caustic photons in the Any Hit shader \parencite{kern2023}. \emph{SER, 70\%, 30$^{\circ}$} rejects photon hits whose surface normals deviate more than 30° from the surface normals at the query point \parencite{kern2023}. The most notable performance improvement comes from rejecting non-caustic photons, however, this notably increases error in non-caustic areas. Rejecting photons based on normal deviation has a small positive performance impact and decreases bias.}
+    \caption{Optimizations to Photon Mapping. \emph{IS only} directly accumulates in the Intersection Shader (IS) and skips the Any Hit Shader (AH). \emph{SER} uses Shader Execution Reordering between the Intersection and Any Hit shader to improve coherence. \emph{SER, 70\%} additionally rejects 70\% of the non-caustic photons in the Any Hit shader \parencite{kern2023}. \emph{SER, 70\%, 30$^{\circ}$} rejects photon hits whose surface normals deviate more than 30° from the surface normals at the query point \parencite{kern2023}. The most notable performance improvement comes from rejecting non-caustic photons, however, this notably increases error in non-caustic areas. Rejecting photons based on normal deviation has a small positive performance impact and decreases bias. Timings are averaged over 16 runs.}
     \label{fig:photon_optimization}
 \end{figure}
 \paragraph{Photon Mapping} To optimize Photon Mapping, several optimizations were tested on full SPPM (see \cref{fig:photon_optimization}).
 The biggest performance improvement was achieved by stochastically rejecting a significant portion of the non-caustic photons, as proposed by \textcite{kern2023}.
-This however decreases quality in non-caustic areas, and the performance gain does not carry over to SPPC (see \cref{fig:sppc_optimization}), where the overlap of queries is limited, so we do not use rejection for evaluation.
-In the following tests, $100,000$ photons are traced per frame, with an initial query radius of $0.001$ and a radius reduction factor of $\alpha=0.7$.
+This however decreases quality in non-caustic areas, and the performance gain does not carry over to SPPC (see \cref{fig:sppc_optimization}) where the overlap of queries is limited, so we do not use rejection for evaluation.
+In the following tests, $100,000$ photons are traced per frame, with an initial query radius of $0.001$, a radius reduction factor of $\alpha=0.7$ and a query replacement factor of $\kappa=0.001$, resulting in an approximate query lifetime of $1,000$ frames.
 
 \section{Evaluation}
 
@@ -176,7 +176,7 @@ The improved quality comes with an overhead of around $3-5$ms per frame but stil
 
 \Cref{fig:light_training_comparison} takes a closer look at light training.
 Different balancing strategies were tested to counteract the bias, \emph{Surface Balancing} generates zero samples uniformly on the surfaces in the scene, while \emph{Camera Balancing} generates zero samples by shooting primary camera rays.
-Both times, the samples are mixed in at a ratio of 1:1 with the light training samples.
+Both times, the samples are mixed in at a ratio of 1:1 with the light training samples, so the light training samples are weighted twice as high.
 Unfortunately, neither of these strategies achieve a stable mixing ratio, with surface balancing dragging the cache too little towards zero and camera balancing dragging it too much.
 Light training is also compared to simply storing the outgoing flux at the light path vertices (\emph{Naïve}).
 Surprisingly, this produces better results than light training, even with the technique not being a valid radiance estimator.
@@ -192,7 +192,7 @@ Yet, it is still too far from the reference to be usable.
 \begin{figure}[htb!]
     \centering
     \input{figures/py/breakdown.pgf}
-    \caption{Performance breakdown of the different rendering techniques. Measured in 720p-equivalent $960^2$px resolution on the \textsc{Thinker} scene on an NVIDIA RTX 3060 Ti and averaged over 10s.}
+    \caption{Performance breakdown of the different rendering techniques. Measured in 720p-equivalent $960^2$px resolution on the \textsc{Thinker} scene on an NVIDIA RTX 3060 Ti and averaged over 10s. The \emph{other} category represents memory and timing operations.}
     \label{fig:breakdown}
 \end{figure}
 
